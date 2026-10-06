@@ -12,10 +12,11 @@ Idioma: **português do Brasil** em todo texto visível, nos comentários, nos c
 
 ```bash
 python3 -m http.server 8000          # servir o site em http://localhost:8000
-node --test tests/catalogo-core.test.js   # testes (Node 18+)
+node --test tests/catalogo-core.test.js   # regras de negócio (Node 18+)
+node --test tests/e2e.test.js             # telas (precisa do pacote playwright e de um Chromium)
 ```
 
-Não há linter nem build. Antes de entregar qualquer mudança, rode os testes e abra as páginas afetadas em largura de celular (375px) e de desktop (1280px), sem rolagem horizontal e sem erros no console.
+Não há linter nem build. Antes de entregar qualquer mudança, rode os dois conjuntos de testes (o de telas já checa rolagem horizontal, erros de console, rótulos e `alt`) e abra as páginas afetadas em largura de celular (375px) e de desktop (1280px), sem rolagem horizontal e sem erros no console.
 
 ## Arquitetura
 
@@ -23,6 +24,7 @@ Não há linter nem build. Antes de entregar qualquer mudança, rode os testes e
 - `catalogo.js` (catálogo, produto, pedido) e `admin.js` só cuidam de interface e chamam o core. A página é escolhida por `<body data-page="catalogo|produto|pedido|admin">`.
 - `catalogo-dados.js` define `window.CAPIM_PRODUTOS_PADRAO`. A administração grava a lista editada no `localStorage` (chave `capim.produtos.v1`) e `carregarProdutos` a prefere ao padrão.
 - `styles.css` é único para o site inteiro. Reaproveite os tokens de `:root` (`--wine`, `--paper`, `--sans`, `--serif`…) e os componentes existentes (`.button`, `.field`, `.chips`, `.page-hero`, `.notice`) em vez de criar estilos novos.
+- Em grids que viram uma coluna no celular, use `minmax(0, 1fr)` e não `1fr`, senão tabelas largas estouram a largura da tela.
 - Os scripts das páginas de catálogo carregam, nesta ordem: `catalogo-dados.js`, `catalogo-core.js`, `catalogo.js`.
 
 ## Regras de negócio que não podem quebrar

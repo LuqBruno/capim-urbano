@@ -30,11 +30,14 @@ Abrir os arquivos direto pelo navegador (`file://`) também funciona, mas use um
 
 ## Testes
 
-Requer Node 18 ou superior. Cobrem as regras de negócio (filtros, validação do pedido, mensagem do WhatsApp, cadastro):
+Requer Node 18 ou superior.
 
 ```bash
-node --test tests/catalogo-core.test.js
+node --test tests/catalogo-core.test.js   # regras de negócio (filtros, validação, mensagem do WhatsApp, cadastro)
+node --test tests/e2e.test.js             # telas: fluxo, responsividade (375/768/1280px) e acessibilidade básica
 ```
+
+Os testes de tela usam o pacote `playwright` (`npm i -g playwright`) e um Chromium. Sem o pacote, eles são ignorados. Use `CHROMIUM_PATH=/caminho/do/chromium` para apontar um navegador específico.
 
 ## Estrutura
 
