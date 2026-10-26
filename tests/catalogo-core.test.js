@@ -80,3 +80,8 @@ test('cadastro: validação, slug e armazenamento', () => {
   mem.d[C.STORAGE_KEY] = '{quebrado';
   assert.strictEqual(C.carregarProdutos(produtos, mem).length, produtos.length);
 });
+
+test('cuidados, durabilidade e prazo: texto ou aviso quando ausente (US04)', () => {
+  assert.strictEqual(C.textoOuAviso('  Longe da água  '), 'Longe da água');
+  for (const vazio of ['', '   ', undefined, null, 42]) assert.strictEqual(C.textoOuAviso(vazio), C.AVISO_SEM_INFO);
+});

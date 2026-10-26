@@ -35,13 +35,14 @@
             <button class="button button-light" type="button" id="exportar">Exportar JSON</button>
             <label class="button button-light file-button">Importar JSON<input type="file" id="importar" accept="application/json" hidden></label>
             <button class="button button-light" type="button" id="restaurar">Restaurar padrão</button>
+            <a class="button button-light" href="catalogo.html" target="_blank" rel="noopener">Ver como o cliente vê</a>
           </div>
-          <p id="admin-status" class="count" role="status" aria-live="polite"></p>
+          <p id="admin-status" class="admin-status" role="status" aria-live="polite"></p>
           <div class="table-wrap">
             <table class="admin-table">
               <caption class="sr-only">Produtos cadastrados</caption>
               <thead><tr><th scope="col">Produto</th><th scope="col">Preço</th><th scope="col">Disponibilidade</th><th scope="col">No catálogo</th><th scope="col">Ações</th></tr></thead>
-              <tbody id="tabela"></tbody>
+              <tbody id="tabela"><tr><td colspan="5" class="table-state">Carregando produtos…</td></tr></tbody>
             </table>
           </div>
         </div>

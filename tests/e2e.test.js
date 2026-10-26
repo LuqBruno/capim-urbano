@@ -130,3 +130,81 @@ test('acessibilidade: campos com rótulo, imagens com alt e menu por teclado (NF
   assert.strictEqual(await page.getAttribute('.menu-toggle', 'aria-expanded'), 'false');
   await ctx.close();
 });
+
+test('produto: cuidados, durabilidade e prazo aparecem para cada produto (US04)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.celular, 'produto.html?id=vaso-terracota-capim');
+  const specs = await page.locator('.specs .spec').allTextContents();
+  const texto = specs.join(' | ');
+  assert.match(texto, /Prazo de produção ou entrega/);
+  assert.match(texto, /Durabilidade.*Mais de 1 ano/);
+  assert.match(texto, /Cuidados.*longe de água/);
+  assert.strictEqual(await page.locator('.spec-missing').count(), 0);
+  await ctx.close();
+});
+
+test('produto sem cuidados e durabilidade mostra aviso, sem campo vazio (US04)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'admin.html');
+  await page.fill('#a-nome', 'Sem detalhes'); await page.fill('#a-cat', 'Teste'); await page.fill('#a-desc', 'd');
+  await page.fill('#a-fotos', 'imagens/web/capim5.webp'); await page.fill('#a-prazo', '3 dias');
+  await page.click('#form-produto button[type=submit]');
+  await page.goto(base + 'produto.html?id=sem-detalhes');
+  assert.strictEqual(await page.locator('.spec-missing').count(), 2);
+  assert.match(await page.locator('.spec-missing').first().textContent(), /Não informado/);
+  await ctx.close();
+});
+
+test('administração: edição e disponibilidade refletem no catálogo e no pedido (US06, RN01)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'admin.html');
+  await page.click('button[aria-label="Editar: Vaso terracota com capim laranja"]');
+  assert.strictEqual(await page.inputValue('#a-nome'), 'Vaso terracota com capim laranja');
+  await page.fill('#a-preco', '150,50');
+  await page.selectOption('#a-disp', 'indisponivel');
+  await page.click('#form-produto button[type=submit]');
+  assert.match(await page.textContent('#admin-status'), /Produto salvo/);
+  await page.goto(base + 'catalogo.html');
+  const cartao = page.locator('.product-card', { hasText: 'Vaso terracota com capim laranja' });
+  assert.match(await cartao.textContent(), /150,50/);
+  assert.match(await cartao.textContent(), /Indisponível/);
+  await page.goto(base + 'produto.html?id=vaso-terracota-capim');
+  assert.strictEqual(await page.locator('a', { hasText: 'Fazer pedido' }).count(), 0, 'indisponível não oferece pedido');
+  await page.goto(base + 'pedido.html?produto=vaso-terracota-capim');
+  await page.fill('#p-nome', 'Ana'); await page.fill('#p-ocasiao', 'x'); await page.fill('#p-cores', 'y');
+  await page.click('button[type=submit]');
+  assert.strictEqual(await page.locator('#resumo').isVisible(), false);
+  await ctx.close();
+});
+
+test('administração: desativar remove do catálogo e reativar devolve (US06)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'admin.html');
+  const nome = 'Guirlanda de flores desidratadas';
+  await page.click(`button[aria-label="Desativar: ${nome}"]`);
+  assert.match(await page.textContent('#admin-status'), /Desativado/);
+  await page.goto(base + 'catalogo.html');
+  assert.strictEqual(await page.locator('.product-card', { hasText: nome }).count(), 0);
+  await page.goto(base + 'admin.html');
+  await page.click(`button[aria-label="Reativar: ${nome}"]`);
+  await page.goto(base + 'catalogo.html');
+  assert.strictEqual(await page.locator('.product-card', { hasText: nome }).count(), 1);
+  await ctx.close();
+});
+
+test('administração: estados de carregamento, vazio, sucesso e erro (Trello: interface administrativa)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.celular, 'admin.html');
+  assert.strictEqual(await page.locator('#tabela tr').count(), 7);
+  // erro de validação
+  await page.click('#form-produto button[type=submit]');
+  assert.strictEqual(await page.getAttribute('#admin-status', 'role'), 'alert');
+  assert.match(await page.textContent('#admin-status'), /Corrija/);
+  // erro de importação
+  await page.setInputFiles('#importar', { name: 'ruim.json', mimeType: 'application/json', buffer: Buffer.from('{quebrado') });
+  await page.waitForFunction(() => /inválido/.test(document.getElementById('admin-status').textContent));
+  assert.ok(await page.locator('.admin-status.is-error').count());
+  // estado vazio e sucesso
+  await page.setInputFiles('#importar', { name: 'vazio.json', mimeType: 'application/json', buffer: Buffer.from('[]') });
+  await page.waitForFunction(() => /Nenhum produto cadastrado/.test(document.getElementById('tabela').textContent));
+  assert.ok(await page.locator('.admin-status.is-success').count());
+  await page.goto(base + 'catalogo.html');
+  assert.strictEqual(await page.locator('.product-card').count(), 0);
+  assert.strictEqual(await page.locator('#catalogo-vazio').isVisible(), true);
+  await ctx.close();
+});

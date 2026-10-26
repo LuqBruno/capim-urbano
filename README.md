@@ -15,7 +15,14 @@ Planejamento, requisitos e andamento ficam no Trello:
 | Pedido | `pedido.html` (`?produto=<id>` opcional) | Formulário com validação, resumo e envio pelo WhatsApp. |
 | Administração | `admin.html` | Cadastro de produtos (veja as limitações abaixo). |
 
-Mapeamento com o Trello: US01–US05, RN01, RN02, NFR01 e NFR02 estão implementados. **US06 (administradora) está só parcialmente atendida**, porque não há login nem banco de dados.
+Mapeamento com o Trello: US01, US02, US04, RN01 (regras), RN02 e NFR01 estão atendidos. **US03, US05, US06 e NFR02 estão parciais**: veja o motivo na [matriz de requisitos](docs/matriz-de-requisitos.md).
+
+## Documentação
+
+- [Manual](docs/manual.md): uso para cliente, administradora e equipe técnica.
+- [Modelo de dados](docs/modelo-de-dados.md): produto, pedido e regras de disponibilidade.
+- [Matriz de requisitos](docs/matriz-de-requisitos.md): cards do Trello, código e testes.
+- [Relatório de qualidade e desempenho](docs/relatorio-qualidade.md).
 
 ## Como rodar
 

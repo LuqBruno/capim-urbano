@@ -12,9 +12,14 @@
     const o = document.createElement('option'); o.value = v; o.textContent = t; form.elements.disponibilidade.append(o);
   });
 
-  const avisar = (texto) => { status.textContent = texto; };
+  // Estados de retorno: neutro, sucesso e erro (o erro também é lido por leitores de tela).
+  const avisar = (texto, tipo) => {
+    status.textContent = texto;
+    status.className = 'admin-status' + (tipo ? ' is-' + tipo : '');
+    status.setAttribute('role', tipo === 'error' ? 'alert' : 'status');
+  };
   const persistir = () => {
-    if (!storage) { avisar('Não foi possível salvar: o navegador bloqueou o armazenamento.'); return false; }
+    if (!storage) { avisar('Não foi possível salvar: o navegador bloqueou o armazenamento.', 'error'); return false; }
     C.salvarProdutos(produtos, storage);
     return true;
   };
@@ -27,6 +32,15 @@
   };
 
   function desenhar() {
+    if (produtos.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5; td.className = 'table-state';
+      td.textContent = 'Nenhum produto cadastrado. Use "Novo produto" para começar.';
+      tr.append(td);
+      tabela.replaceChildren(tr);
+      return;
+    }
     tabela.replaceChildren(...produtos.map((p) => {
       const tr = document.createElement('tr');
       const cel = (t) => { const td = document.createElement('td'); td.textContent = t; return td; };
@@ -39,7 +53,7 @@
       const tdAcoes = document.createElement('td'); tdAcoes.className = 'row-actions';
       tdAcoes.append(
         acao('Editar', () => editar(p.id)),
-        acao(p.ativo === false ? 'Reativar' : 'Desativar', () => { p.ativo = p.ativo === false; if (persistir()) { avisar((p.ativo ? 'Reativado: ' : 'Desativado: ') + p.nome); desenhar(); } })
+        acao(p.ativo === false ? 'Reativar' : 'Desativar', () => { p.ativo = p.ativo === false; if (persistir()) { avisar((p.ativo ? 'Reativado no catálogo: ' : 'Desativado, saiu do catálogo: ') + p.nome, 'success'); desenhar(); } })
       );
       tr.append(tdNome, cel(C.formatarPreco(p.preco)), cel(C.DISPONIBILIDADE[p.disponibilidade] || '—'), cel(p.ativo === false ? 'Não' : 'Sim'), tdAcoes);
       return tr;
@@ -105,7 +119,7 @@
     };
     const { valido, erros } = C.validarProduto(produto);
     marcarErros(erros);
-    if (!valido) { const p = form.querySelector('[aria-invalid="true"]'); if (p) p.focus(); return; }
+    if (!valido) { avisar('Corrija os campos destacados e salve novamente.', 'error'); const p = form.querySelector('[aria-invalid="true"]'); if (p) p.focus(); return; }
     if (!produto.id) {
       let base = C.slug(produto.nome) || 'produto', id = base, n = 2;
       while (produtos.some((x) => x.id === id)) id = base + '-' + n++;
@@ -114,7 +128,7 @@
     } else {
       produtos = produtos.map((x) => (x.id === produto.id ? produto : x));
     }
-    if (persistir()) { avisar('Produto salvo: ' + produto.nome); limparForm(); desenhar(); }
+    if (persistir()) { avisar('Produto salvo: ' + produto.nome + '. Já aparece no catálogo deste navegador.', 'success'); limparForm(); desenhar(); }
   });
 
   document.getElementById('novo').addEventListener('click', () => { limparForm(); form.elements.nome.focus(); });
@@ -125,7 +139,7 @@
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'produtos-capim-urbano.json'; a.click();
     URL.revokeObjectURL(a.href);
-    avisar('Arquivo exportado.');
+    avisar('Arquivo exportado.', 'success');
   });
 
   document.getElementById('importar').addEventListener('change', (e) => {
@@ -133,12 +147,12 @@
     if (!arquivo) return;
     arquivo.text().then((texto) => {
       let lista;
-      try { lista = JSON.parse(texto); } catch (err) { avisar('Arquivo inválido: não é um JSON.'); return; }
+      try { lista = JSON.parse(texto); } catch (err) { avisar('Arquivo inválido: não é um JSON.', 'error'); return; }
       if (!Array.isArray(lista) || !lista.every((p) => p && p.id && C.validarProduto(p).valido)) {
-        avisar('Arquivo inválido: há produtos sem os campos obrigatórios.'); return;
+        avisar('Arquivo inválido: há produtos sem os campos obrigatórios.', 'error'); return;
       }
       produtos = lista;
-      if (persistir()) { avisar(lista.length + ' produtos importados.'); desenhar(); }
+      if (persistir()) { avisar(lista.length + ' produtos importados.', 'success'); desenhar(); }
     });
     e.target.value = '';
   });
@@ -147,7 +161,7 @@
     if (!window.confirm('Descartar as alterações deste navegador e voltar ao catálogo padrão?')) return;
     try { storage && storage.removeItem(C.STORAGE_KEY); } catch (err) { /* ignora */ }
     produtos = C.carregarProdutos(window.CAPIM_PRODUTOS_PADRAO || [], null);
-    avisar('Catálogo padrão restaurado.'); limparForm(); desenhar();
+    avisar('Catálogo padrão restaurado.', 'success'); limparForm(); desenhar();
   });
 
   desenhar();

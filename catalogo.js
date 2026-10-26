@@ -91,7 +91,13 @@
     }
     document.title = p.nome + ' | Capim Urbano';
     const indisponivel = p.disponibilidade === 'indisponivel';
-    const info = (rotulo, valor) => valor && el('div', { class: 'spec' }, [el('dt', { text: rotulo }), el('dd', { text: valor })]);
+    // Cuidados, durabilidade e prazo sempre aparecem; sem cadastro, mostram aviso (US04).
+    const info = (rotulo, valor, obrigatorio) => {
+      const texto = obrigatorio ? C.textoOuAviso(valor) : valor;
+      if (!texto) return null;
+      const ausente = obrigatorio && texto === C.AVISO_SEM_INFO;
+      return el('div', { class: 'spec' + (ausente ? ' spec-missing' : '') }, [el('dt', { text: rotulo }), el('dd', { text: texto })]);
+    };
 
     const principal = el('img', { src: p.fotos[0], alt: p.nome, width: 1200, height: 1500, id: 'foto-principal' });
     const miniaturas = p.fotos.length > 1 && el('ul', { class: 'thumbs', 'aria-label': 'Outras fotos' },
@@ -116,8 +122,8 @@
         el('p', { class: 'product-price big', text: C.formatarPreco(p.preco) }),
         el('p', {}, [badge(p)]),
         el('p', { class: 'lead', text: p.descricao }),
-        el('dl', { class: 'specs' }, [
-          info('Prazo', p.prazo), info('Durabilidade', p.durabilidade), info('Cuidados', p.cuidados),
+        el('dl', { class: 'specs', 'aria-label': 'Cuidados, durabilidade e prazo' }, [
+          info('Prazo de produção ou entrega', p.prazo, true), info('Durabilidade', p.durabilidade, true), info('Cuidados', p.cuidados, true),
           info('Ocasiões', (p.ocasioes || []).join(', ')), info('Cores', (p.cores || []).join(', '))
         ]),
         indisponivel

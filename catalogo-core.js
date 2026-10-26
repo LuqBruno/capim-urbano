@@ -23,6 +23,11 @@
   const TAMANHOS = ['Pequeno', 'Médio', 'Grande', 'Não sei, quero sugestão'];
   const ORCAMENTOS = ['Até R$ 100', 'R$ 100 a R$ 200', 'R$ 200 a R$ 400', 'Acima de R$ 400', 'Prefiro conversar'];
 
+  const AVISO_SEM_INFO = 'Não informado. Consulte o ateliê pelo WhatsApp.';
+
+  /* Texto do cadastro, ou um aviso claro quando a informação não foi preenchida (US04). */
+  const textoOuAviso = (valor) => (typeof valor === 'string' && valor.trim() ? valor.trim() : AVISO_SEM_INFO);
+
   const formatarPreco = (preco) =>
     typeof preco === 'number' && isFinite(preco)
       ? 'R$ ' + preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -130,7 +135,7 @@
 
   return {
     WHATSAPP, STORAGE_KEY, DISPONIBILIDADE, FAIXAS_PRECO, TAMANHOS, ORCAMENTOS,
-    formatarPreco, unicos, filtrarProdutos, validarPedido, montarMensagem,
+    AVISO_SEM_INFO, textoOuAviso, formatarPreco, unicos, filtrarProdutos, validarPedido, montarMensagem,
     montarLinkWhatsApp, slug, validarProduto, carregarProdutos, salvarProdutos
   };
 });

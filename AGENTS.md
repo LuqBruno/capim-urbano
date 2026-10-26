@@ -25,6 +25,7 @@ Não há linter nem build. Antes de entregar qualquer mudança, rode os dois con
 - `catalogo-dados.js` define `window.CAPIM_PRODUTOS_PADRAO`. A administração grava a lista editada no `localStorage` (chave `capim.produtos.v1`) e `carregarProdutos` a prefere ao padrão.
 - `styles.css` é único para o site inteiro. Reaproveite os tokens de `:root` (`--wine`, `--paper`, `--sans`, `--serif`…) e os componentes existentes (`.button`, `.field`, `.chips`, `.page-hero`, `.notice`) em vez de criar estilos novos.
 - Em grids que viram uma coluna no celular, use `minmax(0, 1fr)` e não `1fr`, senão tabelas largas estouram a largura da tela.
+- Cuidados, durabilidade e prazo sempre aparecem na página do produto: quando faltam, use `textoOuAviso` em vez de esconder o campo (US04).
 - Os scripts das páginas de catálogo carregam, nesta ordem: `catalogo-dados.js`, `catalogo-core.js`, `catalogo.js`.
 
 ## Regras de negócio que não podem quebrar
@@ -60,4 +61,4 @@ Vêm dos cards RN01, RN02 e das histórias do Trello:
 2. Implemente com testes para toda regra nova em `catalogo-core.js`.
 3. Verifique em celular e desktop, teclado e console limpo.
 4. Commits pequenos, em português ou inglês claro, descrevendo o que e por quê.
-5. Atualize o `README.md` quando mudar páginas, estrutura ou pendências, e este arquivo quando mudar convenções.
+5. Atualize o `README.md` quando mudar páginas, estrutura ou pendências, os arquivos de `docs/` (modelo de dados, manual, matriz de requisitos) quando mudar dados, fluxos ou requisitos, e este arquivo quando mudar convenções.
