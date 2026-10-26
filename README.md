@@ -23,6 +23,7 @@ Mapeamento com o Trello: US01, US02, US04, RN01 (regras), RN02 e NFR01 estão at
 - [Modelo de dados](docs/modelo-de-dados.md): produto, pedido e regras de disponibilidade.
 - [Matriz de requisitos](docs/matriz-de-requisitos.md): cards do Trello, código e testes.
 - [Relatório de qualidade e desempenho](docs/relatorio-qualidade.md).
+- [Plano de integração com o Supabase](docs/supabase-plano.md): passo a passo para ligar o cadastro a banco de dados com login (**ainda não implementado**).
 
 ## Como rodar
 
@@ -72,7 +73,7 @@ imagens/web/                imagens otimizadas (.webp) usadas pelo site
 ## Pendências conhecidas
 
 1. **Preços, prazos e disponibilidade em `catalogo-dados.js` são exemplos** e precisam ser conferidos pela administradora antes de publicar.
-2. **A administração não tem senha e não publica para os clientes.** Hoje o fluxo é: editar em `admin.html`, "Exportar JSON" e levar o conteúdo para `catalogo-dados.js`. O próximo passo é um backend com login e banco de dados.
+2. **A administração não tem senha e não publica para os clientes.** Hoje o fluxo é: editar em `admin.html`, "Exportar JSON" e levar o conteúdo para `catalogo-dados.js`. O próximo passo é um backend com login e banco de dados, planejado em [docs/supabase-plano.md](docs/supabase-plano.md).
 3. **Referência visual no pedido é um link**, não um upload. O cliente pode enviar a imagem direto na conversa do WhatsApp.
 
 ## Identidade visual

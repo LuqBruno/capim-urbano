@@ -60,4 +60,4 @@ O pedido não é armazenado: vira o texto de uma mensagem do WhatsApp.
 
 ## Limitação atual
 
-Os dados dos produtos ficam no navegador de quem edita. Para que a alteração chegue aos clientes é preciso exportar o JSON e atualizar `catalogo-dados.js`. O passo seguinte é uma tabela `produtos` em um banco com login da administradora (Supabase foi a opção levantada), mantendo exatamente os campos acima.
+Os dados dos produtos ficam no navegador de quem edita. Para que a alteração chegue aos clientes é preciso exportar o JSON e atualizar `catalogo-dados.js`. O passo seguinte é uma tabela `produtos` em um banco com login da administradora (Supabase foi a opção levantada), mantendo exatamente os campos acima (esquema SQL em [supabase-plano.md](supabase-plano.md)).

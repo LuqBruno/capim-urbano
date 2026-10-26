@@ -22,7 +22,7 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 
 - **US03:** a referência visual é um **link**; não há upload de imagem (o cliente pode enviar a foto na conversa do WhatsApp).
 - **US05:** o pedido é de **um produto por vez**; não há carrinho com vários itens.
-- **US06 e RN01 ("alterações refletem no catálogo"):** acontece apenas **no navegador de quem edita**. Falta banco de dados e login para valer para todos os clientes.
+- **US06 e RN01 ("alterações refletem no catálogo"):** acontece apenas **no navegador de quem edita**. Falta banco de dados e login para valer para todos os clientes. O passo a passo está em [supabase-plano.md](supabase-plano.md).
 
 ## Pontos ainda sem evidência automática
 
