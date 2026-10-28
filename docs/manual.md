@@ -13,8 +13,9 @@
 A página não está no menu do site. Acesse pelo endereço `/admin.html`.
 
 - **Entrar:** informe o e-mail e a senha da administradora e clique em "Entrar". Se errar, a tela avisa "E-mail ou senha incorretos". Contas sem permissão de administradora são recusadas. Para sair, use o botão "Sair".
+- **Painel:** no topo aparece o resumo do catálogo (quantos produtos, quantos estão no catálogo e quantos estão indisponíveis). Use **Buscar produto** para filtrar a lista por nome ou categoria. Cada produto aparece com a foto de capa, a categoria e etiquetas de disponibilidade e de "No catálogo". No celular, cada produto vira um cartão.
 - **Novo produto:** botão "Novo produto", preencha o formulário e "Salvar produto". Campos obrigatórios: nome, categoria, descrição, ao menos uma foto, disponibilidade e prazo. Preço vazio vale "sob orçamento". Use vírgula nos centavos (`129,90`). Ao salvar, o produto **já aparece no catálogo para todos os clientes**, sem exportar nem publicar nada.
-- **Editar:** botão "Editar" na linha do produto, altere e salve.
+- **Editar:** botão "Editar" na linha do produto, altere e salve. A linha em edição fica destacada, e o formulário (dividido em Identificação, Fotos, Preço e prazo, Detalhes e Publicação) acompanha a rolagem, com "Salvar produto" sempre visível.
 - **Desativar e reativar:** tira o produto do catálogo sem apagar os dados. Produtos desativados continuam na lista da administração.
 - **Disponibilidade:** escolha Disponível, Sob encomenda ou Indisponível. Produto indisponível continua visível, mas não aceita pedido.
 - **Baixar cópia (JSON):** salva no seu computador uma cópia de todos os produtos (inclusive os desativados), como backup.
@@ -23,7 +24,8 @@ A página não está no menu do site. Acesse pelo endereço `/admin.html`.
 
 ### Fotos
 
-- **Enviar fotos novas:** no formulário, use "Enviar fotos novas" e escolha arquivos **WebP, JPEG ou PNG de até 2 MB** cada. Elas são guardadas no Supabase (bucket `produtos`, pasta com o identificador do produto) e o endereço entra sozinho no cadastro. Arquivo de outro tipo ou maior que 2 MB é recusado antes do envio.
+- **Prévia:** as fotos do produto aparecem em miniatura, com a capa marcada. O "×" de cada miniatura tira aquela foto do produto (vale ao salvar). As fotos escolhidas para enviar aparecem com borda tracejada.
+- **Enviar fotos novas:** no formulário, use "Escolher fotos" e escolha arquivos **WebP, JPEG ou PNG de até 2 MB** cada. Elas são guardadas no Supabase (bucket `produtos`, pasta com o identificador do produto) e o endereço entra sozinho no cadastro. Arquivo de outro tipo ou maior que 2 MB é recusado antes do envio.
 - **Fotos já cadastradas:** o campo de texto lista um caminho ou link por linha, e a primeira é a capa. Aceita caminhos do site (`imagens/web/arquivo.webp`) ou links `https`. Prefira imagens `.webp` otimizadas.
 
 ### Primeiro acesso e senha

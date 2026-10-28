@@ -189,7 +189,6 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 | Janela em arco de estufa | foto principal da home (com um arco sálvia deslocado atrás, como papel recortado), fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
 | Espécime preso com fita | fita translúcida no topo de cada produto do catálogo |
 | Ficha numerada | cartão do produto com "Nº 01, Nº 02…" (ordem do catálogo) e a "Ficha da peça" na página do produto |
-| Selo do acervo | selo circular com texto girando na foto da home (`src/components/Selo.astro`) |
 | Varal de secagem | logo abaixo da abertura, sobre uma faixa sálvia: fotos do ateliê como polaroids presas num cordão que cede, na home (`src/components/Varal.astro`): arraste, clique, use ←/→ ou os botões; balançam conforme a velocidade e há botão de pausar o autoplay |
 
 Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/styles.css`, no bloco "Herbário Capim Urbano".

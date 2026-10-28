@@ -17,6 +17,12 @@ import { SUPABASE } from '../lib/supabase-config.js';
   const botaoSalvar = form.querySelector('button[type=submit]');
   let cliente = null;
   let produtos = [];
+  let editandoId = '';
+  let urlsPrevia = [];
+  const busca = document.getElementById('busca');
+  const resumo = document.getElementById('admin-resumo');
+  const previas = document.getElementById('previas');
+  const nomesArquivos = document.getElementById('arquivos-nomes');
 
   Object.entries(C.DISPONIBILIDADE).forEach(([v, t]) => {
     const o = document.createElement('option'); o.value = v; o.textContent = t; form.elements.disponibilidade.append(o);
@@ -65,26 +71,102 @@ import { SUPABASE } from '../lib/supabase-config.js';
     tabela.replaceChildren(tr);
   }
 
+  // Resumo do catálogo no topo do painel.
+  const atualizarResumo = () => {
+    const total = produtos.length;
+    if (!total) { resumo.textContent = ''; return; }
+    const noCatalogo = produtos.filter((p) => p.ativo !== false).length;
+    const indisponiveis = produtos.filter((p) => p.disponibilidade === 'indisponivel').length;
+    resumo.textContent = total + (total === 1 ? ' produto' : ' produtos') + ' · ' + noCatalogo + ' no catálogo · ' +
+      indisponiveis + (indisponiveis === 1 ? ' indisponível' : ' indisponíveis');
+  };
+
+  const destacarEdicao = () => {
+    tabela.querySelectorAll('tr[data-id]').forEach((tr) => tr.classList.toggle('is-editando', tr.dataset.id === editandoId));
+  };
+
   function desenhar() {
+    atualizarResumo();
     if (produtos.length === 0) { linhaDeEstado('Nenhum produto cadastrado. Use "Novo produto" para começar.'); return; }
-    tabela.replaceChildren(...produtos.map((p) => {
+    const termo = C.slug(busca.value);
+    const visiveis = termo ? produtos.filter((p) => C.slug(p.nome + ' ' + p.categoria).includes(termo)) : produtos;
+    if (visiveis.length === 0) { linhaDeEstado('Nenhum produto encontrado para "' + busca.value.trim() + '".'); return; }
+    tabela.replaceChildren(...visiveis.map((p) => {
       const tr = document.createElement('tr');
-      const cel = (t) => { const td = document.createElement('td'); td.textContent = t; return td; };
+      tr.dataset.id = p.id;
+      if (p.ativo === false) tr.classList.add('is-inativo');
+      const cel = (conteudo, rotulo) => { const td = document.createElement('td'); td.dataset.rotulo = rotulo; td.append(conteudo); return td; };
+      const etiqueta = (texto, classe) => { const s = document.createElement('span'); s.className = classe; s.textContent = texto; return s; };
       const acao = (rotulo, fn) => {
         const b = document.createElement('button');
-        b.type = 'button'; b.className = 'text-link'; b.textContent = rotulo;
+        b.type = 'button'; b.className = 'admin-acao'; b.textContent = rotulo;
         b.setAttribute('aria-label', rotulo + ': ' + p.nome); b.addEventListener('click', fn); return b;
       };
-      const tdNome = document.createElement('th'); tdNome.scope = 'row'; tdNome.textContent = p.nome;
+      // Produto: miniatura, nome e categoria na mesma célula de cabeçalho da linha.
+      const tdNome = document.createElement('th'); tdNome.scope = 'row';
+      const caixa = document.createElement('div'); caixa.className = 'admin-produto';
+      const foto = document.createElement('img');
+      foto.alt = ''; foto.width = 48; foto.height = 60; foto.loading = 'lazy';
+      if (p.fotos && p.fotos[0]) foto.src = p.fotos[0];
+      const textos = document.createElement('div');
+      textos.append(etiqueta(p.nome, 'admin-produto-nome'), etiqueta(p.categoria || '', 'admin-produto-cat'));
+      caixa.append(foto, textos); tdNome.append(caixa);
       const tdAcoes = document.createElement('td'); tdAcoes.className = 'row-actions';
       tdAcoes.append(
         acao('Editar', () => editar(p.id)),
         acao(p.ativo === false ? 'Reativar' : 'Desativar', () => alternarAtivo(p))
       );
-      tr.append(tdNome, cel(C.formatarPreco(p.preco)), cel(C.DISPONIBILIDADE[p.disponibilidade] || '—'), cel(p.ativo === false ? 'Não' : 'Sim'), tdAcoes);
+      tr.append(
+        tdNome,
+        cel(C.formatarPreco(p.preco), 'Preço'),
+        cel(etiqueta(C.DISPONIBILIDADE[p.disponibilidade] || '—', 'status status-' + p.disponibilidade), 'Disponibilidade'),
+        cel(etiqueta(p.ativo === false ? 'Não' : 'Sim', p.ativo === false ? 'admin-nao' : 'admin-sim'), 'No catálogo'),
+        tdAcoes
+      );
       return tr;
     }));
+    destacarEdicao();
   }
+
+  /* Prévia das fotos: as já cadastradas (com botão de remover) e as escolhidas para enviar. */
+  function atualizarPrevias() {
+    urlsPrevia.forEach((u) => URL.revokeObjectURL(u));
+    urlsPrevia = [];
+    const existentes = lista(form.elements.fotos.value);
+    const novas = [...form.elements.arquivos.files].filter((f) => !C.validarArquivoFoto(f));
+    const item = (src, legenda, remover) => {
+      const li = document.createElement('li');
+      const img = document.createElement('img');
+      img.src = src; img.alt = legenda; img.width = 72; img.height = 90;
+      li.append(img);
+      if (remover) {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'admin-previa-remover'; b.textContent = '×';
+        b.setAttribute('aria-label', 'Remover ' + legenda.toLowerCase());
+        b.addEventListener('click', remover);
+        li.append(b);
+      }
+      return li;
+    };
+    const itens = existentes.map((src, i) => item(src, 'Foto ' + (i + 1) + (i === 0 ? ' (capa)' : ''), () => {
+      const resto = existentes.filter((_, j) => j !== i);
+      form.elements.fotos.value = resto.join('\n');
+      atualizarPrevias();
+    }));
+    novas.forEach((f, i) => {
+      const url = URL.createObjectURL(f); urlsPrevia.push(url);
+      const li = item(url, 'Foto nova ' + (i + 1), null);
+      li.classList.add('is-nova');
+      itens.push(li);
+    });
+    previas.replaceChildren(...itens);
+    previas.hidden = itens.length === 0;
+    const escolhidas = [...form.elements.arquivos.files];
+    nomesArquivos.textContent = escolhidas.length ? escolhidas.map((f) => f.name).join(', ') : 'Nenhuma foto escolhida';
+  }
+  form.elements.fotos.addEventListener('input', atualizarPrevias);
+  form.elements.arquivos.addEventListener('change', atualizarPrevias);
+  busca.addEventListener('input', desenhar);
 
   async function carregarLista() {
     linhaDeEstado('Carregando produtos…');
@@ -107,7 +189,10 @@ import { SUPABASE } from '../lib/supabase-config.js';
     form.reset();
     form.elements.id.value = '';
     titulo.textContent = 'Novo produto';
+    editandoId = '';
     marcarErros({});
+    atualizarPrevias();
+    destacarEdicao();
   }
 
   function editar(id) {
@@ -128,7 +213,10 @@ import { SUPABASE } from '../lib/supabase-config.js';
     form.elements.cores.value = (p.cores || []).join(', ');
     form.elements.ativo.checked = p.ativo !== false;
     titulo.textContent = 'Editar produto';
+    editandoId = p.id;
     marcarErros({});
+    atualizarPrevias();
+    destacarEdicao();
     form.elements.nome.focus();
   }
 
@@ -249,6 +337,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
     }
     mostrar('admin');
     avisar('');
+    busca.value = '';
     limparForm();
     await carregarLista();
   }
