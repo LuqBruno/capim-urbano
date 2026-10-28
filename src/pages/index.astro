@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icone from '../components/Icone.astro';
+import Selo from '../components/Selo.astro';
+import Faixa from '../components/Faixa.astro';
 ---
 <Base titulo={"Capim Urbano | Ateliê floral de flores desidratadas em Tubarão"} descricao={"Ateliê de flores desidratadas em Tubarão (SC): assinatura floral, eternização de flores, oficinas e arranjos sob encomenda."} og atual="Início" whatsapp={"Oi, Capim Urbano! Quero conversar sobre um serviço floral."}>
   <section class="hero">
@@ -13,10 +15,12 @@ import Icone from '../components/Icone.astro';
       </div>
       <figure class="hero-media">
         <div class="hero-frame"><img src="imagens/web/capim1.webp" alt="Composição de estúdio com arranjos de flores desidratadas em tons de creme, vinho e dourado ao redor de uma cadeira de madeira" width="1600" height="1066" fetchpriority="high"></div>
+        <Selo />
         <figcaption class="hero-tag"><strong>Natureza preservada</strong>Flores que acompanham a vida por muito mais tempo, sem perder a poesia.</figcaption>
       </figure>
     </div>
   </section>
+  <Faixa />
 
   <section class="section manifesto" style="padding-top:clamp(48px,6vw,88px)">
     <div class="wrap reveal">

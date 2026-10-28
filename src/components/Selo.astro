@@ -1,0 +1,20 @@
+---
+// Selo do acervo: texto circular que gira devagar em volta de uma flor. Decorativo (aria-hidden):
+// a mesma informação já está no texto da página. Para quem prefere menos movimento, fica parado.
+const texto = 'flores que habitam o tempo · ateliê floral · tubarão sc · ';
+const petalas = [0, 60, 120, 180, 240, 300];
+---
+<svg class="selo" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="selo-circulo" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0" />
+  </defs>
+  <circle class="selo-fundo" cx="100" cy="100" r="98" />
+  <circle class="selo-aro" cx="100" cy="100" r="58" />
+  <g class="selo-texto">
+    <text><textPath href="#selo-circulo" textLength="474" lengthAdjust="spacing">{texto}</textPath></text>
+  </g>
+  <g class="selo-flor">
+    {petalas.map((a) => <ellipse cx="100" cy="83" rx="6.5" ry="15" transform={`rotate(${a} 100 100)`} />)}
+    <circle cx="100" cy="100" r="5.5" />
+  </g>
+</svg>

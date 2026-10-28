@@ -59,10 +59,11 @@ import { SUPABASE } from '../lib/supabase-config.js';
 
     const cartao = (p) => {
       const href = 'produto.html?id=' + encodeURIComponent(p.id);
+      const numero = 'Nº ' + String(ativos.indexOf(p) + 1).padStart(2, '0');
       return el('li', { class: 'product-card' }, [
         el('a', { href, class: 'product-link' }, [
           el('div', { class: 'product-media' }, [el('img', { src: p.fotos[0], alt: p.nome, width: 800, height: 1000, loading: 'lazy' })]),
-          el('div', { class: 'product-body' }, [
+          el('div', { class: 'product-body', 'data-especime': numero }, [
             el('div', { class: 'product-meta' }, [el('span', { text: p.categoria }), badge(p)]),
             el('h2', { text: p.nome }),
             el('p', { class: 'product-price', text: C.formatarPreco(p.preco) }),

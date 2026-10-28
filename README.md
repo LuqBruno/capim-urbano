@@ -179,6 +179,21 @@ Feito por **Gustavo Constante** ([@gstvdc](https://github.com/gstvdc)) e **Bruno
 
 ## Identidade visual
 
+O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flores, o site se apresenta como um herbário vivo, o arquivo onde espécimes são prensados, numerados e etiquetados.
+
+| Elemento do herbário | Onde aparece |
+|---|---|
+| Papel de arquivo | grão sutil no fundo de papel de todas as páginas |
+| Janela em arco de estufa | foto principal da home, fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
+| Espécime preso com fita | fita translúcida no topo de cada produto do catálogo |
+| Ficha numerada | cartão do produto com "Nº 01, Nº 02…" (ordem do catálogo) e a "Ficha da peça" na página do produto |
+| Selo do acervo | selo circular com texto girando na foto da home (`src/components/Selo.astro`) |
+| Etiquetas da coleção | faixa de serviços deslizando abaixo da home (`src/components/Faixa.astro`) |
+| Assinatura do acervo | "capim urbano" em tamanho grande no rodapé |
+
+Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/styles.css`, no bloco "Herbário Capim Urbano".
+
+
 - Fonte principal: **Quicksand** (acompanha a letra do logotipo). Títulos grandes e o "ateliê floral" usam **Cormorant Garamond**.
 - Paleta: papel (`#f4f1ea`), sálvia, oliva e vinho (`#7a2937`). Os tokens ficam no início de `src/styles/styles.css`.
 - Meta de acessibilidade: foco visível, rótulos em todos os campos, mensagens de erro com `role="alert"` e navegação por teclado.
