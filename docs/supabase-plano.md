@@ -1,16 +1,70 @@
-# Plano de integração com o Supabase (a fazer depois)
+# Integração com o Supabase
 
-**Situação:** ainda **não implementado**. Hoje o cadastro de produtos (`admin.html`) guarda os dados no navegador de quem edita e não tem login. Este documento descreve como ligar o cadastro a um banco de dados com login para fechar o card **US06** e a regra "alterações refletem no catálogo" da **RN01**.
+**Situação:** **implementado** em 2026-10-28, com duas pendências que dependem de uma pessoa (veja "O que falta" abaixo). O cadastro de produtos (`admin.html`) agora tem login e grava no banco, e o catálogo lê do banco. Isso fecha o card **US06** e a regra "alterações refletem no catálogo" da **RN01**.
 
-Nada aqui foi criado no Supabase ainda: não existe projeto, tabela, política nem usuário configurado por este repositório.
+| Item | Valor |
+|---|---|
+| Projeto | `capim-urbano` (plano Free, região `sa-east-1`, São Paulo) |
+| Project ref | `gkpiwqztgzkuxvwrkpiy` |
+| URL | https://gkpiwqztgzkuxvwrkpiy.supabase.co |
+| Chave no site | somente a **publicável** (`sb_publishable_…`), em `supabase-config.js`. A `service_role` não é usada nem gravada em nenhum arquivo |
+| Migrações | [`supabase/migrations/`](../supabase/migrations/) |
+| Administradora | uma conta, cadastrada em `public.administradoras` (e-mail informado pelo time no pedido do trabalho) |
 
-## Objetivo
+## O que foi feito
+
+- [x] **Passo 1:** tabela `public.produtos` (com gatilho de `atualizado_em`) e `public.administradoras`.
+- [x] **Passo 2:** administradora cadastrada. Usuário criado por SQL com uma senha aleatória que ninguém conhece (veja "O que falta").
+- [x] **Passo 3:** RLS. Visitante lê só `ativo = true`; só administradora escreve. Desvios em relação ao plano original, explicados abaixo.
+- [x] **Passo 4:** bucket público `produtos` (2 MB; `image/webp`, `image/jpeg`, `image/png`), escrita só de administradoras.
+- [x] **Advisors:** segurança e desempenho sem nenhum alerta após as migrações (verificado duas vezes: antes e depois de unificar as políticas).
+- [x] **Passo 5:** `supabase-config.js`, `carregarProdutos` assíncrona, estados de carregando e erro com "Tentar de novo" no catálogo, no produto e no pedido, login e cadastro no `admin.html`/`admin.js`, upload de fotos. Gravação em `localStorage` removida (e "Importar JSON" e "Restaurar padrão" também, que dependiam dela; "Exportar" virou "Baixar cópia").
+- [x] **Passo 6:** carga inicial com os 7 produtos de `catalogo-dados.js` (**são exemplos**, veja "O que falta").
+- [x] **Passo 7:** testes. `tests/catalogo-core.test.js` (conversão, foto, cliente, carga) e `tests/e2e.test.js` (Supabase simulado com `page.route`).
+- [x] **Segurança:** testado com a chave publicável, sem login (veja "Verificação de segurança").
+
+### Desvios em relação ao plano original
+
+1. **Política em `administradoras`.** O plano dizia "sem políticas". Mas as políticas de `produtos` consultam essa tabela, e o RLS vale também dentro dessas consultas: com a tabela fechada, a checagem nunca acharia ninguém e **nem a administradora conseguiria escrever**. Foi criada a política `ler a propria linha` (cada usuária lê só o próprio `user_id`). Ninguém consegue listar as administradoras.
+2. **Políticas de `produtos` unificadas.** O plano tinha 3 políticas, e duas liam o mesmo dado. O Supabase avisou "múltiplas políticas permissivas" no desempenho. Ficaram: `ler produtos` (visitante vê ativos; administradora vê tudo) e uma política por ação para escrever (`administradoras criam`, `editam`, `apagam`).
+3. **Falha de rede no catálogo.** O plano falava em usar `CAPIM_PRODUTOS_PADRAO` como reserva em caso de falha. Isso exibiria preços e disponibilidade de **exemplo** como se fossem reais (e um produto marcado como indisponível no banco apareceria como disponível). Por isso a reserva só vale quando o site **não** está configurado para o Supabase. Se a busca falhar, a tela mostra o erro e "Tentar de novo". No pedido, se o produto do link não carregar, o envio fica bloqueado até a busca funcionar (RN01).
+4. **Fotos do seed.** Os 7 produtos continuam com os caminhos `imagens/web/...` do site (a opção permitida no passo 6.3 do plano). Fotos novas vão para o bucket.
+
+## O que falta (depende de uma pessoa)
+
+1. **Definir a senha da administradora.** Ninguém conhece a senha atual (foi gerada aleatoriamente no banco). Em https://supabase.com/dashboard/project/gkpiwqztgzkuxvwrkpiy/auth/users, abra o menu (`...`) do usuário e escolha **Send password recovery** (chega ao e-mail da administradora), ou **Reset password**. Antes disso, configure em **Authentication → URL Configuration** o *Site URL* com o endereço onde o site for publicado, para o link do e-mail abrir a página certa. Nunca envie a senha por chat, e-mail ou commit.
+2. **Desligar o cadastro público.** O ambiente de trabalho não tem ferramenta para mudar essa configuração. Em **Authentication → Sign In / Providers → Email**, desligue **Allow new users to sign up** (e, se aparecer, mantenha a confirmação de e-mail ligada). Enquanto estiver ligado, qualquer pessoa pode criar uma conta no Auth, mas **essa conta não escreve nada**: só quem está em `public.administradoras` escreve (isso foi testado). O risco restante é de abuso do serviço (contas de lixo), não de alteração de dados.
+3. **Trocar os valores de exemplo.** Os 7 produtos do banco vêm de `catalogo-dados.js`: preços, prazos e disponibilidade são fictícios. A administradora deve conferir cada um em `admin.html` antes de divulgar o site.
+4. **Plano e limites.** O projeto está no plano Free (pausa por inatividade e 500 MB de banco, 1 GB de arquivos). Pausar derrubaria o catálogo. Avaliar um plano pago antes de divulgar.
+
+## Verificação de segurança
+
+Feita em 2026-10-28 com a chave publicável e **sem login** (requisições reais à API do projeto):
+
+| Tentativa | Resultado |
+|---|---|
+| `GET /rest/v1/produtos` | 7 produtos, todos `ativo = true` |
+| `INSERT` em `produtos` | negado (`401`, `42501`, "violates row-level security policy") |
+| `PATCH` em `produtos` | `200` com `[]`: nenhuma linha afetada (conferido no banco: nada mudou) |
+| `DELETE` em `produtos` | `200` com `[]`: nenhuma linha afetada (conferido: 7 produtos intactos) |
+| `GET /rest/v1/administradoras` | `[]` |
+| Upload no bucket `produtos` | negado (`403`, RLS) |
+| Listar o bucket | `[]` |
+| Produto `ativo = false` visto como visitante | não aparece (testado em transação com `ROLLBACK`: 0 linhas da inativa, 6 de 7 visíveis) |
+| Administradora (simulada por papel e `sub` da conta) | lê `administradoras`, vê produto inativo, cria, edita e apaga (transação revertida) |
+| Conta logada que **não** é administradora | lê só ativos; não escreve |
+
+Não foi possível testar o login real da administradora (a senha não é conhecida por design). Teste esse caminho ao definir a senha: entre em `admin.html`, crie um produto, veja-o no catálogo em outro aparelho e desative-o.
+
+## Objetivo (plano original)
+
+> As seções abaixo são o plano original, mantidas como referência. O SQL que vale é o de [`supabase/migrations/`](../supabase/migrations/) (veja os desvios acima).
 
 - A administradora entra com e-mail e senha, e cadastra, edita, desativa produtos e envia fotos.
 - Os clientes veem o catálogo sempre atualizado, sem exportar JSON nem publicar de novo.
 - Só quem está autorizado consegue escrever. Qualquer visitante só lê produtos ativos.
 
-## Pré-requisitos
+## Pré-requisitos (cumpridos, exceto os do "O que falta")
 
 1. Um projeto Supabase (crie em https://supabase.com e anote a **URL do projeto** e a **chave publicável** (`anon`/publishable)).
 2. Reautorizar o conector do Supabase em https://claude.ai/customize/connectors, se a ideia for deixar o Claude aplicar as migrações.
@@ -125,9 +179,11 @@ Ao ligar o banco, **remova** a gravação no `localStorage` e os botões "Export
 
 ## Critérios de pronto
 
+> Situação: os critérios técnicos estão cumpridos. Falta confirmar o primeiro bloco depois que a administradora definir a senha.
+
 - A administradora faz login, cria, edita e desativa um produto, e um visitante em outro aparelho vê a mudança sem exportar arquivo.
 - Visitante sem login não consegue escrever nem ler produtos desativados.
-- Nenhuma chave secreta no repositório. `service_role` não aparece em nenhum arquivo.
+- Nenhuma chave secreta no repositório. a chave `service_role` não é usada nem gravada em nenhum arquivo (só é citada em avisos).
 - Estados de carregamento, vazio, sucesso e erro cobertos em celular, tablet e desktop.
 - README, manual, modelo de dados e matriz de requisitos atualizados (US06 e RN01 passam a **atendidos**).
 

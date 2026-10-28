@@ -12,25 +12,30 @@
 
 A página não está no menu do site. Acesse pelo endereço `/admin.html`.
 
-**Aviso:** neste momento a página não tem senha e guarda as alterações apenas no navegador usado. Os clientes só veem as mudanças depois que o arquivo exportado for aplicado em `catalogo-dados.js` pela equipe técnica.
-
-- **Novo produto:** botão "Novo produto", preencha o formulário e "Salvar produto". Campos obrigatórios: nome, categoria, descrição, ao menos uma foto, disponibilidade e prazo. Preço vazio vale "sob orçamento". Use vírgula nos centavos (`129,90`).
+- **Entrar:** informe o e-mail e a senha da administradora e clique em "Entrar". Se errar, a tela avisa "E-mail ou senha incorretos". Contas sem permissão de administradora são recusadas. Para sair, use o botão "Sair".
+- **Novo produto:** botão "Novo produto", preencha o formulário e "Salvar produto". Campos obrigatórios: nome, categoria, descrição, ao menos uma foto, disponibilidade e prazo. Preço vazio vale "sob orçamento". Use vírgula nos centavos (`129,90`). Ao salvar, o produto **já aparece no catálogo para todos os clientes**, sem exportar nem publicar nada.
 - **Editar:** botão "Editar" na linha do produto, altere e salve.
-- **Desativar e reativar:** tira o produto do catálogo sem apagar os dados.
+- **Desativar e reativar:** tira o produto do catálogo sem apagar os dados. Produtos desativados continuam na lista da administração.
 - **Disponibilidade:** escolha Disponível, Sob encomenda ou Indisponível. Produto indisponível continua visível, mas não aceita pedido.
-- **Exportar JSON / Importar JSON:** exporta o cadastro para publicação ou backup, e importa um arquivo no mesmo formato. Arquivo inválido é recusado com mensagem de erro.
-- **Restaurar padrão:** descarta as alterações deste navegador.
+- **Baixar cópia (JSON):** salva no seu computador uma cópia de todos os produtos (inclusive os desativados), como backup.
 - **Ver como o cliente vê:** abre o catálogo em outra aba.
-- **Mensagens da tela:** "Carregando produtos…" ao abrir, "Nenhum produto cadastrado" quando a lista está vazia, faixa verde para sucesso e faixa vinho para erro (também lida por leitores de tela).
+- **Mensagens da tela:** "Carregando produtos…" ao abrir, "Nenhum produto cadastrado" quando a lista está vazia, "Tentar de novo" se a lista não carregar, faixa verde para sucesso e faixa vinho para erro (também lida por leitores de tela).
 
 ### Fotos
 
-Informe um caminho que exista no site (`imagens/web/arquivo.webp`) ou um link `https` de imagem. Há um por linha, e a primeira é a capa. Prefira imagens `.webp` otimizadas.
+- **Enviar fotos novas:** no formulário, use "Enviar fotos novas" e escolha arquivos **WebP, JPEG ou PNG de até 2 MB** cada. Elas são guardadas no Supabase (bucket `produtos`, pasta com o identificador do produto) e o endereço entra sozinho no cadastro. Arquivo de outro tipo ou maior que 2 MB é recusado antes do envio.
+- **Fotos já cadastradas:** o campo de texto lista um caminho ou link por linha, e a primeira é a capa. Aceita caminhos do site (`imagens/web/arquivo.webp`) ou links `https`. Prefira imagens `.webp` otimizadas.
+
+### Primeiro acesso e senha
+
+A conta da administradora foi criada sem senha conhecida. Para definir a sua: no painel do Supabase, **Authentication → Users**, abra o menu (`...`) do usuário e use **Send password recovery**, ou crie a senha pelo próprio painel. Use uma senha longa e única, e não a compartilhe por mensagem. O passo a passo da equipe técnica está em [supabase-plano.md](supabase-plano.md).
 
 ## Para a equipe técnica
 
 - Rodar: `python3 -m http.server 8000`.
 - Testes: `node --test tests/catalogo-core.test.js` e `node --test tests/e2e.test.js` (o segundo precisa do `playwright` e de um Chromium).
-- Publicar um novo catálogo: abra `admin.html`, exporte o JSON e copie a lista para `CAPIM_PRODUTOS_PADRAO` em `catalogo-dados.js`.
+- Publicar produtos: não há publicação. A administradora salva em `admin.html` e o catálogo lê direto do Supabase. `catalogo-dados.js` só é usado quando `supabase-config.js` está sem configuração.
+- Banco: o SQL está em `supabase/migrations/`. Mudanças no banco entram como arquivo novo ali e são aplicadas no projeto.
+- Os testes de tela simulam o Supabase e não usam a rede.
 - Mudar o número do WhatsApp: `WHATSAPP` em `catalogo-core.js` e os links `wa.me` das páginas.
 - Detalhes dos dados: [modelo-de-dados.md](modelo-de-dados.md). Rastreabilidade: [matriz-de-requisitos.md](matriz-de-requisitos.md). Qualidade: [relatorio-qualidade.md](relatorio-qualidade.md).

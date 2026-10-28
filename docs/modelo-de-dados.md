@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Dados do catálogo e do pedido. O catálogo mora em `catalogo-dados.js` (padrão) e, quando a administradora salva alterações em `admin.html`, em `localStorage` no navegador dela (chave `capim.produtos.v1`). As regras ficam em `catalogo-core.js`.
+Dados do catálogo e do pedido. O catálogo mora na tabela `public.produtos` do Supabase (SQL em [`supabase/migrations/`](../supabase/migrations/)). `catalogo-dados.js` guarda os produtos de exemplo, usados na carga inicial e como reserva só quando o site não está configurado para o Supabase. As regras ficam em `catalogo-core.js`, que converte a linha do banco em produto (`linhaParaProduto`) e o produto em linha (`produtoParaLinha`).
 
 ## Produto
 
@@ -10,7 +10,7 @@ Dados do catálogo e do pedido. O catálogo mora em `catalogo-dados.js` (padrão
 | `nome` | texto | sim | |
 | `categoria` | texto | sim | Ex.: Vasos, Buquês, Arranjos. |
 | `descricao` | texto | sim | |
-| `fotos` | lista de textos | sim, ao menos 1 | Caminho (`imagens/web/...`) ou link `https`. A primeira é a capa. |
+| `fotos` | lista de textos | sim, ao menos 1 | Caminho (`imagens/web/...`) ou link `https`, inclusive o endereço público de uma foto enviada ao bucket `produtos` (`<id>/<arquivo>-<marca>.webp|jpg|png`). A primeira é a capa. |
 | `preco` | número ou `null` | não | Em reais, maior ou igual a 0. `null` aparece como "Sob orçamento". |
 | `disponibilidade` | `disponivel`, `sob-encomenda` ou `indisponivel` | sim | Veja as regras abaixo. |
 | `prazo` | texto | sim | Prazo de produção ou entrega (RN01). |
@@ -18,7 +18,14 @@ Dados do catálogo e do pedido. O catálogo mora em `catalogo-dados.js` (padrão
 | `cuidados` | texto | não | Mesmo tratamento de `durabilidade`. |
 | `ocasioes` | lista de textos | não | Alimenta o filtro de ocasião. |
 | `cores` | lista de textos | não | Alimenta o filtro de cor. |
-| `ativo` | verdadeiro ou falso | não (padrão `true`) | `false` tira o produto do catálogo sem apagá-lo. |
+| `ativo` | verdadeiro ou falso | não (padrão `true`) | `false` tira o produto do catálogo sem apagá-lo. No banco, quem não está logada só consegue ler `ativo = true`. |
+| `criado_em`, `atualizado_em` | data e hora | gerados | Só existem no banco. `atualizado_em` é refeito por gatilho a cada alteração. Não fazem parte do produto no site. |
+
+### Tabelas do banco
+
+- `public.produtos`: colunas iguais aos campos acima (`preco` é `numeric(10,2)`; textos opcionais vazios são gravados como `null`). Restrições: `id` em minúsculas com hífens, textos obrigatórios não vazios, ao menos 1 foto, `preco >= 0` ou nulo e `disponibilidade` entre os três valores.
+- `public.administradoras`: `user_id` (referência a `auth.users`). Quem está nesta tabela pode criar, editar e apagar produtos, ver os desativados e enviar fotos. Cada usuária só enxerga a própria linha.
+- Storage: bucket público `produtos`, até 2 MB por arquivo, apenas `image/webp`, `image/jpeg` e `image/png`; só administradoras escrevem.
 
 ### Regras de disponibilidade e exibição (RN01)
 
@@ -58,6 +65,14 @@ O pedido não é armazenado: vira o texto de uma mensagem do WhatsApp.
 | `observacoes` | não | texto livre |
 | produto | não | se vier de um produto `indisponivel`, o pedido é bloqueado |
 
-## Limitação atual
+## Segurança por linha (RLS)
 
-Os dados dos produtos ficam no navegador de quem edita. Para que a alteração chegue aos clientes é preciso exportar o JSON e atualizar `catalogo-dados.js`. O passo seguinte é uma tabela `produtos` em um banco com login da administradora (Supabase foi a opção levantada), mantendo exatamente os campos acima (esquema SQL em [supabase-plano.md](supabase-plano.md)).
+| Quem | Lê produtos | Cria, edita e apaga | Fotos (Storage) |
+|---|---|---|---|
+| Visitante (chave publicável, sem login) | só `ativo = true` | não | lê pela URL pública; não lista o bucket nem envia |
+| Conta logada que não é administradora | só `ativo = true` | não | igual ao visitante |
+| Administradora | todos, inclusive desativados | sim | lista, envia, atualiza e apaga |
+
+## Pendências de dados
+
+Os produtos hoje no banco são os **exemplos** de `catalogo-dados.js` (preço, prazo e disponibilidade fictícios). A administradora deve conferir e corrigir todos em `admin.html` antes de divulgar o site.
