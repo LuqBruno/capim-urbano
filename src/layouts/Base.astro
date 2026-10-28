@@ -1,0 +1,66 @@
+---
+import '../styles/styles.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  titulo: string;
+  descricao?: string;
+  /** Inclui as tags Open Graph (páginas do site institucional). */
+  og?: boolean;
+  /** Valor de data-page: o script da página usa para saber o que montar. */
+  pagina?: string;
+  /** Rótulo do item do menu marcado como página atual. */
+  atual?: string;
+  /** Mensagem inicial do WhatsApp no rodapé. */
+  whatsapp?: string;
+  /** Administração: cabeçalho simples, sem rodapé, sem animações e fora dos buscadores. */
+  admin?: boolean;
+}
+const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{titulo}</title>
+  {descricao && <meta name="description" content={descricao} />}
+  {admin && <meta name="robots" content="noindex, nofollow" />}
+  <meta name="theme-color" content="#f4f1ea">
+  {og && <>
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Capim Urbano Ateliê Floral">
+    <meta property="og:title" content={titulo}>
+    <meta property="og:description" content={descricao}>
+    <meta property="og:image" content="imagens/web/og.jpg">
+  </>}
+  <link rel="icon" href="imagens/web/capimlogo.webp" type="image/webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  {!admin && <script is:inline>document.documentElement.classList.add('js')</script>}
+</head>
+<body data-page={pagina}>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  {admin ? (
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand-mark" href="index.html" aria-label="Capim Urbano, página inicial"><span class="brand-name">capim urbano</span><span class="brand-subtitle">ateliê floral</span></a>
+        <nav class="site-nav" aria-label="Navegação"><a href="catalogo.html">Ver catálogo</a></nav>
+      </div>
+    </header>
+  ) : (
+    <>
+      <div class="scroll-progress" aria-hidden="true"></div>
+      <Header atual={atual} />
+    </>
+  )}
+  <main id="conteudo">
+    <slot />
+  </main>
+  {!admin && <Footer whatsapp={whatsapp} />}
+  {!admin && <script>import '../scripts/site.js';</script>}
+</body>
+</html>

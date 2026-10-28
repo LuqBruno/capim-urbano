@@ -1,7 +1,10 @@
 /* Cadastro de produtos: login da administradora (Supabase Auth) e gravação em public.produtos.
    Quem pode escrever é decidido pelo banco (RLS); esta tela só cuida da interface. */
+import { createClient } from '@supabase/supabase-js';
+import * as C from '../lib/catalogo-core.js';
+import { SUPABASE } from '../lib/supabase-config.js';
+
 (function () {
-  const C = window.CapimCore;
   const form = document.getElementById('form-produto');
   const formLogin = document.getElementById('form-login');
   const areaLogin = document.getElementById('area-login');
@@ -285,7 +288,7 @@
 
   /* ---------- Início ---------- */
   (async function iniciar() {
-    try { cliente = C.criarCliente(window.CAPIM_SUPABASE, window.supabase); }
+    try { cliente = C.criarCliente(SUPABASE, { createClient }); }
     catch (erro) { cliente = null; }
     if (!cliente) {
       mostrar('login');

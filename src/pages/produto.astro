@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base titulo={"Produto | Capim Urbano"} descricao={"Detalhes do produto, preço, disponibilidade, prazo, cuidados e durabilidade."} pagina="produto" atual="Catálogo" whatsapp={"Oi, Capim Urbano! Quero encomendar um arranjo/presente."}>
+  <section class="section" style="padding-top:clamp(40px,6vw,80px)">
+    <div class="wrap">
+      <div id="produto" class="product-detail"><p role="status">Carregando produto…</p></div>
+    </div>
+  </section>
+  <script>import '../scripts/catalogo.js';</script>
+</Base>

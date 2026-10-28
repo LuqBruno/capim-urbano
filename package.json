@@ -1,0 +1,21 @@
+{
+  "name": "capim-urbano",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site e catálogo da Capim Urbano Ateliê Floral",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --test tests/catalogo-core.test.js",
+    "test:e2e": "astro build && node --test tests/e2e.test.js"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.3",
+    "astro": "7.4.2"
+  }
+}

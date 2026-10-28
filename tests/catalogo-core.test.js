@@ -1,10 +1,13 @@
 // Executar: node --test tests/catalogo-core.test.js
-const test = require('node:test');
-const assert = require('node:assert');
-const C = require('../catalogo-core.js');
-globalThis.window = globalThis;
-require('../catalogo-dados.js');
-const produtos = globalThis.CAPIM_PRODUTOS_PADRAO;
+import test from 'node:test';
+import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as C from '../src/lib/catalogo-core.js';
+import { PRODUTOS_PADRAO as produtos } from '../src/lib/catalogo-dados.js';
+
+const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const pedidoValido = { nome: 'Ana', quantidade: '2', ocasiao: 'Aniversário', cores: 'vinho, creme', tamanho: 'Médio', orcamento: 'R$ 100 a R$ 200', referencia: 'https://exemplo.com/foto', observacoes: 'Entrega sexta' };
 
@@ -133,8 +136,7 @@ test('cliente do Supabase: sem configuração é null; configurado sem a bibliot
 });
 
 test('configuração pública não traz chave secreta', () => {
-  const fs = require('node:fs');
-  const config = fs.readFileSync(require('node:path').join(__dirname, '..', 'supabase-config.js'), 'utf8');
+  const config = fs.readFileSync(path.join(RAIZ, 'src', 'lib', 'supabase-config.js'), 'utf8');
   assert.match(config, /sb_publishable_/);
   assert.ok(!/sb_secret_|eyJ[A-Za-z0-9_-]{10,}\./.test(config), 'só a chave publicável, nunca chave secreta ou JWT');
 });

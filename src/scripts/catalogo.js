@@ -1,6 +1,10 @@
 /* Interface do catálogo, da página de produto e do pedido personalizado. */
+import { createClient } from '@supabase/supabase-js';
+import * as C from '../lib/catalogo-core.js';
+import { PRODUTOS_PADRAO } from '../lib/catalogo-dados.js';
+import { SUPABASE } from '../lib/supabase-config.js';
+
 (function () {
-  const C = window.CapimCore;
   const page = document.body.dataset.page;
 
   const el = (tag, attrs = {}, children = []) => {
@@ -20,9 +24,9 @@
   /* Busca os produtos no Supabase. Retorna { produtos, origem, erro }; o erro vira a tela "Tentar de novo". */
   async function carregar() {
     let cliente;
-    try { cliente = C.criarCliente(window.CAPIM_SUPABASE, window.supabase); }
+    try { cliente = C.criarCliente(SUPABASE, { createClient }); }
     catch (erro) { return { produtos: [], origem: 'banco', erro }; }
-    const r = await C.carregarProdutos(window.CAPIM_PRODUTOS_PADRAO || [], cliente);
+    const r = await C.carregarProdutos(PRODUTOS_PADRAO, cliente);
     ativos = r.produtos.filter((p) => p.ativo !== false);
     return r;
   }

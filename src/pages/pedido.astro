@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base titulo={"Pedido personalizado | Capim Urbano"} descricao={"Monte seu pedido de arranjo personalizado com ocasião, cores, tamanho e orçamento e envie pelo WhatsApp."} pagina="pedido" atual="Catálogo" whatsapp={"Oi, Capim Urbano! Quero encomendar um arranjo/presente."}>
+  <section class="page-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Você está em"><a href="catalogo.html">Catálogo</a><span aria-hidden="true">/</span><span aria-current="page">Pedido</span></nav>
+      <div class="page-hero-grid">
+        <h1>Conte o que você <em>imagina.</em></h1>
+        <div class="page-hero-note"><p>Preencha as preferências, confira o resumo e envie pelo WhatsApp. A disponibilidade e o valor final são confirmados no atendimento.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap order-layout">
+      <div>
+        <div id="produto-escolhido" class="chosen" hidden></div>
+        <form id="pedido" class="order-form" novalidate>
+          <div class="field" data-campo="nome"><label for="p-nome">Seu nome <span class="req">(obrigatório)</span></label><input id="p-nome" name="nome" type="text" autocomplete="name" required><p class="field-error" id="e-nome" role="alert" hidden></p></div>
+          <div class="field" data-campo="quantidade"><label for="p-qtd">Quantidade <span class="req">(obrigatório)</span></label><input id="p-qtd" name="quantidade" type="number" inputmode="numeric" min="1" max="99" value="1" required><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="ocasiao"><label for="p-ocasiao">Ocasião ou finalidade <span class="req">(obrigatório)</span></label><input id="p-ocasiao" name="ocasiao" type="text" list="ocasioes-sugeridas" placeholder="Ex.: aniversário de mãe" required><datalist id="ocasioes-sugeridas"></datalist><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="cores"><label for="p-cores">Cores preferidas <span class="req">(obrigatório)</span></label><input id="p-cores" name="cores" type="text" placeholder="Ex.: vinho, creme e dourado" required><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="tamanho"><label for="p-tamanho">Tamanho desejado</label><select id="p-tamanho" name="tamanho"><option value="">Selecione</option></select><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="orcamento"><label for="p-orcamento">Faixa de orçamento</label><select id="p-orcamento" name="orcamento"><option value="">Selecione</option></select><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="referencia"><label for="p-ref">Link de referência visual</label><input id="p-ref" name="referencia" type="url" inputmode="url" placeholder="https://…" aria-describedby="d-ref"><p class="hint" id="d-ref">Cole o link de uma foto ou publicação. Se preferir, envie a imagem direto na conversa do WhatsApp.</p><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="observacoes"><label for="p-obs">Observações</label><textarea id="p-obs" name="observacoes" rows="4" placeholder="Data de entrega, estilo da pessoa, local onde ficará…"></textarea><p class="field-error" role="alert" hidden></p></div>
+          <button class="button button-dark" type="submit">Revisar pedido</button>
+        </form>
+      </div>
+      <aside id="resumo" class="summary" tabindex="-1" aria-labelledby="resumo-titulo" hidden>
+        <h2 id="resumo-titulo">Resumo do pedido</h2>
+        <pre id="resumo-texto"></pre>
+        <a id="enviar-whatsapp" class="button button-dark" href="#" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
+        <p class="hint">Você será levado ao WhatsApp com esta mensagem pronta. Nada é enviado até você confirmar por lá.</p>
+      </aside>
+    </div>
+  </section>
+  <script>import '../scripts/catalogo.js';</script>
+</Base>

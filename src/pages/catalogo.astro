@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base titulo={"Catálogo | Capim Urbano"} descricao={"Catálogo de arranjos, vasos e presentes com flores desidratadas. Filtre por ocasião, cor e faixa de preço e peça pelo WhatsApp."} pagina="catalogo" atual="Catálogo" whatsapp={"Oi, Capim Urbano! Quero encomendar um arranjo/presente."}>
+  <section class="page-hero">
+    <div class="wrap">
+      <div class="page-hero-grid">
+        <h1>Catálogo de <em>flores desidratadas.</em></h1>
+        <div class="page-hero-note"><p>Escolha por ocasião, cor ou faixa de preço. Cada peça mostra prazo, durabilidade e cuidados, e o pedido segue direto para o WhatsApp do ateliê.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <form id="filtros" class="filters" aria-label="Filtrar produtos">
+        <div class="field"><label for="f-ocasiao">Ocasião</label><select id="f-ocasiao" name="ocasiao"><option value="">Todas</option></select></div>
+        <div class="field"><label for="f-cor">Cor</label><select id="f-cor" name="cor"><option value="">Todas</option></select></div>
+        <div class="field"><label for="f-faixa">Faixa de preço</label><select id="f-faixa" name="faixa"><option value="">Todas</option></select></div>
+        <button class="button button-light" type="reset">Limpar filtros</button>
+      </form>
+      <p id="catalogo-contagem" class="count" role="status" aria-live="polite">Carregando produtos…</p>
+      <noscript><p class="notice">Ative o JavaScript para ver o catálogo, ou fale com a gente pelo <a href="contato.html">contato</a>.</p></noscript>
+      <div id="catalogo-erro" class="empty" role="alert" tabindex="-1" hidden>
+        <h2>Não foi possível carregar os produtos.</h2>
+        <p>Verifique sua conexão e tente de novo. Se continuar, fale com a gente pelo <a href="contato.html">contato</a>.</p>
+        <div class="actions"><button id="tentar-de-novo" class="button button-dark" type="button">Tentar de novo</button></div>
+      </div>
+      <ul id="lista-produtos" class="product-grid"></ul>
+      <div id="catalogo-vazio" class="empty" hidden>
+        <h2>Nenhum produto com esses filtros.</h2>
+        <p>Tente outra combinação ou peça um arranjo sob medida.</p>
+        <div class="actions"><button id="limpar-vazio" class="button button-light" type="button">Limpar filtros</button><a class="button button-dark" href="pedido.html">Pedir arranjo personalizado</a></div>
+      </div>
+    </div>
+  </section>
+  <script>import '../scripts/catalogo.js';</script>
+</Base>

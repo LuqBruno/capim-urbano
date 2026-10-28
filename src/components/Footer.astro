@@ -1,0 +1,32 @@
+---
+import { WHATSAPP } from '../lib/catalogo-core.js';
+// "whatsapp" é a mensagem inicial do link de WhatsApp do rodapé (muda por página).
+const { whatsapp } = Astro.props;
+---
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      <a class="brand-mark" href="index.html" aria-label="Capim Urbano, página inicial"><span class="brand-name">capim urbano</span><span class="brand-subtitle">ateliê floral</span></a>
+      <p>Flores desidratadas em composições autorais, criadas em Tubarão, Santa Catarina. <em>Plantar beleza, colher alegria.</em></p>
+    </div>
+    <div>
+      <p class="footer-title">Serviços</p>
+      <ul class="footer-list">
+        <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="assinatura-floral.html">Assinatura floral</a></li>
+        <li><a href="eternizacao-de-flores.html">Eternização de flores</a></li>
+        <li><a href="oficinas-florais.html">Oficinas florais</a></li>
+        <li><a href="arranjos-e-presentes.html">Arranjos &amp; presentes</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-title">Conversar</p>
+      <ul class="footer-list">
+        <li><a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(whatsapp)}`} target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 19.5l1.2-3.7A8 8 0 1 1 8.6 18.6z"/><path d="M9.2 8.6c.2 2.8 3 5.6 5.9 5.9l1-1.3-1.9-1-1 .7a5 5 0 0 1-2.4-2.4l.7-1-1-1.9z"/></svg> WhatsApp (48) 99176-5295</a></li>
+        <li><a href="https://www.instagram.com/capimurbano.ateliefloral/" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/></svg> @capimurbano.ateliefloral</a></li>
+        <li><a href="contato.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg> Tubarão · SC</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-base"><span>© <span data-year>2026</span> Capim Urbano Ateliê Floral</span><span>Feito com carinho, flor por flor.</span></div>
+</footer>

@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base titulo={"Administração do catálogo | Capim Urbano"} pagina="admin" admin>
+  <section class="page-hero">
+    <div class="wrap">
+      <h1>Produtos do <em>catálogo.</em></h1>
+      <p class="notice" role="note">Área restrita à administradora. As alterações salvas aqui aparecem no catálogo para todos os clientes.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0" id="area-login" hidden>
+    <div class="wrap">
+      <form id="form-login" class="order-form admin-form" novalidate aria-labelledby="login-titulo">
+        <h2 id="login-titulo">Entrar</h2>
+        <div class="field" data-campo="email"><label for="l-email">E-mail</label><input id="l-email" name="email" type="email" autocomplete="username" required><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="senha"><label for="l-senha">Senha</label><input id="l-senha" name="senha" type="password" autocomplete="current-password" required><p class="field-error" role="alert" hidden></p></div>
+        <p id="login-status" class="admin-status" role="status" aria-live="polite"></p>
+        <div class="actions"><button class="button button-dark" type="submit" id="entrar">Entrar</button></div>
+      </form>
+    </div>
+  </section>
+  <p id="admin-carregando" class="wrap table-state" role="status">Carregando…</p>
+  <section class="section" style="padding-top:0" id="area-admin" hidden>
+    <div class="wrap admin-layout">
+      <div>
+        <div class="admin-actions">
+          <button class="button button-dark" type="button" id="novo">Novo produto</button>
+          <button class="button button-light" type="button" id="exportar">Baixar cópia (JSON)</button>
+          <a class="button button-light" href="catalogo.html" target="_blank" rel="noopener">Ver como o cliente vê</a>
+          <button class="button button-light" type="button" id="sair">Sair</button>
+        </div>
+        <p id="admin-status" class="admin-status" role="status" aria-live="polite"></p>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <caption class="sr-only">Produtos cadastrados</caption>
+            <thead><tr><th scope="col">Produto</th><th scope="col">Preço</th><th scope="col">Disponibilidade</th><th scope="col">No catálogo</th><th scope="col">Ações</th></tr></thead>
+            <tbody id="tabela"><tr><td colspan="5" class="table-state">Carregando produtos…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <form id="form-produto" class="order-form admin-form" novalidate aria-labelledby="form-titulo">
+        <h2 id="form-titulo">Novo produto</h2>
+        <input type="hidden" name="id">
+        <div class="field" data-campo="nome"><label for="a-nome">Nome</label><input id="a-nome" name="nome" type="text" required><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="categoria"><label for="a-cat">Categoria</label><input id="a-cat" name="categoria" type="text" required placeholder="Ex.: Vasos"><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="descricao"><label for="a-desc">Descrição</label><textarea id="a-desc" name="descricao" rows="3" required></textarea><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="fotos"><label for="a-fotos">Fotos já cadastradas (um caminho ou link por linha)</label><textarea id="a-fotos" name="fotos" rows="3" placeholder="imagens/web/capim5.webp"></textarea><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="arquivos"><label for="a-arquivos">Enviar fotos novas (WebP, JPEG ou PNG, até 2 MB cada)</label><input id="a-arquivos" name="arquivos" type="file" accept="image/webp,image/jpeg,image/png" multiple><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="preco"><label for="a-preco">Preço em reais (vazio = sob orçamento)</label><input id="a-preco" name="preco" type="text" inputmode="decimal" placeholder="129,90"><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="disponibilidade"><label for="a-disp">Disponibilidade</label><select id="a-disp" name="disponibilidade"></select><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="prazo"><label for="a-prazo">Prazo de produção ou entrega</label><input id="a-prazo" name="prazo" type="text" required><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="durabilidade"><label for="a-dur">Durabilidade</label><input id="a-dur" name="durabilidade" type="text"><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="cuidados"><label for="a-cui">Cuidados</label><textarea id="a-cui" name="cuidados" rows="2"></textarea><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="ocasioes"><label for="a-oca">Ocasiões (separadas por vírgula)</label><input id="a-oca" name="ocasioes" type="text" placeholder="Aniversário, Decoração"><p class="field-error" role="alert" hidden></p></div>
+        <div class="field" data-campo="cores"><label for="a-cor">Cores (separadas por vírgula)</label><input id="a-cor" name="cores" type="text" placeholder="Vinho, Creme"><p class="field-error" role="alert" hidden></p></div>
+        <div class="field checkbox"><label><input type="checkbox" name="ativo" checked> Mostrar no catálogo</label></div>
+        <div class="actions"><button class="button button-dark" type="submit">Salvar produto</button><button class="button button-light" type="button" id="cancelar">Cancelar</button></div>
+      </form>
+    </div>
+  </section>
+  <script>import '../scripts/admin.js';</script>
+</Base>

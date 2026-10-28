@@ -1,27 +1,27 @@
 // Testes de tela (fluxo, responsividade e acessibilidade básica).
-// O Supabase é simulado com page.route (nada vai à rede) e a biblioteca supabase-js vem de tests/vendor.
+// O site testado é o de dist/: use `npm run test:e2e` (faz o build e roda) ou rode `npm run build` antes.
+// O Supabase é simulado com page.route (nada vai à rede); o supabase-js já vai dentro do bundle do site.
 // Requer o pacote "playwright" instalado globalmente ou no projeto e um Chromium.
 // Executar: node --test tests/e2e.test.js
 // Opcional: CHROMIUM_PATH=/caminho/do/chromium (padrão: o navegador do Playwright).
-const test = require('node:test');
-const assert = require('node:assert');
-const http = require('node:http');
-const fs = require('node:fs');
-const path = require('node:path');
+import test from 'node:test';
+import assert from 'node:assert';
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import * as C from '../src/lib/catalogo-core.js';
+import { PRODUTOS_PADRAO as PADRAO } from '../src/lib/catalogo-dados.js';
 
-const C = require('../catalogo-core.js');
-globalThis.window = globalThis;
-require('../catalogo-dados.js');
-const PADRAO = globalThis.CAPIM_PRODUTOS_PADRAO;
-
+const require = createRequire(import.meta.url); // respeita NODE_PATH, para achar o playwright global
 let chromium;
 try { ({ chromium } = require('playwright')); } catch (e) { /* sem playwright: testes são ignorados */ }
 
-const RAIZ = path.join(__dirname, '..');
-const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
+const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json' };
 const VIEWPORTS = { celular: { width: 375, height: 800 }, tablet: { width: 768, height: 1024 }, desktop: { width: 1280, height: 900 } };
 const SUPABASE = 'https://gkpiwqztgzkuxvwrkpiy.supabase.co';
-const BIBLIOTECA = fs.readFileSync(path.join(__dirname, 'vendor', 'supabase-js-2.117.3.umd.js'));
 const EMAIL = 'admin@exemplo.test';
 const SENHA = 'senha-de-teste';
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
@@ -32,6 +32,7 @@ let servidor, base, navegador;
 
 test.before(async () => {
   if (!chromium) return;
+  if (!fs.existsSync(path.join(RAIZ, 'index.html'))) throw new Error('dist/ não existe: rode `npm run build` antes (ou use `npm run test:e2e`).');
   servidor = http.createServer((req, res) => {
     const arquivo = path.join(RAIZ, decodeURIComponent(new URL(req.url, 'http://x').pathname));
     if (!arquivo.startsWith(RAIZ) || !fs.existsSync(arquivo) || fs.statSync(arquivo).isDirectory()) { res.writeHead(404).end(); return; }
@@ -59,9 +60,8 @@ function novoBanco(extra = {}) {
   };
 }
 
-/* Intercepta a biblioteca (CDN) e o Supabase. Visitante (chave publicável) só vê ativos; com o token, a administradora vê tudo. */
+/* Intercepta o Supabase. Visitante (chave publicável) só vê ativos; com o token, a administradora vê tudo. */
 async function simularSupabase(ctx, banco) {
-  await ctx.route('https://cdn.jsdelivr.net/**', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: BIBLIOTECA }));
   await ctx.route(SUPABASE + '/**', async (route) => {
     const req = route.request();
     const url = new URL(req.url());

@@ -1,0 +1,23 @@
+---
+// Cabeçalho do site. "atual" é o rótulo do item do menu que representa a página (aria-current).
+const { atual } = Astro.props;
+const itens = [
+  { href: 'index.html', rotulo: 'Início' },
+  { href: 'catalogo.html', rotulo: 'Catálogo' },
+  { href: 'servicos.html', rotulo: 'Serviços' },
+  { href: 'assinatura-floral.html', rotulo: 'Assinatura' },
+  { href: 'eternizacao-de-flores.html', rotulo: 'Eternização' },
+  { href: 'oficinas-florais.html', rotulo: 'Oficinas' },
+  { href: 'arranjos-e-presentes.html', rotulo: 'Arranjos' },
+  { href: 'contato.html', rotulo: 'Conversar', classe: 'nav-contact' }
+];
+---
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand-mark" href="index.html" aria-label="Capim Urbano, página inicial"><span class="brand-name">capim urbano</span><span class="brand-subtitle">ateliê floral</span></a>
+    <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+    <nav class="site-nav" id="menu" aria-label="Navegação principal">
+      {itens.map((i) => <a class={i.classe} href={i.href} aria-current={i.rotulo === atual ? 'page' : undefined}>{i.rotulo}</a>)}
+    </nav>
+  </div>
+</header>

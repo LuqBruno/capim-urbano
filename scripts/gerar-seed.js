@@ -1,7 +1,7 @@
 /* Gera o SQL de carga inicial a partir de catalogo-dados.js.
    Uso: node scripts/gerar-seed.js > supabase/migrations/20261028000400_seed_produtos_exemplo.sql */
-require('../catalogo-dados.js');
-const lista = globalThis.CAPIM_PRODUTOS_PADRAO;
+import { PRODUTOS_PADRAO as lista } from '../src/lib/catalogo-dados.js';
+
 const txt = (v) => (v == null || v === '' ? 'null' : "'" + String(v).replace(/'/g, "''") + "'");
 const arr = (a) => (a && a.length ? 'array[' + a.map(txt).join(', ') + ']::text[]' : "'{}'::text[]");
 const linhas = lista.map((p) =>
