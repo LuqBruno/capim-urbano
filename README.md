@@ -186,17 +186,17 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 | Elemento do herbário | Onde aparece |
 |---|---|
 | Papel de arquivo | grão sutil no fundo de papel de todas as páginas |
-| Janela em arco de estufa | foto principal da home, fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
+| Janela em arco de estufa | foto principal da home (com um arco sálvia deslocado atrás, como papel recortado), fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
 | Espécime preso com fita | fita translúcida no topo de cada produto do catálogo |
 | Ficha numerada | cartão do produto com "Nº 01, Nº 02…" (ordem do catálogo) e a "Ficha da peça" na página do produto |
 | Selo do acervo | selo circular com texto girando na foto da home (`src/components/Selo.astro`) |
-| Etiquetas da coleção | faixa de serviços deslizando abaixo da home (`src/components/Faixa.astro`) |
-| Assinatura do acervo | "capim urbano" em tamanho grande no rodapé |
-| Varal de secagem | fotos do ateliê como polaroids presas num cordão que cede, na home (`src/components/Varal.astro`): arraste, clique, use ←/→ ou os botões; balançam conforme a velocidade e há botão de pausar o autoplay |
+| Varal de secagem | logo abaixo da abertura, sobre uma faixa sálvia: fotos do ateliê como polaroids presas num cordão que cede, na home (`src/components/Varal.astro`): arraste, clique, use ←/→ ou os botões; balançam conforme a velocidade e há botão de pausar o autoplay |
 
 Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/styles.css`, no bloco "Herbário Capim Urbano".
 
 
-- Fonte principal: **Quicksand** (acompanha a letra do logotipo). Títulos grandes e o "ateliê floral" usam **Cormorant Garamond**.
-- Paleta: papel (`#f4f1ea`), sálvia, oliva e vinho (`#7a2937`). Os tokens ficam no início de `src/styles/styles.css`.
+- **Marca:** a logo oficial (letras grafite e "ateliê floral" manuscrito) está em `public/imagens/marca/`: `logo-sobre-papel.webp` (manuscrito em sálvia, usada no cabeçalho) e `logo-sobre-salvia.webp` (manuscrito branco, usada no rodapé, que reproduz o cartão da marca).
+- **Paleta da marca** (medida na logo): sálvia `#b1aa97`, grafite `#5b5852` e branco, sobre papel claro `#f6f4ef`. O destaque de textos e links é o sálvia-grafite `#6e6a5a` (`--acento`). Texto sobre sálvia usa `#3d3b36` (`--sobre-salvia`) para manter o contraste AA. O vinho fica só para erro e "indisponível".
+- **Tipografia:** **Quicksand** no texto, **Cormorant Garamond** em peso leve nos títulos e **Allura** no manuscrito "plantar beleza, colher alegria", como nos posts da marca.
+- Os tokens ficam no início de `src/styles/styles.css`.
 - Meta de acessibilidade: foco visível, rótulos em todos os campos, mensagens de erro com `role="alert"` e navegação por teclado.
