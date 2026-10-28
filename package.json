@@ -9,7 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node --test tests/catalogo-core.test.js",
+    "test": "node --test tests/catalogo-core.test.js tests/varal-core.test.js",
     "test:e2e": "astro build && node --test tests/e2e.test.js"
   },
   "engines": {

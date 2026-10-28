@@ -578,3 +578,56 @@ test('o site não grava produtos no localStorage', opts, async () => {
   assert.ok(chaves.every((c) => c.startsWith('sb-')), 'só a sessão do Supabase: ' + chaves);
   await ctx.close();
 });
+
+/* ---------- Varal de fotos (home) ---------- */
+
+test('varal: botões, teclado e arrasto trocam a foto ativa; legenda e anúncio acompanham', opts, async () => {
+  const { ctx, page, erros } = await abrir(VIEWPORTS.desktop, 'index.html');
+  const varal = page.locator('[data-varal]');
+  await varal.scrollIntoViewIfNeeded();
+  await page.waitForSelector('[data-varal].is-pronto');
+  const ativa = () => page.textContent('.varal-contador b');
+  const esperar = (n) => page.waitForFunction((v) => document.querySelector('.varal-contador b').textContent === v, n);
+  assert.strictEqual(await ativa(), '01');
+  assert.strictEqual(await page.textContent('.varal-titulo'), 'Vaso terracota');
+  await page.click('[data-proxima]');
+  await esperar('02');
+  assert.match(await page.textContent('[data-anuncio]'), /^Foto 2 de 8: Para presentear$/);
+  assert.strictEqual(await page.textContent('.varal-titulo'), 'Para presentear');
+  assert.strictEqual(await page.locator('.varal-cartao[data-on="1"]').count(), 1);
+  await varal.focus();
+  await page.keyboard.press('ArrowRight');
+  await esperar('03');
+  await page.keyboard.press('ArrowLeft');
+  await esperar('02');
+  const caixa = await varal.boundingBox();
+  await page.mouse.move(caixa.x + caixa.width * 0.75, caixa.y + caixa.height * 0.4);
+  await page.mouse.down();
+  await page.mouse.move(caixa.x + caixa.width * 0.15, caixa.y + caixa.height * 0.4, { steps: 12 });
+  await page.mouse.up();
+  await page.waitForFunction(() => Number(document.querySelector('.varal-contador b').textContent) > 2);
+  await page.click('[data-anterior]');
+  await page.waitForFunction(() => Number(document.querySelector('.varal-contador b').textContent) >= 2);
+  assert.strictEqual(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'rolagem horizontal');
+  assert.deepStrictEqual(erros, []);
+  await ctx.close();
+});
+
+test('varal: botão de pausa alterna; com menos movimento não há autoplay nem pausa', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.celular, 'index.html');
+  await page.waitForSelector('[data-varal].is-pronto', { state: 'attached' });
+  const pausa = page.locator('[data-pausa]');
+  assert.strictEqual(await pausa.getAttribute('aria-pressed'), 'false');
+  await pausa.scrollIntoViewIfNeeded();
+  await pausa.click();
+  assert.strictEqual(await pausa.getAttribute('aria-pressed'), 'true');
+  assert.match(await pausa.getAttribute('aria-label'), /Continuar/);
+  await ctx.close();
+  const ctx2 = await navegador.newContext({ viewport: VIEWPORTS.celular, reducedMotion: 'reduce' });
+  await simularSupabase(ctx2, novoBanco());
+  const p2 = await ctx2.newPage();
+  await p2.goto(base + 'index.html');
+  await p2.waitForSelector('[data-varal].is-pronto', { state: 'attached' });
+  assert.strictEqual(await p2.locator('[data-pausa]').isHidden(), true, 'sem autoplay, o botão de pausa some');
+  await ctx2.close();
+});

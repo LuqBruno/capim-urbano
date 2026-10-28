@@ -1,0 +1,46 @@
+---
+// Varal de fotos: polaroids presas num cordão que cede no meio. Arraste, clique numa foto,
+// use ←/→ ou os botões. A física e a interação estão em src/scripts/varal.js (lógica em src/lib/varal-core.js).
+// Sem JavaScript, as fotos aparecem lado a lado com rolagem.
+import Icone from './Icone.astro';
+import { doisDigitos } from '../lib/varal-core.js';
+
+interface Foto { src: string; alt: string; titulo: string; legenda?: string; largura: number; altura: number; }
+interface Props {
+  fotos: Foto[];
+  /** Nome do carrossel para leitores de tela. */
+  rotulo?: string;
+  /** Largura máxima de uma foto em px (diminui em telas estreitas). */
+  largura?: number;
+  /** Quanto o cordão cede no meio, em px. */
+  cede?: number;
+  /** ms por foto; 0 desliga o autoplay. */
+  autoplay?: number;
+}
+const { fotos, rotulo = 'Varal de fotos', largura = 260, cede = 40, autoplay = 5000 } = Astro.props;
+const primeira = fotos[0];
+---
+<div class="varal" data-varal data-largura={largura} data-cede={cede} data-autoplay={autoplay} role="region" aria-roledescription="carrossel" aria-label={rotulo} tabindex="0">
+  <svg class="varal-cordao" aria-hidden="true"><path fill="none" stroke-width="1.5" stroke-linecap="round" /></svg>
+  {fotos.map((f, i) => (
+    <div class="varal-cartao" data-i={i} data-on={i === 0 ? '1' : '0'} data-titulo={f.titulo} data-legenda={f.legenda ?? ''}>
+      <div class="varal-papel">
+        <div class="varal-foto"><img src={f.src} alt={f.alt} width={f.largura} height={f.altura} loading="lazy" draggable="false" /></div>
+        <p class="varal-nota">{f.titulo}</p>
+      </div>
+      <span class="varal-prendedor" aria-hidden="true"></span>
+    </div>
+  ))}
+  <div class="varal-barra">
+    <div class="varal-legenda" aria-hidden="true"><span class="varal-titulo">{primeira.titulo}</span><span class="varal-sub">{primeira.legenda}</span></div>
+    <span class="varal-contador" aria-hidden="true"><b>01</b> / {doisDigitos(fotos.length)}</span>
+    <button class="varal-botao" type="button" data-pausa aria-pressed="false" aria-label="Pausar a passagem automática">
+      <svg class="icon icone-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12" /></svg>
+      <svg class="icon icone-continuar" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" /></svg>
+    </button>
+    <button class="varal-botao" type="button" data-anterior aria-label="Foto anterior"><Icone nome="seta" /></button>
+    <button class="varal-botao" type="button" data-proxima aria-label="Próxima foto"><Icone nome="seta" /></button>
+  </div>
+  <p class="sr-only" aria-live="polite" data-anuncio></p>
+</div>
+<script>import '../scripts/varal.js';</script>

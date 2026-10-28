@@ -14,7 +14,7 @@ Idioma: **português do Brasil** em todo texto visível, nos comentários, nos c
 npm install                          # uma vez (Node 22.23.4 ou superior, exigência do Astro 7)
 npm run dev                          # servidor de desenvolvimento em http://localhost:4321
 npm run build                        # gera o site estático em dist/
-npm test                             # regras de negócio (node --test tests/catalogo-core.test.js)
+npm test                             # regras de negócio e física do varal (tests/catalogo-core.test.js e tests/varal-core.test.js)
 npm run test:e2e                     # build + telas (precisa do pacote playwright e de um Chromium)
 ```
 
@@ -51,7 +51,7 @@ Vêm dos cards RN01, RN02 e das histórias do Trello:
 - Imagens: ficam em `public/imagens/web/` e são referenciadas como `imagens/web/arquivo.webp`. Use as versões `.webp` com `width`, `height` e `loading="lazy"` (exceto a imagem principal da dobra).
 - Não use `display` em um elemento que também use o atributo `hidden` sem manter a regra global `[hidden] { display: none !important; }` de `src/styles/styles.css`. Sem ela, `.summary`, `.chosen` e `.empty` ficariam visíveis mesmo com `hidden`.
 - Novas páginas: crie `src/pages/<nome>.astro` usando `Base` (prop `titulo`, `descricao`, `atual` para o item do menu, `whatsapp` para o rodapé) e, se for item do menu, adicione-o em `src/components/Header.astro`. Ícones de traço (setas, WhatsApp, Instagram, local) vêm de `<Icone nome="…" />`; não cole SVG inline repetido.
-- Identidade "Herbário Capim Urbano" (detalhes no README): fotos de destaque em arco (`border-radius: var(--arch)`), produtos como espécimes com fita e ficha numerada (`data-especime` no `.product-body`), selo (`Selo.astro`), faixa (`Faixa.astro`) e assinatura no rodapé. O bloco fica no **fim** de `src/styles/styles.css` de propósito, para vencer as regras anteriores. Decoração nova: `aria-hidden` e sem animação com `prefers-reduced-motion`.
+- Identidade "Herbário Capim Urbano" (detalhes no README): fotos de destaque em arco (`border-radius: var(--arch)`), produtos como espécimes com fita e ficha numerada (`data-especime` no `.product-body`), selo (`Selo.astro`), faixa (`Faixa.astro`), varal de fotos (`Varal.astro`, com a física em `src/lib/varal-core.js` e a interação em `src/scripts/varal.js`) e assinatura no rodapé. Carrosséis e animações automáticas precisam de botão de pausa e param com `prefers-reduced-motion`. O bloco fica no **fim** de `src/styles/styles.css` de propósito, para vencer as regras anteriores. Decoração nova: `aria-hidden` e sem animação com `prefers-reduced-motion`.
 - Fonte principal: Quicksand (`--sans`). Mantenha o `<link>` do Google Fonts igual em todas as páginas.
 
 ## Cuidados

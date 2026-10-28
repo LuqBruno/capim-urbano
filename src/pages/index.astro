@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Icone from '../components/Icone.astro';
 import Selo from '../components/Selo.astro';
 import Faixa from '../components/Faixa.astro';
+import Varal from '../components/Varal.astro';
 ---
 <Base titulo={"Capim Urbano | Ateliê floral de flores desidratadas em Tubarão"} descricao={"Ateliê de flores desidratadas em Tubarão (SC): assinatura floral, eternização de flores, oficinas e arranjos sob encomenda."} og atual="Início" whatsapp={"Oi, Capim Urbano! Quero conversar sobre um serviço floral."}>
   <section class="hero">
@@ -100,6 +101,22 @@ import Faixa from '../components/Faixa.astro';
     </div>
   </section>
 
+  <section class="section varal-secao" aria-labelledby="varal-titulo">
+    <div class="wrap varal-cabeca reveal">
+      <h2 id="varal-titulo">Pendurado no <em>varal.</em></h2>
+      <p class="lead">Peças e oficinas do ateliê, presas como flores secando. Arraste o varal, clique numa foto ou use as setas.</p>
+    </div>
+    <Varal rotulo="Fotos do ateliê" fotos={[
+      { src: 'imagens/web/capim5.webp', largura: 1200, altura: 1600, titulo: 'Vaso terracota', legenda: 'Vaso de cerâmica terracota com capim tingido em laranja queimado', alt: 'Vaso de cerâmica terracota com capim tingido em laranja queimado' },
+      { src: 'imagens/web/oficina-presente-vivo.webp', largura: 1350, altura: 1800, titulo: 'Para presentear', legenda: 'Buquê de flores desidratadas embrulhado para presente', alt: 'Buquê de flores desidratadas embrulhado para presente' },
+      { src: 'imagens/web/oficina-guirlanda.webp', largura: 960, altura: 1194, titulo: 'Oficina de guirlanda', legenda: 'Oficina de guirlanda', alt: 'Oficina de guirlanda' },
+      { src: 'imagens/web/capim6.webp', largura: 1200, altura: 1600, titulo: 'Vaso esculpido', legenda: 'Vaso branco esculpido com etiqueta Capim Urbano sobre mesa de mármore verde', alt: 'Vaso branco esculpido com etiqueta Capim Urbano sobre mesa de mármore verde' },
+      { src: 'imagens/web/oficina-arranjo-180.webp', largura: 1350, altura: 1800, titulo: 'Arranjo 180 graus', legenda: 'Oficina de arranjos 180 graus', alt: 'Oficina de arranjos 180 graus' },
+      { src: 'imagens/web/capim4.webp', largura: 1200, altura: 1600, titulo: 'Difusor vinho', legenda: 'Difusor de vidro com raminho de flores vinho sobre base de madeira', alt: 'Difusor de vidro com raminho de flores vinho sobre base de madeira' },
+      { src: 'imagens/web/oficina-escapularios.webp', largura: 960, altura: 1106, titulo: 'Escapulários', legenda: 'Oficina de escapulários', alt: 'Oficina de escapulários' },
+      { src: 'imagens/web/oficina-hero.webp', largura: 1254, altura: 1254, titulo: 'Mãos na massa', legenda: 'Participante montando um arranjo em oficina floral da Capim Urbano', alt: 'Participante montando um arranjo em oficina floral da Capim Urbano' }
+    ]} />
+  </section>
   <section class="section">
     <div class="wrap insta">
       <div class="reveal">
