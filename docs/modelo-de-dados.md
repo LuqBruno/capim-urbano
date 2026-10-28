@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Dados do catálogo e do pedido. O catálogo mora na tabela `public.produtos` do Supabase (SQL em [`supabase/migrations/`](../supabase/migrations/)). `catalogo-dados.js` guarda os produtos de exemplo, usados na carga inicial e como reserva só quando o site não está configurado para o Supabase. As regras ficam em `catalogo-core.js`, que converte a linha do banco em produto (`linhaParaProduto`) e o produto em linha (`produtoParaLinha`).
+Dados do catálogo e do pedido. O catálogo mora na tabela `public.produtos` do Supabase (SQL em [`supabase/migrations/`](../supabase/migrations/)). `src/lib/catalogo-dados.js` guarda os produtos de exemplo, usados na carga inicial e como reserva só quando o site não está configurado para o Supabase. As regras ficam em `src/lib/catalogo-core.js`, que converte a linha do banco em produto (`linhaParaProduto`) e o produto em linha (`produtoParaLinha`).
 
 ## Produto
 
@@ -75,4 +75,4 @@ O pedido não é armazenado: vira o texto de uma mensagem do WhatsApp.
 
 ## Pendências de dados
 
-Os produtos hoje no banco são os **exemplos** de `catalogo-dados.js` (preço, prazo e disponibilidade fictícios). A administradora deve conferir e corrigir todos em `admin.html` antes de divulgar o site.
+Os produtos hoje no banco são os **exemplos** de `src/lib/catalogo-dados.js` (preço, prazo e disponibilidade fictícios). A administradora deve conferir e corrigir todos em `admin.html` antes de divulgar o site.

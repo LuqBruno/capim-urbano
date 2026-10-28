@@ -7,7 +7,7 @@
 | Projeto | `capim-urbano` (plano Free, região `sa-east-1`, São Paulo) |
 | Project ref | `gkpiwqztgzkuxvwrkpiy` |
 | URL | https://gkpiwqztgzkuxvwrkpiy.supabase.co |
-| Chave no site | somente a **publicável** (`sb_publishable_…`), em `supabase-config.js`. A `service_role` não é usada nem gravada em nenhum arquivo |
+| Chave no site | somente a **publicável** (`sb_publishable_…`), em `src/lib/supabase-config.js`. A `service_role` não é usada nem gravada em nenhum arquivo |
 | Migrações | [`supabase/migrations/`](../supabase/migrations/) |
 | Administradora | uma conta, cadastrada em `public.administradoras` (e-mail informado pelo time no pedido do trabalho) |
 
@@ -18,7 +18,7 @@
 - [x] **Passo 3:** RLS. Visitante lê só `ativo = true`; só administradora escreve. Desvios em relação ao plano original, explicados abaixo.
 - [x] **Passo 4:** bucket público `produtos` (2 MB; `image/webp`, `image/jpeg`, `image/png`), escrita só de administradoras.
 - [x] **Advisors:** segurança e desempenho sem nenhum alerta após as migrações (verificado duas vezes: antes e depois de unificar as políticas).
-- [x] **Passo 5:** `supabase-config.js`, `carregarProdutos` assíncrona, estados de carregando e erro com "Tentar de novo" no catálogo, no produto e no pedido, login e cadastro no `admin.html`/`admin.js`, upload de fotos. Gravação em `localStorage` removida (e "Importar JSON" e "Restaurar padrão" também, que dependiam dela; "Exportar" virou "Baixar cópia").
+- [x] **Passo 5:** `src/lib/supabase-config.js`, `carregarProdutos` assíncrona, estados de carregando e erro com "Tentar de novo" no catálogo, no produto e no pedido, login e cadastro no `admin.html`/`admin.js`, upload de fotos. Gravação em `localStorage` removida (e "Importar JSON" e "Restaurar padrão" também, que dependiam dela; "Exportar" virou "Baixar cópia").
 - [x] **Passo 6:** carga inicial com os 7 produtos de `catalogo-dados.js` (**são exemplos**, veja "O que falta").
 - [x] **Passo 7:** testes. `tests/catalogo-core.test.js` (conversão, foto, cliente, carga) e `tests/e2e.test.js` (Supabase simulado com `page.route`).
 - [x] **Segurança:** testado com a chave publicável, sem login (veja "Verificação de segurança").
@@ -28,7 +28,8 @@
 1. **Política em `administradoras`.** O plano dizia "sem políticas". Mas as políticas de `produtos` consultam essa tabela, e o RLS vale também dentro dessas consultas: com a tabela fechada, a checagem nunca acharia ninguém e **nem a administradora conseguiria escrever**. Foi criada a política `ler a propria linha` (cada usuária lê só o próprio `user_id`). Ninguém consegue listar as administradoras.
 2. **Políticas de `produtos` unificadas.** O plano tinha 3 políticas, e duas liam o mesmo dado. O Supabase avisou "múltiplas políticas permissivas" no desempenho. Ficaram: `ler produtos` (visitante vê ativos; administradora vê tudo) e uma política por ação para escrever (`administradoras criam`, `editam`, `apagam`).
 3. **Falha de rede no catálogo.** O plano falava em usar `CAPIM_PRODUTOS_PADRAO` como reserva em caso de falha. Isso exibiria preços e disponibilidade de **exemplo** como se fossem reais (e um produto marcado como indisponível no banco apareceria como disponível). Por isso a reserva só vale quando o site **não** está configurado para o Supabase. Se a busca falhar, a tela mostra o erro e "Tentar de novo". No pedido, se o produto do link não carregar, o envio fica bloqueado até a busca funcionar (RN01).
-4. **Fotos do seed.** Os 7 produtos continuam com os caminhos `imagens/web/...` do site (a opção permitida no passo 6.3 do plano). Fotos novas vão para o bucket.
+4. **Biblioteca.** O plano previa o `supabase-js` por CDN. Depois da migração do site para Astro (2026-10-28) ele é dependência do npm, com versão exata no `package.json`, e entra no bundle das páginas. Não há mais CDN nem `integrity`.
+5. **Fotos do seed.** Os 7 produtos continuam com os caminhos `imagens/web/...` do site (a opção permitida no passo 6.3 do plano). Fotos novas vão para o bucket.
 
 ## O que falta (depende de uma pessoa)
 
