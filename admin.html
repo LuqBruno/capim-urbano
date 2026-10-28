@@ -24,18 +24,29 @@
     <section class="page-hero">
       <div class="wrap">
         <h1>Produtos do <em>catálogo.</em></h1>
-        <p class="notice" role="note"><strong>Importante:</strong> esta área guarda as alterações apenas <em>neste navegador</em> e não tem senha. Para publicar para todos os clientes, use "Exportar JSON" e envie o arquivo à equipe de desenvolvimento. Um cadastro com login e banco de dados é o próximo passo.</p>
+        <p class="notice" role="note">Área restrita à administradora. As alterações salvas aqui aparecem no catálogo para todos os clientes.</p>
       </div>
     </section>
-    <section class="section" style="padding-top:0">
+    <section class="section" style="padding-top:0" id="area-login" hidden>
+      <div class="wrap">
+        <form id="form-login" class="order-form admin-form" novalidate aria-labelledby="login-titulo">
+          <h2 id="login-titulo">Entrar</h2>
+          <div class="field" data-campo="email"><label for="l-email">E-mail</label><input id="l-email" name="email" type="email" autocomplete="username" required><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="senha"><label for="l-senha">Senha</label><input id="l-senha" name="senha" type="password" autocomplete="current-password" required><p class="field-error" role="alert" hidden></p></div>
+          <p id="login-status" class="admin-status" role="status" aria-live="polite"></p>
+          <div class="actions"><button class="button button-dark" type="submit" id="entrar">Entrar</button></div>
+        </form>
+      </div>
+    </section>
+    <p id="admin-carregando" class="wrap table-state" role="status">Carregando…</p>
+    <section class="section" style="padding-top:0" id="area-admin" hidden>
       <div class="wrap admin-layout">
         <div>
           <div class="admin-actions">
             <button class="button button-dark" type="button" id="novo">Novo produto</button>
-            <button class="button button-light" type="button" id="exportar">Exportar JSON</button>
-            <label class="button button-light file-button">Importar JSON<input type="file" id="importar" accept="application/json" hidden></label>
-            <button class="button button-light" type="button" id="restaurar">Restaurar padrão</button>
+            <button class="button button-light" type="button" id="exportar">Baixar cópia (JSON)</button>
             <a class="button button-light" href="catalogo.html" target="_blank" rel="noopener">Ver como o cliente vê</a>
+            <button class="button button-light" type="button" id="sair">Sair</button>
           </div>
           <p id="admin-status" class="admin-status" role="status" aria-live="polite"></p>
           <div class="table-wrap">
@@ -52,7 +63,8 @@
           <div class="field" data-campo="nome"><label for="a-nome">Nome</label><input id="a-nome" name="nome" type="text" required><p class="field-error" role="alert" hidden></p></div>
           <div class="field" data-campo="categoria"><label for="a-cat">Categoria</label><input id="a-cat" name="categoria" type="text" required placeholder="Ex.: Vasos"><p class="field-error" role="alert" hidden></p></div>
           <div class="field" data-campo="descricao"><label for="a-desc">Descrição</label><textarea id="a-desc" name="descricao" rows="3" required></textarea><p class="field-error" role="alert" hidden></p></div>
-          <div class="field" data-campo="fotos"><label for="a-fotos">Fotos (um caminho ou link por linha)</label><textarea id="a-fotos" name="fotos" rows="3" required placeholder="imagens/web/capim5.webp"></textarea><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="fotos"><label for="a-fotos">Fotos já cadastradas (um caminho ou link por linha)</label><textarea id="a-fotos" name="fotos" rows="3" placeholder="imagens/web/capim5.webp"></textarea><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="arquivos"><label for="a-arquivos">Enviar fotos novas (WebP, JPEG ou PNG, até 2 MB cada)</label><input id="a-arquivos" name="arquivos" type="file" accept="image/webp,image/jpeg,image/png" multiple><p class="field-error" role="alert" hidden></p></div>
           <div class="field" data-campo="preco"><label for="a-preco">Preço em reais (vazio = sob orçamento)</label><input id="a-preco" name="preco" type="text" inputmode="decimal" placeholder="129,90"><p class="field-error" role="alert" hidden></p></div>
           <div class="field" data-campo="disponibilidade"><label for="a-disp">Disponibilidade</label><select id="a-disp" name="disponibilidade"></select><p class="field-error" role="alert" hidden></p></div>
           <div class="field" data-campo="prazo"><label for="a-prazo">Prazo de produção ou entrega</label><input id="a-prazo" name="prazo" type="text" required><p class="field-error" role="alert" hidden></p></div>
@@ -66,6 +78,8 @@
       </div>
     </section>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous"></script>
+  <script src="supabase-config.js"></script>
   <script src="catalogo-dados.js"></script>
   <script src="catalogo-core.js"></script>
   <script src="admin.js"></script>

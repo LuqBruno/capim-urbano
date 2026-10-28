@@ -42,6 +42,11 @@
         </form>
         <p id="catalogo-contagem" class="count" role="status" aria-live="polite">Carregando produtos…</p>
         <noscript><p class="notice">Ative o JavaScript para ver o catálogo, ou fale com a gente pelo <a href="contato.html">contato</a>.</p></noscript>
+        <div id="catalogo-erro" class="empty" role="alert" tabindex="-1" hidden>
+          <h2>Não foi possível carregar os produtos.</h2>
+          <p>Verifique sua conexão e tente de novo. Se continuar, fale com a gente pelo <a href="contato.html">contato</a>.</p>
+          <div class="actions"><button id="tentar-de-novo" class="button button-dark" type="button">Tentar de novo</button></div>
+        </div>
         <ul id="lista-produtos" class="product-grid"></ul>
         <div id="catalogo-vazio" class="empty" hidden>
           <h2>Nenhum produto com esses filtros.</h2>
@@ -79,6 +84,8 @@
     <div class="wrap footer-base"><span>© <span data-year>2026</span> Capim Urbano Ateliê Floral</span><span>Feito com carinho, flor por flor.</span></div>
   </footer>
   <script src="script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous" defer></script>
+  <script src="supabase-config.js" defer></script>
   <script src="catalogo-dados.js" defer></script>
   <script src="catalogo-core.js" defer></script>
   <script src="catalogo.js" defer></script>

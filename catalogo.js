@@ -2,7 +2,6 @@
 (function () {
   const C = window.CapimCore;
   const page = document.body.dataset.page;
-  const safeStorage = () => { try { return window.localStorage; } catch (e) { return null; } };
 
   const el = (tag, attrs = {}, children = []) => {
     const node = document.createElement(tag);
@@ -15,14 +14,24 @@
     return node;
   };
 
-  const produtos = C.carregarProdutos(window.CAPIM_PRODUTOS_PADRAO || [], safeStorage());
-  const ativos = produtos.filter((p) => p.ativo !== false);
+  let ativos = [];
   const porId = (id) => ativos.find((p) => p.id === id);
+
+  /* Busca os produtos no Supabase. Retorna { produtos, origem, erro }; o erro vira a tela "Tentar de novo". */
+  async function carregar() {
+    let cliente;
+    try { cliente = C.criarCliente(window.CAPIM_SUPABASE, window.supabase); }
+    catch (erro) { return { produtos: [], origem: 'banco', erro }; }
+    const r = await C.carregarProdutos(window.CAPIM_PRODUTOS_PADRAO || [], cliente);
+    ativos = r.produtos.filter((p) => p.ativo !== false);
+    return r;
+  }
 
   const badge = (p) => el('span', { class: 'status status-' + p.disponibilidade, text: C.DISPONIBILIDADE[p.disponibilidade] });
 
   /* ---------- Catálogo ---------- */
   function iniciarCatalogo() {
+    const erroBox = document.getElementById('catalogo-erro');
     const lista = document.getElementById('lista-produtos');
     const vazio = document.getElementById('catalogo-vazio');
     const contagem = document.getElementById('catalogo-contagem');
@@ -31,14 +40,18 @@
     const selCor = form.elements.cor;
     const selFaixa = form.elements.faixa;
 
-    const opcoes = (sel, valores) => valores.forEach((v) => sel.append(el('option', { value: v[0], text: v[1] })));
-    opcoes(selOcasiao, C.unicos(ativos, 'ocasioes').map((v) => [v, v]));
-    opcoes(selCor, C.unicos(ativos, 'cores').map((v) => [v, v]));
-    opcoes(selFaixa, Object.entries(C.FAIXAS_PRECO).map(([k, f]) => [k, f.rotulo]));
-
-    // Filtros ficam na URL: o link do catálogo filtrado pode ser compartilhado.
-    const params = new URLSearchParams(location.search);
-    ['ocasiao', 'cor', 'faixa'].forEach((k) => { if (params.get(k)) form.elements[k].value = params.get(k); });
+    // Refaz as opções mantendo o que já estava escolhido (na primeira carga, vem da URL).
+    const opcoes = (sel, valores) => {
+      const atual = sel.value || new URLSearchParams(location.search).get(sel.name) || '';
+      sel.querySelectorAll('option:not(:first-child)').forEach((o) => o.remove());
+      valores.forEach((v) => sel.append(el('option', { value: v[0], text: v[1] })));
+      if ([...sel.options].some((o) => o.value === atual)) sel.value = atual;
+    };
+    const montarOpcoes = () => {
+      opcoes(selOcasiao, C.unicos(ativos, 'ocasioes').map((v) => [v, v]));
+      opcoes(selCor, C.unicos(ativos, 'cores').map((v) => [v, v]));
+      opcoes(selFaixa, Object.entries(C.FAIXAS_PRECO).map(([k, f]) => [k, f.rotulo]));
+    };
 
     const cartao = (p) => {
       const href = 'produto.html?id=' + encodeURIComponent(p.id);
@@ -67,18 +80,47 @@
       history.replaceState(null, '', q.toString() ? '?' + q : location.pathname);
     };
 
+    // Estados: carregando, erro (com "Tentar de novo"), vazio e lista.
+    const carregarEDesenhar = async () => {
+      erroBox.hidden = true; vazio.hidden = true; lista.hidden = true;
+      lista.replaceChildren();
+      contagem.textContent = 'Carregando produtos…';
+      const r = await carregar();
+      if (r.erro) {
+        contagem.textContent = '';
+        erroBox.hidden = false;
+        erroBox.focus();
+        return;
+      }
+      montarOpcoes();
+      desenhar();
+    };
+
     const limpar = () => { form.reset(); desenhar(); selOcasiao.focus(); };
     form.addEventListener('change', desenhar);
     form.addEventListener('submit', (e) => e.preventDefault());
     form.addEventListener('reset', () => setTimeout(desenhar));
     document.getElementById('limpar-vazio').addEventListener('click', limpar);
-    desenhar();
+    document.getElementById('tentar-de-novo').addEventListener('click', carregarEDesenhar);
+    carregarEDesenhar();
   }
 
   /* ---------- Produto ---------- */
-  function iniciarProduto() {
+  async function iniciarProduto() {
     const alvo = document.getElementById('produto');
     const id = new URLSearchParams(location.search).get('id');
+    alvo.replaceChildren(el('p', { role: 'status', text: 'Carregando produto…' }));
+    const r = await carregar();
+    if (r.erro) {
+      const tentar = el('button', { class: 'button button-dark', type: 'button', text: 'Tentar de novo' });
+      tentar.addEventListener('click', iniciarProduto);
+      alvo.replaceChildren(el('div', { role: 'alert' }, [
+        el('h1', { text: 'Não foi possível carregar o produto.' }),
+        el('p', { text: 'Verifique sua conexão e tente de novo.' }),
+        el('div', { class: 'actions' }, [tentar, el('a', { class: 'text-link', href: 'catalogo.html', text: 'Voltar ao catálogo' })])
+      ]));
+      return;
+    }
     const p = porId(id);
     if (!p) {
       alvo.replaceChildren(
@@ -140,39 +182,20 @@
   }
 
   /* ---------- Pedido personalizado ---------- */
-  function iniciarPedido() {
+  async function iniciarPedido() {
     const form = document.getElementById('pedido');
     const resumo = document.getElementById('resumo');
     const resumoTexto = document.getElementById('resumo-texto');
     const enviar = document.getElementById('enviar-whatsapp');
     const produtoBox = document.getElementById('produto-escolhido');
     const id = new URLSearchParams(location.search).get('produto');
-    const produto = id ? porId(id) : null;
 
     C.TAMANHOS.forEach((t) => form.elements.tamanho.append(el('option', { value: t, text: t })));
     C.ORCAMENTOS.forEach((t) => form.elements.orcamento.append(el('option', { value: t, text: t })));
-    const sugestoes = C.unicos(ativos, 'ocasioes');
-    const lista = document.getElementById('ocasioes-sugeridas');
-    sugestoes.forEach((s) => lista.append(el('option', { value: s })));
 
-    if (id && !produto) {
-      produtoBox.hidden = false;
-      produtoBox.append(el('p', { role: 'alert', text: 'O produto do link não foi encontrado. Você pode seguir com um arranjo personalizado.' }));
-    } else if (produto) {
-      produtoBox.hidden = false;
-      produtoBox.append(
-        el('img', { src: produto.fotos[0], alt: '', width: 96, height: 120 }),
-        el('div', {}, [
-          el('p', { class: 'eyebrow', text: 'Produto escolhido' }),
-          el('p', { class: 'product-name', text: produto.nome }),
-          el('p', { text: C.formatarPreco(produto.preco) }),
-          el('a', { href: 'pedido.html', text: 'Remover e pedir personalizado' })
-        ])
-      );
-      if (produto.disponibilidade === 'indisponivel') {
-        produtoBox.append(el('p', { class: 'field-error', role: 'alert', text: C.validarPedido({}, produto).erros.produto }));
-      }
-    }
+    // Enquanto o produto do link não carrega (ou se falhar), não dá para saber se está indisponível: o pedido fica bloqueado.
+    let produto = null;
+    let bloqueado = Boolean(id);
 
     const dados = () => Object.fromEntries(new FormData(form).entries());
     const marcarErros = (erros) => {
@@ -189,6 +212,7 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (bloqueado) { resumo.hidden = true; produtoBox.scrollIntoView({ behavior: 'smooth' }); return; }
       const d = dados();
       const { valido, erros } = C.validarPedido(d, produto);
       marcarErros(erros);
@@ -207,6 +231,41 @@
       resumo.focus();
     });
     form.addEventListener('input', () => { resumo.hidden = true; });
+
+    const carregarProdutoDoLink = async () => {
+      const r = await carregar();
+      produto = id ? porId(id) : null;
+      bloqueado = false;
+      const lista = document.getElementById('ocasioes-sugeridas');
+      C.unicos(ativos, 'ocasioes').forEach((s) => lista.append(el('option', { value: s })));
+
+      if (r.erro && id) {
+        bloqueado = true;
+        const tentar = el('button', { class: 'button button-light', type: 'button', text: 'Tentar de novo' });
+        tentar.addEventListener('click', () => location.reload());
+        produtoBox.hidden = false;
+        produtoBox.append(el('p', { role: 'alert', text: 'Não foi possível carregar o produto do link. Verifique sua conexão e tente de novo.' }), tentar);
+      } else if (id && !produto) {
+        produtoBox.hidden = false;
+        produtoBox.append(el('p', { role: 'alert', text: 'O produto do link não foi encontrado. Você pode seguir com um arranjo personalizado.' }));
+      } else if (produto) {
+        produtoBox.hidden = false;
+        produtoBox.append(
+          el('img', { src: produto.fotos[0], alt: '', width: 96, height: 120 }),
+          el('div', {}, [
+            el('p', { class: 'eyebrow', text: 'Produto escolhido' }),
+            el('p', { class: 'product-name', text: produto.nome }),
+            el('p', { text: C.formatarPreco(produto.preco) }),
+            el('a', { href: 'pedido.html', text: 'Remover e pedir personalizado' })
+          ])
+        );
+        if (produto.disponibilidade === 'indisponivel') {
+          produtoBox.append(el('p', { class: 'field-error', role: 'alert', text: C.validarPedido({}, produto).erros.produto }));
+        }
+      }
+    };
+
+    carregarProdutoDoLink();
   }
 
   if (page === 'catalogo') iniciarCatalogo();
