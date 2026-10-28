@@ -62,7 +62,7 @@ astro.config.mjs            configuração do Astro (saída estática, páginas 
 package.json                scripts e dependências (astro e @supabase/supabase-js)
 src/pages/*.astro           uma página por arquivo (index, servicos, catalogo, produto, pedido, admin…)
 src/layouts/Base.astro      <head>, cabeçalho, rodapé e scripts comuns a todas as páginas
-src/components/             Header.astro (menu com página atual) e Footer.astro
+src/components/             Header.astro (menu com página atual), Footer.astro e Icone.astro (ícones de traço)
 src/styles/styles.css       estilos de todo o site (tokens em :root)
 src/scripts/site.js         menu, animações e rolagem do site institucional
 src/scripts/catalogo.js     interface do catálogo, produto e pedido

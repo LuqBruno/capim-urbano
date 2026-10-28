@@ -49,7 +49,7 @@ Vêm dos cards RN01, RN02 e das histórias do Trello:
 - Acessibilidade é requisito (NFR02): todo campo tem `<label>`, erros usam `role="alert"` e `aria-invalid`, o foco vai ao primeiro campo com erro, alvos de toque têm pelo menos 44px e imagens têm `alt`.
 - Imagens: ficam em `public/imagens/web/` e são referenciadas como `imagens/web/arquivo.webp`. Use as versões `.webp` com `width`, `height` e `loading="lazy"` (exceto a imagem principal da dobra).
 - Não use `display` em um elemento que também use o atributo `hidden` sem manter a regra global `[hidden] { display: none !important; }` de `src/styles/styles.css`. Sem ela, `.summary`, `.chosen` e `.empty` ficariam visíveis mesmo com `hidden`.
-- Novas páginas: crie `src/pages/<nome>.astro` usando `Base` (prop `titulo`, `descricao`, `atual` para o item do menu, `whatsapp` para o rodapé) e, se for item do menu, adicione-o em `src/components/Header.astro`.
+- Novas páginas: crie `src/pages/<nome>.astro` usando `Base` (prop `titulo`, `descricao`, `atual` para o item do menu, `whatsapp` para o rodapé) e, se for item do menu, adicione-o em `src/components/Header.astro`. Ícones de traço (setas, WhatsApp, Instagram, local) vêm de `<Icone nome="…" />`; não cole SVG inline repetido.
 - Fonte principal: Quicksand (`--sans`). Mantenha o `<link>` do Google Fonts igual em todas as páginas.
 
 ## Cuidados
