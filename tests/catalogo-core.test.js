@@ -70,15 +70,110 @@ test('link do WhatsApp usa o número oficial e codifica a mensagem', () => {
   assert.strictEqual(url.searchParams.get('text'), msg);
 });
 
-test('cadastro: validação, slug e armazenamento', () => {
+test('cadastro: validação e identificador (slug)', () => {
   assert.ok(!C.validarProduto({ nome: '', fotos: [], preco: -1, disponibilidade: 'x' }).valido);
   assert.strictEqual(C.slug('Arranjo Ação & Flor!'), 'arranjo-acao-flor');
-  const mem = { d: {}, getItem(k) { return this.d[k] ?? null; }, setItem(k, v) { this.d[k] = v; } };
-  assert.strictEqual(C.carregarProdutos(produtos, mem).length, produtos.length);
-  C.salvarProdutos([produtos[0]], mem);
-  assert.strictEqual(C.carregarProdutos(produtos, mem).length, 1);
-  mem.d[C.STORAGE_KEY] = '{quebrado';
-  assert.strictEqual(C.carregarProdutos(produtos, mem).length, produtos.length);
+});
+
+test('banco -> produto: preço numérico vira número, vazios viram padrão e ativo assume true', () => {
+  const p = C.linhaParaProduto({
+    id: 'a', nome: 'A', categoria: 'C', descricao: 'D', fotos: ['f.webp'], preco: '129.50', disponibilidade: 'disponivel', prazo: 'P',
+    durabilidade: null, cuidados: null, ocasioes: null, cores: ['Vinho'], ativo: null, criado_em: '2026-01-01T00:00:00Z', atualizado_em: '2026-01-01T00:00:00Z'
+  });
+  assert.strictEqual(p.preco, 129.5);
+  assert.strictEqual(p.durabilidade, '');
+  assert.strictEqual(p.cuidados, '');
+  assert.deepStrictEqual(p.ocasioes, []);
+  assert.deepStrictEqual(p.cores, ['Vinho']);
+  assert.strictEqual(p.ativo, true);
+  assert.ok(!('criado_em' in p) && !('atualizado_em' in p));
+  assert.strictEqual(C.linhaParaProduto({ ...p, preco: null, ativo: false }).preco, null);
+  assert.strictEqual(C.linhaParaProduto({ ...p, preco: null, ativo: false }).ativo, false);
+});
+
+test('produto -> banco: textos opcionais vazios viram null e não envia datas', () => {
+  const linha = C.produtoParaLinha({ id: 'a', nome: ' A ', categoria: 'C', descricao: 'D', fotos: ['f'], preco: NaN, disponibilidade: 'disponivel', prazo: 'P', durabilidade: '  ', cuidados: 'Longe da água', ocasioes: ['X'], cores: [], ativo: false });
+  assert.strictEqual(linha.nome, 'A');
+  assert.strictEqual(linha.preco, null);
+  assert.strictEqual(linha.durabilidade, null);
+  assert.strictEqual(linha.cuidados, 'Longe da água');
+  assert.strictEqual(linha.ativo, false);
+  assert.deepStrictEqual(Object.keys(linha).sort(), ['ativo', 'categoria', 'cores', 'cuidados', 'descricao', 'disponibilidade', 'durabilidade', 'fotos', 'id', 'nome', 'ocasioes', 'prazo', 'preco']);
+});
+
+test('ida e volta: produtos padrão sobrevivem à conversão banco <-> produto', () => {
+  for (const p of produtos) {
+    const volta = C.linhaParaProduto(C.produtoParaLinha(p));
+    assert.deepStrictEqual(volta, p, p.id);
+  }
+});
+
+test('foto: aceita webp, jpeg e png até 2 MB; recusa o resto', () => {
+  const ok = (type, size) => C.validarArquivoFoto({ name: 'f', type, size });
+  for (const tipo of ['image/webp', 'image/jpeg', 'image/png']) assert.strictEqual(ok(tipo, 1000), '');
+  assert.strictEqual(ok('image/png', 2 * 1024 * 1024), '');
+  assert.match(ok('image/png', 2 * 1024 * 1024 + 1), /2 MB/);
+  assert.match(ok('image/gif', 10), /WebP, JPEG ou PNG/);
+  assert.match(ok('application/pdf', 10), /WebP, JPEG ou PNG/);
+});
+
+test('foto: caminho no Storage usa o id do produto, nome limpo e extensão pelo tipo', () => {
+  assert.strictEqual(C.caminhoFoto('vaso-x', { name: 'Minha Foto Ação.JPG', type: 'image/jpeg' }, 'k1'), 'vaso-x/minha-foto-acao-k1.jpg');
+  assert.strictEqual(C.caminhoFoto('vaso-x', { name: '....png', type: 'image/png' }, 'k2'), 'vaso-x/foto-k2.png');
+});
+
+test('cliente do Supabase: sem configuração é null; configurado sem a biblioteca é erro', () => {
+  assert.strictEqual(C.criarCliente(undefined, {}), null);
+  assert.strictEqual(C.criarCliente({ url: '', chavePublicavel: '' }, {}), null);
+  assert.throws(() => C.criarCliente({ url: 'https://x.supabase.co', chavePublicavel: 'k' }, undefined), /não carregada/);
+  const chamadas = [];
+  const lib = { createClient: (url, chave) => { chamadas.push([url, chave]); return { ok: true }; } };
+  assert.deepStrictEqual(C.criarCliente({ url: 'https://x.supabase.co', chavePublicavel: 'k' }, lib), { ok: true });
+  assert.deepStrictEqual(chamadas, [['https://x.supabase.co', 'k']]);
+});
+
+test('configuração pública não traz chave secreta', () => {
+  const fs = require('node:fs');
+  const config = fs.readFileSync(require('node:path').join(__dirname, '..', 'supabase-config.js'), 'utf8');
+  assert.match(config, /sb_publishable_/);
+  assert.ok(!/sb_secret_|eyJ[A-Za-z0-9_-]{10,}\./.test(config), 'só a chave publicável, nunca chave secreta ou JWT');
+});
+
+function clienteFalso(resposta) {
+  const consulta = { filtros: [] };
+  const cadeia = {
+    select() { return cadeia; },
+    order(coluna) { consulta.filtros.push(coluna); return cadeia; },
+    then(ok, falha) { return Promise.resolve(typeof resposta === 'function' ? resposta() : resposta).then(ok, falha); }
+  };
+  return { consulta, from(tabela) { consulta.tabela = tabela; return cadeia; } };
+}
+
+test('carregar produtos: sem cliente usa o catálogo padrão (cópia)', async () => {
+  const r = await C.carregarProdutos(produtos, null);
+  assert.strictEqual(r.origem, 'padrao');
+  assert.strictEqual(r.erro, null);
+  assert.deepStrictEqual(r.produtos, produtos);
+  r.produtos[0].nome = 'mudou';
+  assert.notStrictEqual(produtos[0].nome, 'mudou');
+});
+
+test('carregar produtos: com cliente busca em "produtos" e converte as linhas', async () => {
+  const cliente = clienteFalso({ data: produtos.map(C.produtoParaLinha), error: null });
+  const r = await C.carregarProdutos([], cliente);
+  assert.strictEqual(cliente.consulta.tabela, 'produtos');
+  assert.strictEqual(r.origem, 'banco');
+  assert.strictEqual(r.erro, null);
+  assert.deepStrictEqual(r.produtos, produtos);
+});
+
+test('carregar produtos: erro do banco ou da rede devolve lista vazia e o erro, sem exibir os exemplos', async () => {
+  for (const resposta of [{ data: null, error: { message: 'permissão negada' } }, () => { throw new TypeError('Failed to fetch'); }]) {
+    const r = await C.carregarProdutos(produtos, clienteFalso(resposta));
+    assert.deepStrictEqual(r.produtos, []);
+    assert.ok(r.erro instanceof Error);
+    assert.strictEqual(r.origem, 'banco');
+  }
 });
 
 test('cuidados, durabilidade e prazo: texto ou aviso quando ausente (US04)', () => {

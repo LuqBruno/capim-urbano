@@ -5,7 +5,8 @@
   else root.CapimCore = api;
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   const WHATSAPP = '5548991765295';
-  const STORAGE_KEY = 'capim.produtos.v1';
+  const TIPOS_FOTO = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png' };
+  const TAMANHO_MAX_FOTO = 2 * 1024 * 1024;
 
   const DISPONIBILIDADE = {
     'disponivel': 'Disponível',
@@ -117,25 +118,86 @@
     return { valido: Object.keys(erros).length === 0, erros };
   }
 
-  /* Produtos: usa o cadastro salvo pela administradora neste navegador; senão, o padrão. */
-  function carregarProdutos(padrao, storage) {
-    try {
-      const bruto = storage && storage.getItem(STORAGE_KEY);
-      if (bruto) {
-        const lista = JSON.parse(bruto);
-        if (Array.isArray(lista)) return lista;
-      }
-    } catch (e) { /* cai no catálogo padrão */ }
-    return padrao.map((p) => ({ ...p }));
+  /* Linha da tabela public.produtos -> produto usado pelo site. */
+  function linhaParaProduto(l) {
+    const preco = l.preco === null || l.preco === undefined || l.preco === '' ? null : Number(l.preco);
+    return {
+      id: l.id,
+      nome: l.nome,
+      categoria: l.categoria,
+      descricao: l.descricao,
+      fotos: Array.isArray(l.fotos) ? l.fotos.slice() : [],
+      preco: preco !== null && isFinite(preco) ? preco : null,
+      disponibilidade: l.disponibilidade,
+      prazo: l.prazo,
+      durabilidade: l.durabilidade || '',
+      cuidados: l.cuidados || '',
+      ocasioes: Array.isArray(l.ocasioes) ? l.ocasioes.slice() : [],
+      cores: Array.isArray(l.cores) ? l.cores.slice() : [],
+      ativo: l.ativo !== false
+    };
   }
 
-  function salvarProdutos(lista, storage) {
-    storage.setItem(STORAGE_KEY, JSON.stringify(lista));
+  /* Produto do cadastro -> linha para gravar. Texto opcional vazio vira null; não envia criado_em/atualizado_em. */
+  function produtoParaLinha(p) {
+    const opcional = (t) => (typeof t === 'string' && t.trim() ? t.trim() : null);
+    return {
+      id: p.id,
+      nome: String(p.nome || '').trim(),
+      categoria: String(p.categoria || '').trim(),
+      descricao: String(p.descricao || '').trim(),
+      fotos: (p.fotos || []).slice(),
+      preco: typeof p.preco === 'number' && isFinite(p.preco) ? p.preco : null,
+      disponibilidade: p.disponibilidade,
+      prazo: String(p.prazo || '').trim(),
+      durabilidade: opcional(p.durabilidade),
+      cuidados: opcional(p.cuidados),
+      ocasioes: (p.ocasioes || []).slice(),
+      cores: (p.cores || []).slice(),
+      ativo: p.ativo !== false
+    };
+  }
+
+  /* Confere tipo (webp, jpeg ou png) e tamanho (até 2 MB) de uma foto antes de enviar. Retorna a mensagem de erro ou ''. */
+  function validarArquivoFoto(arquivo) {
+    if (!TIPOS_FOTO[arquivo.type]) return arquivo.name + ': use uma imagem WebP, JPEG ou PNG.';
+    if (arquivo.size > TAMANHO_MAX_FOTO) return arquivo.name + ': a imagem passa de 2 MB.';
+    return '';
+  }
+
+  /* Nome do arquivo no Storage: "<id-do-produto>/<nome-limpo>-<marca>.<extensão>". */
+  function caminhoFoto(idProduto, arquivo, marca) {
+    const base = slug(arquivo.name.replace(/\.[^.]+$/, '')) || 'foto';
+    return idProduto + '/' + base + '-' + marca + '.' + TIPOS_FOTO[arquivo.type];
+  }
+
+  /* Cliente do Supabase a partir da configuração pública (URL e chave publicável).
+     Sem configuração, devolve null (o site usa o catálogo padrão). Configurado mas sem a biblioteca carregada, é erro. */
+  function criarCliente(config, lib) {
+    if (!config || !config.url || !config.chavePublicavel) return null;
+    if (!lib || typeof lib.createClient !== 'function') throw new Error('Biblioteca do Supabase não carregada.');
+    return lib.createClient(config.url, config.chavePublicavel);
+  }
+
+  /* Produtos do catálogo.
+     - Sem cliente do Supabase (site sem configuração): usa o catálogo padrão de exemplo.
+     - Com cliente: busca em public.produtos (a RLS devolve só os ativos para visitantes e tudo para administradoras).
+       Se a busca falhar, NÃO mostra os exemplos como se fossem reais: devolve a lista vazia e o erro, para a tela oferecer "Tentar de novo".
+     Retorna { produtos, origem: 'padrao' | 'banco', erro: Error | null }. */
+  async function carregarProdutos(padrao, cliente) {
+    if (!cliente) return { produtos: padrao.map((p) => ({ ...p })), origem: 'padrao', erro: null };
+    try {
+      const { data, error } = await cliente.from('produtos').select('*').order('criado_em', { ascending: true }).order('id', { ascending: true });
+      if (error) throw error;
+      return { produtos: (data || []).map(linhaParaProduto), origem: 'banco', erro: null };
+    } catch (e) {
+      return { produtos: [], origem: 'banco', erro: e instanceof Error ? e : new Error(String((e && e.message) || e)) };
+    }
   }
 
   return {
-    WHATSAPP, STORAGE_KEY, DISPONIBILIDADE, FAIXAS_PRECO, TAMANHOS, ORCAMENTOS,
+    WHATSAPP, TIPOS_FOTO, TAMANHO_MAX_FOTO, DISPONIBILIDADE, FAIXAS_PRECO, TAMANHOS, ORCAMENTOS,
     AVISO_SEM_INFO, textoOuAviso, formatarPreco, unicos, filtrarProdutos, validarPedido, montarMensagem,
-    montarLinkWhatsApp, slug, validarProduto, carregarProdutos, salvarProdutos
+    montarLinkWhatsApp, slug, validarProduto, linhaParaProduto, produtoParaLinha, validarArquivoFoto, caminhoFoto, criarCliente, carregarProdutos
   };
 });
