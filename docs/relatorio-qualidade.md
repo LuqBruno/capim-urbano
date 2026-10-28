@@ -1,6 +1,6 @@
 # Relatório de qualidade e desempenho
 
-Medições feitas em laboratório (Chromium headless, servidor local, viewport de celular 375×800, mediana de 3 execuções), em 26/10/2026. **São medidas de referência**: não incluem a latência de uma hospedagem real, e o carregamento das fontes do Google Fonts depende da rede.
+Medições feitas **antes da migração para Astro** (site estático em HTML puro), em laboratório (Chromium headless, servidor local, viewport de celular 375×800, mediana de 3 execuções), em 26/10/2026. **São medidas de referência**: não incluem a latência de uma hospedagem real, e o carregamento das fontes do Google Fonts depende da rede.
 
 ## Carregamento das telas principais
 
@@ -21,7 +21,7 @@ Do catálogo ao WhatsApp são 4 passos: escolher o produto, "Fazer pedido", pree
 
 Não há dados de abandono, porque o site não tem analítica. Essa análise do card de desempenho exige uma ferramenta de métricas com dados reais de uso.
 
-## Verificações automáticas (`node --test tests/e2e.test.js`)
+## Verificações automáticas (`npm run test:e2e`)
 
 - Sem rolagem horizontal e sem erros de console em 5 páginas, em 375, 768 e 1280 px.
 - Todo campo de formulário tem rótulo, toda imagem tem `alt` e a página declara `lang="pt-BR"`.

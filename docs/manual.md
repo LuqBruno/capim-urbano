@@ -34,6 +34,7 @@ A conta da administradora foi criada sem senha conhecida. Para definir a sua: no
 
 - Rodar: `npm install` (uma vez; Node 22.23.4 ou superior) e `npm run dev` (http://localhost:4321). Para o site final: `npm run build` gera `dist/`, que vai para qualquer hospedagem estática.
 - Testes: `npm test` (regras) e `npm run test:e2e` (faz o build e testa as telas; precisa do `playwright` e de um Chromium).
+- Publicar o site: o push na `main` dispara `.github/workflows/deploy.yml` (testes de regras, build e GitHub Pages). Configure uma vez *Settings → Pages → Source = GitHub Actions*; com "Deploy from a branch" o Jekyll tenta ler os `.astro` e falha. O site fica em `https://<usuário>.github.io/<repositório>/` (`BASE_PATH` e `SITE_URL` no workflow).
 - Publicar produtos: não há publicação. A administradora salva em `admin.html` e o catálogo lê direto do Supabase. `src/lib/catalogo-dados.js` só é usado quando `src/lib/supabase-config.js` está sem configuração.
 - Banco: o SQL está em `supabase/migrations/`. Mudanças no banco entram como arquivo novo ali e são aplicadas no projeto.
 - Os testes de tela simulam o Supabase e não usam a rede.

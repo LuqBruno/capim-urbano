@@ -31,6 +31,7 @@ Não há linter. Antes de entregar qualquer mudança, rode os dois conjuntos de 
 - Em grids que viram uma coluna no celular, use `minmax(0, 1fr)` e não `1fr`, senão tabelas largas estouram a largura da tela.
 - Cuidados, durabilidade e prazo sempre aparecem na página do produto: quando faltam, use `textoOuAviso` em vez de esconder o campo (US04).
 - O `@supabase/supabase-js` é dependência do npm (versão exata no `package.json`) e entra no bundle de `catalogo.js` e `admin.js`; não há CDN. Os scripts são módulos que importam o core, os dados e a configuração. Ao atualizar o supabase-js, rode `npm test` e `npm run test:e2e`.
+- A publicação é o workflow `.github/workflows/deploy.yml` (GitHub Pages, Source = GitHub Actions). `BASE_PATH` e `SITE_URL` só existem lá: o site fica em `/<repositório>/`, então **use caminhos relativos** (`catalogo.html`, `imagens/web/x.webp`), nunca `/catalogo.html`. Não crie `_config.yml` nem remova a configuração para "Actions": o Jekyll quebra com os arquivos `.astro`.
 - Mudança no banco vira um arquivo novo em `supabase/migrations/` (e é aplicada no projeto), nunca uma alteração só no painel.
 
 ## Regras de negócio que não podem quebrar
