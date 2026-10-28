@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Site e catálogo da Capim Urbano Ateliê Floral",
+  "author": "Gustavo Constante e Bruno Luque",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

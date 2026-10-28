@@ -10,6 +10,10 @@
 </p>
 
 <p align="center">
+  <sub>Feito por <a href="https://github.com/gstvdc"><strong>Gustavo Constante</strong></a> e <a href="https://github.com/LuqBruno"><strong>Bruno Luque</strong></a></sub>
+</p>
+
+<p align="center">
   <img src="docs/img/home-desktop.webp" alt="Página inicial do site no computador" width="640">
   &nbsp;
   <img src="docs/img/catalogo-celular.webp" alt="Catálogo com filtros no celular" width="150">
@@ -168,6 +172,10 @@ npm run test:e2e     # constrói o site e testa as telas: fluxo, responsividade 
 2. **Senha da administradora e cadastro público:** a senha da conta real precisa ser definida por ela e o cadastro público de usuários deve ser desligado no painel do Supabase. Os passos estão em [docs/supabase-plano.md](docs/supabase-plano.md).
 3. **Referência visual no pedido é um link**, não um upload. O cliente pode enviar a imagem direto na conversa do WhatsApp.
 4. **Plano gratuito do Supabase** pausa o projeto por inatividade, o que tira o catálogo do ar. Avalie um plano pago antes de divulgar.
+
+## Créditos
+
+Feito por **Gustavo Constante** ([@gstvdc](https://github.com/gstvdc)) e **Bruno Luque** ([@LuqBruno](https://github.com/LuqBruno)), para a Capim Urbano Ateliê Floral.
 
 ## Identidade visual
 
