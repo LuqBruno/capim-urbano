@@ -175,9 +175,9 @@ function criarCliente(config, lib) {
 }
 
 /* Produtos do catálogo.
-   - Sem cliente do Supabase (site sem configuração): usa o catálogo padrão de exemplo.
+   - Sem cliente do Supabase (site sem configuração): usa o catálogo padrão.
    - Com cliente: busca em public.produtos (a RLS devolve só os ativos para visitantes e tudo para administradoras).
-     Se a busca falhar, NÃO mostra os exemplos como se fossem reais: devolve a lista vazia e o erro, para a tela oferecer "Tentar de novo".
+     Se a busca falhar, NÃO mostra o catálogo padrão no lugar do banco (poderia estar desatualizado): devolve a lista vazia e o erro, para a tela oferecer "Tentar de novo".
    Retorna { produtos, origem: 'padrao' | 'banco', erro: Error | null }. */
 async function carregarProdutos(padrao, cliente) {
   if (!cliente) return { produtos: padrao.map((p) => ({ ...p })), origem: 'padrao', erro: null };

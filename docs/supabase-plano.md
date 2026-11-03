@@ -1,6 +1,6 @@
 # Integração com o Supabase
 
-**Situação:** **implementado** em 2026-10-28, com duas pendências que dependem de uma pessoa (veja "O que falta" abaixo). O cadastro de produtos (`admin.html`) agora tem login e grava no banco, e o catálogo lê do banco. Isso fecha o card **US06** e a regra "alterações refletem no catálogo" da **RN01**.
+**Situação:** **implementado** em 2026-10-28 e fechado em 2026-11-03 (cadastro público desligado, conta única de administradora e produtos aprovados); resta só um ajuste de senha (veja "O que falta" abaixo). O cadastro de produtos (`admin.html`) agora tem login e grava no banco, e o catálogo lê do banco. Isso fecha o card **US06** e a regra "alterações refletem no catálogo" da **RN01**.
 
 | Item | Valor |
 |---|---|
@@ -19,7 +19,7 @@
 - [x] **Passo 4:** bucket público `produtos` (2 MB; `image/webp`, `image/jpeg`, `image/png`), escrita só de administradoras.
 - [x] **Advisors:** segurança e desempenho sem nenhum alerta após as migrações (verificado duas vezes: antes e depois de unificar as políticas).
 - [x] **Passo 5:** `src/lib/supabase-config.js`, `carregarProdutos` assíncrona, estados de carregando e erro com "Tentar de novo" no catálogo, no produto e no pedido, login e cadastro no `admin.html`/`admin.js`, upload de fotos. Gravação em `localStorage` removida (e "Importar JSON" e "Restaurar padrão" também, que dependiam dela; "Exportar" virou "Baixar cópia").
-- [x] **Passo 6:** carga inicial com os 7 produtos de `catalogo-dados.js` (**são exemplos**, veja "O que falta").
+- [x] **Passo 6:** carga inicial com os 7 produtos de `catalogo-dados.js` (aprovados como oficiais pelo Product Owner em 03/11/2026).
 - [x] **Passo 7:** testes. `tests/catalogo-core.test.js` (conversão, foto, cliente, carga) e `tests/e2e.test.js` (Supabase simulado com `page.route`).
 - [x] **Segurança:** testado com a chave publicável, sem login (veja "Verificação de segurança").
 
@@ -31,12 +31,20 @@
 4. **Biblioteca.** O plano previa o `supabase-js` por CDN. Depois da migração do site para Astro (2026-10-28) ele é dependência do npm, com versão exata no `package.json`, e entra no bundle das páginas. Não há mais CDN nem `integrity`.
 5. **Fotos do seed.** Os 7 produtos continuam com os caminhos `imagens/web/...` do site (a opção permitida no passo 6.3 do plano). Fotos novas vão para o bucket.
 
-## O que falta (depende de uma pessoa)
+## O que falta e o que foi fechado
 
-1. **Definir a senha da administradora.** Ninguém conhece a senha atual (foi gerada aleatoriamente no banco). Em https://supabase.com/dashboard/project/gkpiwqztgzkuxvwrkpiy/auth/users, abra o menu (`...`) do usuário e escolha **Send password recovery** (chega ao e-mail da administradora), ou **Reset password**. Antes disso, configure em **Authentication → URL Configuration** o *Site URL* com o endereço onde o site for publicado (no GitHub Pages, `https://<usuário>.github.io/<repositório>/`), para o link do e-mail abrir a página certa. Nunca envie a senha por chat, e-mail ou commit.
-2. **Desligar o cadastro público.** O ambiente de trabalho não tem ferramenta para mudar essa configuração. Em **Authentication → Sign In / Providers → Email**, desligue **Allow new users to sign up** (e, se aparecer, mantenha a confirmação de e-mail ligada). Enquanto estiver ligado, qualquer pessoa pode criar uma conta no Auth, mas **essa conta não escreve nada**: só quem está em `public.administradoras` escreve (isso foi testado). O risco restante é de abuso do serviço (contas de lixo), não de alteração de dados.
-3. **Trocar os valores de exemplo.** Os 7 produtos do banco vêm de `catalogo-dados.js`: preços, prazos e disponibilidade são fictícios. A administradora deve conferir cada um em `admin.html` antes de divulgar o site.
-4. **Plano e limites.** O projeto está no plano Free (pausa por inatividade e 500 MB de banco, 1 GB de arquivos). Pausar derrubaria o catálogo. Avaliar um plano pago antes de divulgar.
+**Fechado em 03/11/2026:**
+
+- **Cadastro público desligado** (confirmado pela configuração pública do Auth: `disable_signup = true`). A confirmação de e-mail continua ligada.
+- **Conta única de administradora.** A conta pessoal da equipe foi removida do Auth (a linha em `public.administradoras` saiu junto, por `on delete cascade`) e ficou apenas uma conta de administradora, já com senha definida. O e-mail e a senha dela **não** ficam no repositório.
+- **Produtos aprovados:** os 7 produtos do banco foram aprovados como oficiais pelo Product Owner. Ajustes futuros de preço, prazo e disponibilidade são feitos em `admin.html`.
+- **Proteção contra senhas vazadas:** só existe no plano Pro. O alerta do verificador de segurança do Supabase continua aparecendo e é um **risco aceito** enquanto o projeto estiver no plano gratuito (só uma conta escreve e o cadastro público está desligado).
+
+**Ainda falta:**
+
+1. **Senha longa.** A senha atual da administradora é curta (foi gravada direto no banco, fora da regra de tamanho mínimo). Troque por uma de 12 caracteres ou mais em https://supabase.com/dashboard/project/gkpiwqztgzkuxvwrkpiy/auth/users (menu `...` do usuário, *Reset password*). Nunca envie a senha por chat, e-mail ou commit.
+2. **URL do site no Auth.** Em **Authentication → URL Configuration**, conferir o *Site URL* (`https://luqbruno.github.io/capim-urbano/`), para os e-mails de recuperação abrirem a página certa.
+3. **Plano e limites.** O projeto está no plano Free (pausa por inatividade e 500 MB de banco, 1 GB de arquivos). O workflow `verificar-catalogo.yml` reduz o risco de pausa, mas não o elimina. Avaliar um plano pago antes de divulgar.
 
 ## Verificação de segurança
 
@@ -168,7 +176,7 @@ Ao ligar o banco, **remova** a gravação no `localStorage` e os botões "Export
 
 ## Passo 6: migrar os dados atuais
 
-1. Conferir com a administradora os valores reais (preços, prazos e disponibilidade em `catalogo-dados.js` são **exemplos**).
+1. Conferir os valores com a administradora (feito: aprovados como oficiais em 03/11/2026).
 2. Gerar os `insert` a partir de `catalogo-dados.js` (um script `scripts/gerar-seed.js` pode converter a lista em SQL) e aplicar no banco.
 3. Subir as imagens de `imagens/web/` para o bucket e atualizar `fotos`, ou manter os caminhos relativos enquanto as fotos permanecerem no site.
 

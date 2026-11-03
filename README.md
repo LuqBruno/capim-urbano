@@ -119,8 +119,7 @@ Mapeamento com o Trello: US01, US02, US04, **US06**, RN01 (regras), RN02 e NFR01
 - Todo produto mostra nome, foto, categoria, descrição, preço (ou "Sob orçamento"), disponibilidade e prazo. Cuidados e durabilidade aparecem quando existirem, ou um aviso quando faltarem.
 - Produto **indisponível** aparece no catálogo, mas **não pode ser pedido**. Produto **desativado** não aparece.
 - O pedido exige nome, quantidade (1 a 99), ocasião e cores. Tamanho, orçamento, link de referência e observações são opcionais. O WhatsApp só abre depois do resumo e da confirmação do cliente. Disponibilidade e valor final são confirmados no atendimento.
-- Se a busca dos produtos falhar, o catálogo mostra uma mensagem com "Tentar de novo". Os exemplos de `src/lib/varal-core.js       física do varal (cordão, mola e balanço), sem DOM e testada
-src/lib/catalogo-dados.js` **não** aparecem no lugar, para não mostrar preço ou disponibilidade desatualizados. Só quando `src/lib/supabase-config.js` não está configurado o site usa esses exemplos.
+- Se a busca dos produtos falhar, o catálogo mostra uma mensagem com "Tentar de novo". Os produtos padrão de `src/lib/catalogo-dados.js` **não** aparecem no lugar, para não mostrar preço ou disponibilidade desatualizados. Só quando `src/lib/supabase-config.js` não está configurado o site usa esse catálogo padrão.
 - Número do WhatsApp: `5548991765295`, definido em `src/lib/catalogo-core.js` (`WHATSAPP`, usado também pelo rodapé) e nos links `wa.me` das páginas.
 - Cada produto tem: `id`, `nome`, `categoria`, `descricao`, `fotos[]`, `preco` (número, ou `null` para "sob orçamento"), `disponibilidade` (`disponivel`, `sob-encomenda` ou `indisponivel`), `prazo`, `durabilidade`, `cuidados`, `ocasioes[]`, `cores[]` e `ativo`. Detalhes no [modelo de dados](docs/modelo-de-dados.md).
 
@@ -141,7 +140,8 @@ src/scripts/catalogo.js     interface do catálogo, produto e pedido
 src/scripts/admin.js        interface da administração
 src/scripts/varal.js        interação e animação do varal de fotos da home
 src/lib/catalogo-core.js    regras de negócio, sem DOM (módulo ES testável em Node)
-src/lib/catalogo-dados.js   produtos padrão (EXEMPLOS); reserva quando o Supabase não está configurado
+src/lib/varal-core.js       física do varal (cordão, mola e balanço), sem DOM e testada em Node
+src/lib/catalogo-dados.js   produtos padrão (os mesmos do banco); reserva quando o Supabase não está configurado
 src/lib/supabase-config.js  URL do projeto e chave publicável do Supabase (nunca a service_role)
 .github/workflows/          deploy.yml (build e publicação no GitHub Pages) e verificar-catalogo.yml (confere o catálogo a cada 3 dias)
 public/imagens/web/         imagens otimizadas (.webp) usadas pelo site (copiadas para dist/imagens/web/)
@@ -173,8 +173,8 @@ npm run test:e2e     # constrói o site e testa as telas: fluxo, responsividade 
 
 ## Pendências conhecidas
 
-1. **Preços, prazos e disponibilidade em `src/lib/catalogo-dados.js` são exemplos** e precisam ser conferidos pela administradora antes de publicar. Os produtos hoje no banco são esses mesmos exemplos.
-2. **Senha da administradora e cadastro público:** a senha da conta real precisa ser definida por ela e o cadastro público de usuários deve ser desligado no painel do Supabase. Os passos estão em [docs/supabase-plano.md](docs/supabase-plano.md).
+1. **Produtos:** os 7 do banco foram aprovados como oficiais pelo Product Owner em 03/11/2026. Preço, prazo e disponibilidade mudam em `admin.html`, sem refazer o build.
+2. **Conta de administradora:** o cadastro público de usuários está desligado (03/11/2026) e existe uma única conta com permissão de escrita. A senha atual é curta; troque por uma de 12 caracteres ou mais, em *Authentication → Users* do Supabase. A proteção contra senhas vazadas só existe no plano Pro. Detalhes em [docs/supabase-plano.md](docs/supabase-plano.md).
 3. **Referência visual no pedido é um link**, não um upload. O cliente pode enviar a imagem direto na conversa do WhatsApp.
 4. **Plano gratuito do Supabase** pausa o projeto depois de 7 dias sem uso, o que tira o catálogo do ar (já aconteceu em 01/11/2026). O workflow `verificar-catalogo.yml` consulta o catálogo a cada 3 dias, o que conta como uso e, se o projeto já estiver pausado, falha e o GitHub avisa por e-mail. Para eliminar a pausa de vez, avalie um plano pago antes de divulgar.
 5. **Testes manuais que a automação não cobre:** leitor de tela real, Safari e Firefox, aparelhos físicos. A automação cobre contraste e regras WCAG 2.2 AA com o axe-core, em todas as páginas, em celular e desktop.

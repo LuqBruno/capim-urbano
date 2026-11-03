@@ -1,6 +1,7 @@
 /* Catálogo padrão da Capim Urbano.
-   ATENÇÃO: preços, prazos e disponibilidade abaixo são EXEMPLOS para o MVP.
-   A administradora deve conferi-los em admin.html (ou editar este arquivo) antes de publicar.
+   Estes 7 produtos foram aprovados como oficiais pelo Product Owner em 03/11/2026 e já estão no banco (Supabase).
+   Este arquivo só vale como reserva quando o site não está configurado para o Supabase e como origem da carga inicial.
+   Preço, prazo e disponibilidade se alteram em admin.html (no banco), não aqui.
    preco: número em reais, ou null para "sob orçamento". */
 export const PRODUTOS_PADRAO = [
   {

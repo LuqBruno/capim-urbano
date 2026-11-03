@@ -75,4 +75,4 @@ O pedido não é armazenado: vira o texto de uma mensagem do WhatsApp.
 
 ## Pendências de dados
 
-Os produtos hoje no banco são os **exemplos** de `src/lib/catalogo-dados.js` (preço, prazo e disponibilidade fictícios). A administradora deve conferir e corrigir todos em `admin.html` antes de divulgar o site.
+Os 7 produtos do banco vieram de `src/lib/catalogo-dados.js` e foram aprovados como oficiais pelo Product Owner em 03/11/2026. Preço, prazo e disponibilidade se alteram em `admin.html`.

@@ -26,7 +26,8 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 ## US06 e RN01 atendidos com ressalvas
 
 - As alterações agora valem para todos os clientes (banco Supabase com login da administradora). Detalhes em [supabase-plano.md](supabase-plano.md).
-- **Dependem de ação humana:** definir a senha da administradora e desligar o cadastro público no painel. Os produtos no banco ainda são os **exemplos** de `catalogo-dados.js`.
+- **Feito em 03/11/2026:** cadastro público desligado, conta única de administradora com senha definida e os 7 produtos do banco aprovados como oficiais pelo Product Owner.
+- **Ainda por conta de uma pessoa:** trocar a senha da administradora por uma longa (12 caracteres ou mais).
 - A RLS foi verificada no próprio Supabase (visitante sem login: escrita negada e desativados invisíveis); os testes automáticos simulam o Supabase e **não** exercitam a RLS real.
 
 ## Pontos ainda sem evidência automática
