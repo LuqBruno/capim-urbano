@@ -112,7 +112,7 @@ Cada página fica em `src/pages/<nome>.astro` e é publicada como `<nome>.html`.
 | Pedido | `pedido.html` (`?produto=<id>` opcional) | Formulário com validação, resumo e envio pelo WhatsApp. |
 | Administração | `admin.html` | Login (e-mail e senha) e cadastro de produtos com envio de fotos. Grava no Supabase e vale para todos os clientes. |
 
-Mapeamento com o Trello: US01, US02, US04, **US06**, RN01 (regras), RN02 e NFR01 estão atendidos. **US03, US05 e NFR02 estão parciais**: veja o motivo na [matriz de requisitos](docs/matriz-de-requisitos.md).
+Mapeamento com o Trello: US01, US02, US04, **US06**, RN01 (regras), RN02, NFR01 e NFR02 estão atendidos (na NFR02 falta só a verificação manual com leitor de tela, outros navegadores e aparelhos reais). **US03 e US05 estão parciais**: a referência visual é um link e o pedido é de um produto por vez. Os detalhes estão na [matriz de requisitos](docs/matriz-de-requisitos.md).
 
 ## Regras de negócio
 
