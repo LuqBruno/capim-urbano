@@ -130,6 +130,9 @@ src/lib/catalogo-dados.js` **não** aparecem no lugar, para não mostrar preço 
 astro.config.mjs            configuração do Astro (saída estática, páginas como nome.html)
 package.json                scripts e dependências (astro e @supabase/supabase-js)
 src/pages/*.astro           uma página por arquivo (index, servicos, catalogo, produto, pedido, admin…)
+src/pages/404.astro         página de erro (404.html), fora dos buscadores
+src/pages/robots.txt.js     gera robots.txt (esconde admin.html e aponta o sitemap)
+src/pages/sitemap.xml.js    gera sitemap.xml das páginas públicas
 src/layouts/Base.astro      <head>, cabeçalho, rodapé e scripts comuns a todas as páginas
 src/components/             Header.astro (menu com página atual), Footer.astro e Icone.astro (ícones de traço)
 src/styles/styles.css       estilos de todo o site (tokens em :root)
@@ -140,7 +143,7 @@ src/scripts/varal.js        interação e animação do varal de fotos da home
 src/lib/catalogo-core.js    regras de negócio, sem DOM (módulo ES testável em Node)
 src/lib/catalogo-dados.js   produtos padrão (EXEMPLOS); reserva quando o Supabase não está configurado
 src/lib/supabase-config.js  URL do projeto e chave publicável do Supabase (nunca a service_role)
-.github/workflows/          deploy.yml: build e publicação no GitHub Pages
+.github/workflows/          deploy.yml (build e publicação no GitHub Pages) e verificar-catalogo.yml (confere o catálogo a cada 3 dias)
 public/imagens/web/         imagens otimizadas (.webp) usadas pelo site (copiadas para dist/imagens/web/)
 supabase/migrations/        SQL do banco (tabelas, RLS, Storage e carga inicial)
 scripts/gerar-seed.js       gera o SQL de carga inicial a partir de catalogo-dados.js
@@ -173,7 +176,8 @@ npm run test:e2e     # constrói o site e testa as telas: fluxo, responsividade 
 1. **Preços, prazos e disponibilidade em `src/lib/catalogo-dados.js` são exemplos** e precisam ser conferidos pela administradora antes de publicar. Os produtos hoje no banco são esses mesmos exemplos.
 2. **Senha da administradora e cadastro público:** a senha da conta real precisa ser definida por ela e o cadastro público de usuários deve ser desligado no painel do Supabase. Os passos estão em [docs/supabase-plano.md](docs/supabase-plano.md).
 3. **Referência visual no pedido é um link**, não um upload. O cliente pode enviar a imagem direto na conversa do WhatsApp.
-4. **Plano gratuito do Supabase** pausa o projeto por inatividade, o que tira o catálogo do ar. Avalie um plano pago antes de divulgar.
+4. **Plano gratuito do Supabase** pausa o projeto depois de 7 dias sem uso, o que tira o catálogo do ar (já aconteceu em 01/11/2026). O workflow `verificar-catalogo.yml` consulta o catálogo a cada 3 dias, o que conta como uso e, se o projeto já estiver pausado, falha e o GitHub avisa por e-mail. Para eliminar a pausa de vez, avalie um plano pago antes de divulgar.
+5. **Testes manuais que a automação não cobre:** leitor de tela real, Safari e Firefox, aparelhos físicos. A automação cobre contraste e regras WCAG 2.2 AA com o axe-core, em todas as páginas, em celular e desktop.
 
 ## Créditos
 

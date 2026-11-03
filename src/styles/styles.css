@@ -109,6 +109,7 @@ strong { font-weight: 500; color: var(--ink); }
 .site-nav a[aria-current="page"] { color: var(--acento); }
 .site-nav .nav-contact { gap: 8px; margin-left: 12px; padding: 0 18px; border-radius: 999px; color: var(--white); background: var(--grafite); transition: background .3s, transform .3s var(--ease-out); }
 .site-nav .nav-contact:hover { color: var(--white); background: var(--acento); }
+.site-nav .nav-contact[aria-current="page"] { color: var(--white); }
 
 .menu-toggle { display: none; position: relative; width: 46px; height: 46px; padding: 0; border: 1px solid var(--line-strong); border-radius: 999px; background: transparent; color: var(--ink); cursor: pointer; }
 .menu-toggle span { position: absolute; left: 14px; right: 14px; height: 1.5px; background: currentColor; transition: transform .4s var(--ease-out), top .4s var(--ease-out); }

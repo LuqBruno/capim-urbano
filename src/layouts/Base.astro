@@ -16,17 +16,28 @@ interface Props {
   whatsapp?: string;
   /** Administração: cabeçalho simples, sem rodapé, sem animações e fora dos buscadores. */
   admin?: boolean;
+  /** Página de erro 404: serve em qualquer caminho, então fixa a base dos links relativos e sai dos buscadores. */
+  erro404?: boolean;
 }
-const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false } = Astro.props;
+const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false, erro404 = false } = Astro.props;
+
+// Endereços absolutos (compartilhamento e buscadores) só existem na publicação, quando SITE_URL está definido.
+const raiz = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const absoluta = (caminho: string) => (Astro.site ? new URL(raiz + caminho, Astro.site).href : caminho);
+const canonica = Astro.site && !admin && !erro404
+  ? new URL(Astro.url.pathname.replace(/index\.html$/, ''), Astro.site).href
+  : undefined;
 ---
 <!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  {erro404 && <base href={raiz} />}
   <title>{titulo}</title>
   {descricao && <meta name="description" content={descricao} />}
-  {admin && <meta name="robots" content="noindex, nofollow" />}
+  {(admin || erro404) && <meta name="robots" content="noindex, nofollow" />}
+  {canonica && <link rel="canonical" href={canonica} />}
   <meta name="theme-color" content="#f4f1ea">
   {og && <>
     <meta property="og:type" content="website">
@@ -34,7 +45,9 @@ const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = fal
     <meta property="og:site_name" content="Capim Urbano Ateliê Floral">
     <meta property="og:title" content={titulo}>
     <meta property="og:description" content={descricao}>
-    <meta property="og:image" content="imagens/web/og.jpg">
+    <meta property="og:image" content={absoluta('imagens/web/og.jpg')}>
+    {canonica && <meta property="og:url" content={canonica} />}
+    <meta name="twitter:card" content="summary_large_image">
   </>}
   <link rel="icon" href="imagens/web/capimlogo.webp" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">

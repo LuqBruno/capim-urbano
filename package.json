@@ -18,5 +18,8 @@
   "dependencies": {
     "@supabase/supabase-js": "2.117.3",
     "astro": "7.4.2"
+  },
+  "devDependencies": {
+    "axe-core": "4.14.0"
   }
 }

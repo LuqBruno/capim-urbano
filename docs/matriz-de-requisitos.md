@@ -13,7 +13,7 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 | RN01 | Disponibilidade, preço e prazo; indisponível não gera pedido; alterações aparecem no catálogo | atendido (vale para todos os clientes) | `validarPedido`, `filtrarProdutos`, tabela `produtos` | `core` (indisponível), `e2e` (edição reflete no catálogo e bloqueia pedido, inclusive em outra aba de visitante) |
 | RN02 | Personalização com resumo e validação antes do WhatsApp | atendido | `validarPedido`, `src/pages/pedido.astro` | `core`, `e2e` |
 | NFR01 | Responsivo em celular, tablet e desktop | atendido | `src/styles/styles.css` | `e2e` (5 páginas em 375, 768 e 1280 px) |
-| NFR02 | Acessibilidade, desempenho e estados de carregamento, vazio e erro | parcial | todo o site | `e2e` (rótulos, `alt`, `lang`, menu por teclado); [relatório](relatorio-qualidade.md) |
+| NFR02 | Acessibilidade, desempenho e estados de carregamento, vazio e erro | atendido (falta só a verificação manual com leitor de tela e outros navegadores) | todo o site | `e2e` (axe-core WCAG 2.2 AA em todas as páginas, rótulos, `alt`, `lang`, teclado, estados de carregando, vazio e erro); [relatório](relatorio-qualidade.md) |
 | REQ01 | Requisitos funcionais e não funcionais do MVP | parcial | este documento | todos |
 | DS01 | Design system (paleta, tipografia, componentes) | parcial | tokens em `src/styles/styles.css` | n/a (wireframes e protótipo ficam no Trello/Figma) |
 | DEV01 | Estrutura técnica, modelo de dados, WhatsApp e testes | atendido (testes de regressão automáticos) | `src/lib/catalogo-core.js`, `tests/` | 21 testes de regras + 48 de telas |
@@ -31,6 +31,5 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 
 ## Pontos ainda sem evidência automática
 
-- Contraste de cores medido (apenas conferência visual).
 - Teste em aparelhos físicos e em Safari ou Firefox (os testes rodam em Chromium).
 - Leitor de tela real.

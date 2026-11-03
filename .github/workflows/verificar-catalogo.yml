@@ -1,0 +1,31 @@
+# Verifica a cada 3 dias se o catálogo responde (e, de quebra, conta como atividade no Supabase).
+# O plano gratuito do Supabase PAUSA o projeto depois de 7 dias sem uso, o que tira o catálogo do ar.
+# Se o projeto já estiver pausado, este fluxo falha e o GitHub avisa por e-mail: reative em
+# https://supabase.com/dashboard/project/gkpiwqztgzkuxvwrkpiy (o plano pago elimina a pausa).
+# Usa só a URL e a chave PUBLICÁVEL de src/lib/supabase-config.js (a mesma que vai para o navegador).
+name: Verificar catálogo
+
+on:
+  schedule:
+    - cron: '17 12 */3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ler produtos ativos pela API pública
+        run: |
+          URL=$(sed -n "s/.*url: '\([^']*\)'.*/\1/p" src/lib/supabase-config.js)
+          CHAVE=$(sed -n "s/.*chavePublicavel: '\([^']*\)'.*/\1/p" src/lib/supabase-config.js)
+          test -n "$URL" && test -n "$CHAVE" || { echo "Não achei a configuração do Supabase"; exit 1; }
+          resposta=$(curl --silent --show-error --fail --retry 3 --retry-delay 10 --max-time 30 \
+            -H "apikey: $CHAVE" -H "Authorization: Bearer $CHAVE" \
+            "$URL/rest/v1/produtos?select=id&ativo=eq.true")
+          total=$(printf '%s' "$resposta" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')
+          echo "Produtos ativos no catálogo: $total"
+          test "$total" -gt 0 || { echo "O catálogo está vazio"; exit 1; }

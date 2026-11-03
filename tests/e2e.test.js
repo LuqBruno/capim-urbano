@@ -631,3 +631,53 @@ test('varal: botão de pausa alterna; com menos movimento não há autoplay nem 
   assert.strictEqual(await p2.locator('[data-pausa]').isHidden(), true, 'sem autoplay, o botão de pausa some');
   await ctx2.close();
 });
+
+/* ---------- Acessibilidade automática (axe-core, WCAG 2.2 AA) e acabamento do site ---------- */
+let axeCaminho = null;
+try { axeCaminho = require.resolve('axe-core/axe.min.js'); } catch (e) { /* sem axe-core: testes ignorados */ }
+const optsAxe = { skip: (!chromium && 'playwright não instalado') || (!axeCaminho && 'axe-core não instalado') };
+const TAGS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
+const PAGINAS_AXE = ['index', 'servicos', 'assinatura-floral', 'eternizacao-de-flores', 'oficinas-florais', 'arranjos-e-presentes', 'contato',
+  'catalogo', 'produto.html?id=vaso-terracota-capim', 'pedido.html?produto=vaso-terracota-capim', 'pedido', 'admin', '404'];
+
+async function violacoesAxe(page) {
+  await page.addScriptTag({ path: axeCaminho });
+  return page.evaluate(async (tags) => {
+    const r = await axe.run(document, { runOnly: { type: 'tag', values: tags } });
+    return r.violations.map((v) => v.id + ' (' + v.nodes.length + '): ' + v.nodes.slice(0, 3).map((n) => n.target.join(' ') + ' [' + ((n.any[0] || n.all[0] || n.none[0] || {}).message || '').slice(0, 90) + ']').join(' | '));
+  }, TAGS_AXE);
+}
+
+for (const [nomeVp, vp] of [['celular', VIEWPORTS.celular], ['desktop', VIEWPORTS.desktop]]) {
+  test(`acessibilidade: axe sem violações (WCAG 2.2 AA) em todas as páginas (${nomeVp})`, optsAxe, async () => {
+    const falhas = [];
+    for (const pagina of PAGINAS_AXE) {
+      const url = /[.?]/.test(pagina) ? pagina : pagina + '.html';
+      const { ctx, page } = await abrir(vp, url);
+      if (pagina !== 'admin') await page.waitForTimeout(3000); // as animações de entrada precisam assentar: no meio do fade o contraste medido é falso
+      for (const v of await violacoesAxe(page)) falhas.push(pagina + ': ' + v);
+      await ctx.close();
+    }
+    assert.deepStrictEqual(falhas, []);
+  });
+
+  test(`acessibilidade: axe sem violações na administração logada (${nomeVp})`, optsAxe, async () => {
+    const { ctx, page } = await abrirAdminLogada(vp);
+    assert.deepStrictEqual(await violacoesAxe(page), []);
+    await ctx.close();
+  });
+}
+
+test('404.html existe, fica fora dos buscadores e leva de volta ao site', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.celular, '404.html');
+  assert.strictEqual(await page.getAttribute('meta[name="robots"]', 'content'), 'noindex, nofollow');
+  assert.strictEqual(await page.locator('h1').count(), 1);
+  assert.ok(await page.locator('a[href="catalogo.html"]').count());
+  await ctx.close();
+});
+
+test('robots.txt esconde a administração e o sitemap existe', opts, async () => {
+  const robots = fs.readFileSync(path.join(RAIZ, 'robots.txt'), 'utf8');
+  assert.match(robots, /Disallow: \/(.*\/)?admin\.html/);
+  assert.ok(fs.readFileSync(path.join(RAIZ, 'sitemap.xml'), 'utf8').includes('<urlset'));
+});

@@ -18,7 +18,7 @@ npm test                             # regras de negócio e física do varal (te
 npm run test:e2e                     # build + telas (precisa do pacote playwright e de um Chromium)
 ```
 
-Não há linter. Antes de entregar qualquer mudança, rode os dois conjuntos de testes (o de telas já checa rolagem horizontal, erros de console, rótulos e `alt`) e abra as páginas afetadas em largura de celular (375px) e de desktop (1280px), sem rolagem horizontal e sem erros no console.
+Não há linter. Antes de entregar qualquer mudança, rode os dois conjuntos de testes (o de telas já checa rolagem horizontal, erros de console, rótulos, `alt` e roda o axe-core, WCAG 2.2 AA, em todas as páginas em celular e desktop, inclusive a administração logada; o axe mede mal no meio de um fade, por isso o teste espera as animações assentarem) e abra as páginas afetadas em largura de celular (375px) e de desktop (1280px), sem rolagem horizontal e sem erros no console.
 
 ## Arquitetura
 
@@ -32,6 +32,8 @@ Não há linter. Antes de entregar qualquer mudança, rode os dois conjuntos de 
 - Cuidados, durabilidade e prazo sempre aparecem na página do produto: quando faltam, use `textoOuAviso` em vez de esconder o campo (US04).
 - O `@supabase/supabase-js` é dependência do npm (versão exata no `package.json`) e entra no bundle de `catalogo.js` e `admin.js`; não há CDN. Os scripts são módulos que importam o core, os dados e a configuração. Ao atualizar o supabase-js, rode `npm test` e `npm run test:e2e`.
 - A publicação é o workflow `.github/workflows/deploy.yml` (GitHub Pages, Source = GitHub Actions). `BASE_PATH` e `SITE_URL` só existem lá: o site fica em `/<repositório>/`, então **use caminhos relativos** (`catalogo.html`, `imagens/web/x.webp`), nunca `/catalogo.html`. Não crie `_config.yml` nem remova a configuração para "Actions": o Jekyll quebra com os arquivos `.astro`.
+- `.github/workflows/verificar-catalogo.yml` consulta o catálogo a cada 3 dias (mantém o projeto Free do Supabase ativo e avisa se ele pausou). Lê a URL e a chave publicável de `src/lib/supabase-config.js` com `sed`: se mudar o formato desse arquivo, ajuste o workflow.
+- `src/pages/404.astro`, `robots.txt.js` e `sitemap.xml.js` geram `404.html`, `robots.txt` e `sitemap.xml`. Páginas públicas novas entram na lista de `sitemap.xml.js`; a administração fica fora. `Base.astro` gera canonical e `og:image` absolutos só quando `SITE_URL` existe (publicação).
 - Mudança no banco vira um arquivo novo em `supabase/migrations/` (e é aplicada no projeto), nunca uma alteração só no painel.
 
 ## Regras de negócio que não podem quebrar
