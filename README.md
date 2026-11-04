@@ -93,7 +93,7 @@ flowchart LR
 
 O site é publicado no **GitHub Pages** pelo workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): a cada push na `main` ele instala as dependências, roda `npm test`, faz `npm run build` e publica a pasta `dist/`.
 
-**Configuração única (no GitHub):** em *Settings → Pages → Build and deployment → Source*, escolha **GitHub Actions**. Se ficar em "Deploy from a branch", o GitHub tenta construir o repositório com **Jekyll** e o build falha, porque os arquivos `.astro` começam com `---` e o Jekyll os lê como YAML.
+**Configuração única (no GitHub):** em *Settings → Pages → Build and deployment → Source*, escolha **GitHub Actions**. Neste repositório isso já está feito (04/11/2026): a verificação extra "pages build and deployment" não roda mais, e o único workflow de publicação é o `Publicar no GitHub Pages`. Se ficar em "Deploy from a branch", o GitHub tenta construir o repositório com **Jekyll** e o build falha, porque os arquivos `.astro` começam com `---` e o Jekyll os lê como YAML.
 
 - O endereço padrão é `https://<usuário>.github.io/<repositório>/`. Por isso o workflow define `BASE_PATH=/<repositório>` e `SITE_URL`, e o `astro.config.mjs` usa esses valores. Localmente e nos testes eles ficam vazios e o site é servido na raiz.
 - Com domínio próprio, defina `BASE_PATH` como `/` (ou remova a variável) e `SITE_URL` com o domínio.
