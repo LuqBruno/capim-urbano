@@ -13,6 +13,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import * as C from '../src/lib/catalogo-core.js';
 import { PRODUTOS_PADRAO as PADRAO } from '../src/lib/catalogo-dados.js';
+import { INTERFACE } from '../src/i18n/interface.js';
 
 const require = createRequire(import.meta.url); // respeita NODE_PATH, para achar o playwright global
 let chromium;
@@ -119,9 +120,12 @@ async function simularSupabase(ctx, banco) {
 }
 
 /* Espera a página terminar de buscar os produtos (os estados de carregando e erro também contam como "terminou"). */
-async function aguardarCarga(page, url) {
-  if (url.startsWith('catalogo')) await page.waitForFunction(() => document.getElementById('catalogo-contagem').textContent !== 'Carregando produtos…');
-  else if (url.startsWith('produto')) await page.waitForFunction(() => !/^Carregando produto/.test(document.getElementById('produto').textContent));
+const CARREGANDO = Object.values(INTERFACE).map((t) => t.tela.carregando);
+const CARREGANDO_PRODUTO = Object.values(INTERFACE).map((t) => t.tela.carregandoProduto);
+async function aguardarCarga(page, endereco) {
+  const url = endereco.replace(/^(en|es)\//, '');
+  if (url.startsWith('catalogo')) await page.waitForFunction((c) => !c.includes(document.getElementById('catalogo-contagem').textContent), CARREGANDO);
+  else if (url.startsWith('produto')) await page.waitForFunction((c) => !c.includes(document.getElementById('produto').textContent), CARREGANDO_PRODUTO);
   else if (url.startsWith('pedido')) {
     if (/produto=/.test(url)) await page.waitForSelector('#produto-escolhido:not([hidden])');
     else await page.waitForSelector('#ocasioes-sugeridas option', { state: 'attached' });
@@ -650,13 +654,114 @@ test('varal: botão de pausa alterna; com menos movimento não há autoplay nem 
   await ctx2.close();
 });
 
+/* ---------- Inglês e espanhol ---------- */
+const PAGINAS_TRADUZIDAS = ['index', 'catalogo', 'produto.html?id=vaso-terracota-capim', 'pedido', 'servicos', 'assinatura-floral',
+  'eternizacao-de-flores', 'oficinas-florais', 'arranjos-e-presentes', 'contato'];
+const comHtml = (pagina) => (/[.?]/.test(pagina) ? pagina : pagina + '.html');
+
+for (const [nomeVp, vp] of [['celular', VIEWPORTS.celular], ['desktop', VIEWPORTS.desktop]]) {
+  test(`idiomas: páginas em inglês e espanhol sem rolagem horizontal, erros ou arquivos faltando (${nomeVp})`, opts, async () => {
+    const falhas = [];
+    for (const lingua of ['en', 'es']) {
+      for (const pagina of PAGINAS_TRADUZIDAS) {
+        const url = lingua + '/' + comHtml(pagina);
+        const ctx = await navegador.newContext({ viewport: vp });
+        await simularSupabase(ctx, novoBanco());
+        const page = await ctx.newPage();
+        const erros = [];
+        page.on('pageerror', (e) => erros.push(e.message));
+        page.on('response', (r) => r.url().startsWith(base) && r.status() >= 400 && erros.push(r.status() + ' ' + r.url().replace(base, '')));
+        await page.goto(base + url);
+        await aguardarCarga(page, url);
+        await page.evaluate(async () => { for (const img of document.images) { img.loading = 'eager'; await img.decode().catch(() => {}); } });
+        if (await page.evaluate(() => document.documentElement.lang) !== lingua) erros.push('lang errado');
+        if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)) erros.push('rolagem horizontal');
+        const quebradas = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth === 0).map((i) => i.getAttribute('src')));
+        erros.push(...quebradas.map((src) => 'imagem quebrada: ' + src));
+        falhas.push(...erros.map((e) => url + ': ' + e));
+        await ctx.close();
+      }
+    }
+    assert.deepStrictEqual(falhas, []);
+  });
+}
+
+test('idiomas: o seletor leva à mesma página na outra língua e mantém o produto escolhido', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'produto.html?id=vaso-terracota-capim');
+  assert.strictEqual(await page.getAttribute('.linguas a[aria-current="true"]', 'lang'), 'pt-BR');
+  await page.click('.linguas a[lang="en"]');
+  await page.waitForURL(/\/en\/produto\.html\?id=vaso-terracota-capim$/);
+  await aguardarCarga(page, 'en/produto.html');
+  assert.strictEqual(await page.evaluate(() => document.documentElement.lang), 'en');
+  assert.strictEqual(await page.textContent('#produto h1'), 'Vaso terracota com capim laranja');
+  assert.strictEqual(await page.textContent('.status'), 'Available');
+  assert.match(await page.textContent('.product-price.big'), /^R\$ \d{1,3}(,\d{3})*\.\d{2}$/);
+  assert.strictEqual(await page.getAttribute('.specs', 'data-ficha'), 'Specimen sheet · No. 01');
+  assert.strictEqual(await page.locator('#foto-principal').evaluate((img) => img.complete && img.naturalWidth > 0), true, 'a foto do produto carrega fora da raiz');
+  await page.click('.linguas a[lang="es"]');
+  await page.waitForURL(/\/es\/produto\.html\?id=vaso-terracota-capim$/);
+  await aguardarCarga(page, 'es/produto.html');
+  assert.strictEqual(await page.textContent('.status'), 'Disponible');
+  await page.click('.linguas a[lang="pt-BR"]');
+  await page.waitForURL(/127\.0\.0\.1:\d+\/produto\.html\?id=vaso-terracota-capim$/);
+  await ctx.close();
+});
+
+test('idiomas: catálogo em espanhol traduz contagem, filtros e etiquetas (US02)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.celular, 'es/catalogo.html');
+  assert.strictEqual(await page.textContent('#catalogo-contagem'), PADRAO.length + ' productos encontrados');
+  assert.strictEqual(await page.textContent('label[for="f-faixa"]'), 'Rango de precio');
+  await page.selectOption('#f-faixa', 'acima-200');
+  const etiqueta = (await page.textContent('#filtros-ativos .etiqueta')).replace(/\s+/g, ' ').trim();
+  assert.strictEqual(etiqueta, 'Rango de precio Más de R$ 200, quitar filtro');
+  assert.ok((await page.locator('.product-card .status').allTextContents()).every((t) => ['Disponible', 'Por encargo', 'No disponible'].includes(t)));
+  await page.selectOption('#f-ocasiao', 'Decoração');
+  await page.selectOption('#f-cor', 'Terracota');
+  await page.selectOption('#f-faixa', 'orcamento');
+  assert.strictEqual(await page.locator('#catalogo-vazio').isVisible(), true);
+  assert.strictEqual(await page.textContent('#catalogo-vazio h2'), 'Ningún producto coincide con estos filtros.');
+  await ctx.close();
+});
+
+test('idiomas: pedido em inglês valida em inglês e gera a mensagem do WhatsApp em inglês (US03, US05)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'en/pedido.html?produto=vaso-terracota-capim');
+  await page.click('button[type=submit]');
+  assert.strictEqual(await page.locator('#resumo').isVisible(), false);
+  assert.strictEqual(await page.textContent('[data-campo="nome"] .field-error'), 'Enter your name.');
+  assert.strictEqual(await page.evaluate(() => document.activeElement.id), 'p-nome');
+  await page.fill('#p-nome', 'Ana');
+  await page.fill('#p-ocasiao', 'Birthday');
+  await page.fill('#p-cores', 'wine');
+  await page.selectOption('#p-tamanho', 'Medium');
+  await page.click('button[type=submit]');
+  assert.strictEqual(await page.locator('#resumo').isVisible(), true);
+  const href = new URL(await page.getAttribute('#enviar-whatsapp', 'href'));
+  assert.strictEqual(href.origin + href.pathname, 'https://wa.me/5548991765295');
+  const texto = href.searchParams.get('text');
+  assert.ok(texto.startsWith('Hi, Capim Urbano!'), texto);
+  assert.ok(texto.includes('*Product:* Vaso terracota com capim laranja') && texto.includes('*Occasion:* Birthday') && texto.includes('*Size:* Medium'));
+  assert.ok(texto.endsWith('I look forward to your confirmation of availability and final price.'));
+  await ctx.close();
+});
+
+test('idiomas: produto indisponível também não gera pedido em espanhol (RN01)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'es/pedido.html?produto=composicao-estudio-creme');
+  assert.strictEqual(await page.textContent('#produto-escolhido .field-error'), INTERFACE.es.erros.produto);
+  await page.fill('#p-nome', 'Ana'); await page.fill('#p-ocasiao', 'x'); await page.fill('#p-cores', 'y');
+  await page.click('button[type=submit]');
+  assert.strictEqual(await page.locator('#resumo').isVisible(), false);
+  await ctx.close();
+});
+
 /* ---------- Acessibilidade automática (axe-core, WCAG 2.2 AA) e acabamento do site ---------- */
 let axeCaminho = null;
 try { axeCaminho = require.resolve('axe-core/axe.min.js'); } catch (e) { /* sem axe-core: testes ignorados */ }
 const optsAxe = { skip: (!chromium && 'playwright não instalado') || (!axeCaminho && 'axe-core não instalado') };
 const TAGS_AXE = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const PAGINAS_AXE = ['index', 'servicos', 'assinatura-floral', 'eternizacao-de-flores', 'oficinas-florais', 'arranjos-e-presentes', 'contato',
-  'catalogo', 'produto.html?id=vaso-terracota-capim', 'pedido.html?produto=vaso-terracota-capim', 'pedido', 'admin', '404'];
+  'catalogo', 'produto.html?id=vaso-terracota-capim', 'pedido.html?produto=vaso-terracota-capim', 'pedido', 'admin', '404',
+  'en/index', 'en/catalogo', 'en/produto.html?id=vaso-terracota-capim', 'en/pedido.html?produto=vaso-terracota-capim',
+  'es/index', 'es/servicos', 'es/oficinas-florais', 'es/contato', 'es/catalogo', 'es/pedido'];
 
 async function violacoesAxe(page) {
   await page.addScriptTag({ path: axeCaminho });

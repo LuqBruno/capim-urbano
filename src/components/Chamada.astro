@@ -1,0 +1,19 @@
+---
+import Icone from './Icone.astro';
+import { linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+import { raizDe, linkWhatsApp, INSTAGRAM } from '../i18n/rotas.js';
+interface Props { titulo: string; texto: string; mensagem: string; botao?: string; lingua?: string; }
+const lingua = linguaValida(Astro.props.lingua);
+const c = siteDe(lingua).comum;
+const r = raizDe(lingua);
+const { titulo, texto, mensagem, botao = c.conversarWhatsapp } = Astro.props;
+---
+<section class="section cta">
+  <img class="cta-sprig left" src={r + 'imagens/botanico-03.png'} alt="" aria-hidden="true" width="260" height="347" loading="lazy"><img class="cta-sprig right" src={r + 'imagens/botanico-04.png'} alt="" aria-hidden="true" width="260" height="347" loading="lazy">
+  <div class="wrap reveal">
+    <h2 set:html={titulo} />
+    <p class="lead">{texto}</p>
+    <div class="actions"><a class="button button-dark" href={linkWhatsApp(mensagem)} target="_blank" rel="noopener"><Icone nome="whatsapp" /> {botao}</a><a class="text-link" href={INSTAGRAM} target="_blank" rel="noopener">{c.instagram} <Icone nome="seta-diagonal" /></a></div>
+  </div>
+</section>

@@ -3,9 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 import * as C from '../lib/catalogo-core.js';
 import { PRODUTOS_PADRAO } from '../lib/catalogo-dados.js';
 import { SUPABASE } from '../lib/supabase-config.js';
+import { interfaceDe } from '../i18n/interface.js';
 
 (function () {
   const page = document.body.dataset.page;
+  const LINGUA = document.documentElement.lang;
+  const T = interfaceDe(LINGUA);
+  const RAIZ = document.documentElement.dataset.raiz || '';
+  const foto = (src) => (/^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(src) ? src : RAIZ + src);
+  const preco = (p) => C.formatarPreco(p.preco, LINGUA);
 
   const el = (tag, attrs = {}, children = []) => {
     const node = document.createElement(tag);
@@ -29,7 +35,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
 
   let ativos = [];
   const porId = (id) => ativos.find((p) => p.id === id);
-  const numeroEspecime = (p) => 'Nº ' + String(ativos.indexOf(p) + 1).padStart(2, '0');
+  const numeroEspecime = (p) => T.especime + ' ' + String(ativos.indexOf(p) + 1).padStart(2, '0');
 
   /* Busca os produtos no Supabase. Retorna { produtos, origem, erro }; o erro vira a tela "Tentar de novo". */
   async function carregar() {
@@ -41,7 +47,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
     return r;
   }
 
-  const badge = (p) => el('span', { class: 'status status-' + p.disponibilidade, text: C.DISPONIBILIDADE[p.disponibilidade] });
+  const badge = (p) => el('span', { class: 'status status-' + p.disponibilidade, text: T.disponibilidade[p.disponibilidade] });
 
   /* ---------- Catálogo ---------- */
   function iniciarCatalogo() {
@@ -66,18 +72,18 @@ import { SUPABASE } from '../lib/supabase-config.js';
     const montarOpcoes = () => {
       opcoes(selOcasiao, C.unicos(ativos, 'ocasioes').map((v) => [v, v]));
       opcoes(selCor, C.unicos(ativos, 'cores').map((v) => [v, v]));
-      opcoes(selFaixa, Object.entries(C.FAIXAS_PRECO).map(([k, f]) => [k, f.rotulo]));
+      opcoes(selFaixa, Object.keys(C.FAIXAS_PRECO).map((k) => [k, T.faixas[k]]));
     };
 
     const cartao = (p, i) => {
       const href = 'produto.html?id=' + encodeURIComponent(p.id);
       return el('li', { class: 'product-card', style: '--i:' + i }, [
         el('a', { href, class: 'product-link' }, [
-          el('div', { class: 'product-media' }, [el('img', { src: p.fotos[0], alt: p.nome, width: 800, height: 1000, loading: 'lazy' })]),
+          el('div', { class: 'product-media' }, [el('img', { src: foto(p.fotos[0]), alt: p.nome, width: 800, height: 1000, loading: 'lazy' })]),
           el('div', { class: 'product-body', 'data-especime': numeroEspecime(p) }, [
             el('div', { class: 'product-meta' }, [el('span', { text: p.categoria }), badge(p)]),
             el('h2', { text: p.nome }),
-            el('p', { class: 'product-price', text: C.formatarPreco(p.preco) }),
+            el('p', { class: 'product-price', text: preco(p) }),
             el('p', { class: 'product-lead', text: p.prazo })
           ])
         ])
@@ -87,7 +93,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
     const etiqueta = (f) => {
       const botao = el('button', { type: 'button', class: 'etiqueta' }, [
         el('span', { class: 'etiqueta-chave', text: f.rotulo }), ' ', el('span', { text: f.valor }),
-        el('span', { class: 'sr-only', text: ', remover filtro' }), icone('M6 6l12 12M18 6 6 18')
+        el('span', { class: 'sr-only', text: T.tela.removerFiltro }), icone('M6 6l12 12M18 6 6 18')
       ]);
       botao.addEventListener('click', () => { form.elements[f.campo].value = ''; desenhar(); form.elements[f.campo].focus(); });
       return el('li', {}, [botao]);
@@ -95,14 +101,14 @@ import { SUPABASE } from '../lib/supabase-config.js';
 
     const desenhar = () => {
       const filtros = { ocasiao: selOcasiao.value, cor: selCor.value, faixa: selFaixa.value };
-      const aplicados = C.descreverFiltros(filtros);
+      const aplicados = C.descreverFiltros(filtros, LINGUA);
       etiquetas.replaceChildren(...aplicados.map(etiqueta));
       etiquetas.hidden = aplicados.length === 0;
       const resultado = C.filtrarProdutos(ativos, filtros);
       lista.replaceChildren(...resultado.map(cartao));
       vazio.hidden = resultado.length > 0;
       lista.hidden = resultado.length === 0;
-      contagem.textContent = resultado.length === 1 ? '1 produto encontrado' : resultado.length + ' produtos encontrados';
+      contagem.textContent = T.tela.encontrados(resultado.length);
       const q = new URLSearchParams();
       Object.entries(filtros).forEach(([k, v]) => v && q.set(k, v));
       history.replaceState(null, '', q.toString() ? '?' + q : location.pathname);
@@ -113,7 +119,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
       erroBox.hidden = true; vazio.hidden = true; lista.hidden = true; etiquetas.hidden = true;
       lista.replaceChildren();
       esqueleto.hidden = false;
-      contagem.textContent = 'Carregando produtos…';
+      contagem.textContent = T.tela.carregando;
       const r = await carregar();
       esqueleto.hidden = true;
       if (r.erro) {
@@ -139,42 +145,42 @@ import { SUPABASE } from '../lib/supabase-config.js';
   async function iniciarProduto() {
     const alvo = document.getElementById('produto');
     const id = new URLSearchParams(location.search).get('id');
-    alvo.replaceChildren(el('p', { role: 'status', text: 'Carregando produto…' }));
+    alvo.replaceChildren(el('p', { role: 'status', text: T.tela.carregandoProduto }));
     const r = await carregar();
     if (r.erro) {
-      const tentar = el('button', { class: 'button button-dark', type: 'button', text: 'Tentar de novo' });
+      const tentar = el('button', { class: 'button button-dark', type: 'button', text: T.tela.tentarDeNovo });
       tentar.addEventListener('click', iniciarProduto);
       alvo.replaceChildren(el('div', { role: 'alert' }, [
-        el('h1', { text: 'Não foi possível carregar o produto.' }),
-        el('p', { text: 'Verifique sua conexão e tente de novo.' }),
-        el('div', { class: 'actions' }, [tentar, el('a', { class: 'text-link', href: 'catalogo.html', text: 'Voltar ao catálogo' })])
+        el('h1', { text: T.tela.erroProduto }),
+        el('p', { text: T.tela.verifiqueConexao }),
+        el('div', { class: 'actions' }, [tentar, el('a', { class: 'text-link', href: 'catalogo.html', text: T.tela.voltarCatalogo })])
       ]));
       return;
     }
     const p = porId(id);
     if (!p) {
       alvo.replaceChildren(
-        el('h1', { text: 'Produto não encontrado' }),
-        el('p', { text: 'Este produto não está mais no catálogo ou o link está incorreto.' }),
-        el('a', { class: 'button button-dark', href: 'catalogo.html', text: 'Voltar ao catálogo' })
+        el('h1', { text: T.tela.naoEncontrado }),
+        el('p', { text: T.tela.naoEncontradoTexto }),
+        el('a', { class: 'button button-dark', href: 'catalogo.html', text: T.tela.voltarCatalogo })
       );
-      document.title = 'Produto não encontrado | Capim Urbano';
+      document.title = T.tela.naoEncontrado + ' | Capim Urbano';
       return;
     }
     document.title = p.nome + ' | Capim Urbano';
     const indisponivel = p.disponibilidade === 'indisponivel';
     // Cuidados, durabilidade e prazo sempre aparecem; sem cadastro, mostram aviso (US04).
     const info = (rotulo, valor, obrigatorio) => {
-      const texto = obrigatorio ? C.textoOuAviso(valor) : valor;
+      const texto = obrigatorio ? C.textoOuAviso(valor, LINGUA) : valor;
       if (!texto) return null;
-      const ausente = obrigatorio && texto === C.AVISO_SEM_INFO;
+      const ausente = obrigatorio && !C.temTexto(valor);
       return el('div', { class: 'spec' + (ausente ? ' spec-missing' : '') }, [el('dt', { text: rotulo }), el('dd', { text: texto })]);
     };
 
-    const principal = el('img', { src: p.fotos[0], alt: p.nome, width: 1200, height: 1500, id: 'foto-principal' });
-    const miniaturas = p.fotos.length > 1 && el('ul', { class: 'thumbs', 'aria-label': 'Outras fotos' },
+    const principal = el('img', { src: foto(p.fotos[0]), alt: p.nome, width: 1200, height: 1500, id: 'foto-principal' });
+    const miniaturas = p.fotos.length > 1 && el('ul', { class: 'thumbs', 'aria-label': T.tela.outrasFotos },
       p.fotos.map((src, i) => el('li', {}, [
-        el('button', { type: 'button', 'aria-label': 'Ver foto ' + (i + 1), 'aria-pressed': String(i === 0) }, [el('img', { src, alt: '', width: 120, height: 150 })])
+        el('button', { type: 'button', 'aria-label': T.tela.verFoto(i + 1), 'aria-pressed': String(i === 0) }, [el('img', { src: foto(src), alt: '', width: 120, height: 150 })])
       ])));
     if (miniaturas) miniaturas.addEventListener('click', (e) => {
       const b = e.target.closest('button');
@@ -193,25 +199,25 @@ import { SUPABASE } from '../lib/supabase-config.js';
     alvo.replaceChildren(
       el('div', { class: 'product-gallery' }, [el('div', { class: 'product-main' }, [principal]), miniaturas]),
       el('div', { class: 'product-info' }, [
-        el('nav', { class: 'crumbs', 'aria-label': 'Você está em' }, [
-          el('a', { href: 'catalogo.html', text: 'Catálogo' }), el('span', { 'aria-hidden': 'true', text: '/' }), el('span', { 'aria-current': 'page', text: p.categoria })
+        el('nav', { class: 'crumbs', 'aria-label': T.tela.voceEstaEm }, [
+          el('a', { href: 'catalogo.html', text: T.tela.catalogo }), el('span', { 'aria-hidden': 'true', text: '/' }), el('span', { 'aria-current': 'page', text: p.categoria })
         ]),
         el('h1', { text: p.nome }),
-        el('p', { class: 'product-price big', text: C.formatarPreco(p.preco) }),
+        el('p', { class: 'product-price big', text: preco(p) }),
         el('p', {}, [badge(p)]),
         el('p', { class: 'lead', text: p.descricao }),
-        el('dl', { class: 'specs', 'data-ficha': 'Ficha da peça · ' + numeroEspecime(p), 'aria-label': 'Cuidados, durabilidade e prazo' }, [
-          info('Prazo de produção ou entrega', p.prazo, true), info('Durabilidade', p.durabilidade, true), info('Cuidados', p.cuidados, true),
-          info('Ocasiões', (p.ocasioes || []).join(', ')), info('Cores', (p.cores || []).join(', '))
+        el('dl', { class: 'specs', 'data-ficha': T.tela.fichaDaPeca + ' · ' + numeroEspecime(p), 'aria-label': T.tela.rotuloFicha }, [
+          info(T.tela.prazo, p.prazo, true), info(T.tela.durabilidade, p.durabilidade, true), info(T.tela.cuidados, p.cuidados, true),
+          info(T.tela.ocasioes, (p.ocasioes || []).join(', ')), info(T.tela.cores, (p.cores || []).join(', '))
         ]),
         indisponivel
-          ? el('p', { class: 'notice', role: 'status', text: 'Este produto está indisponível no momento. Você pode pedir um arranjo personalizado parecido.' })
-          : el('p', { class: 'notice', text: 'Disponibilidade e valor final são confirmados no atendimento pelo WhatsApp.' }),
+          ? el('p', { class: 'notice', role: 'status', text: T.tela.avisoIndisponivel })
+          : el('p', { class: 'notice', text: T.tela.avisoConfirmacao }),
         el('div', { class: 'actions' }, [
           indisponivel
-            ? el('a', { class: 'button button-dark', href: 'pedido.html', text: 'Pedir arranjo personalizado' })
-            : el('a', { class: 'button button-dark', href: pedidoHref, text: 'Fazer pedido' }),
-          el('a', { class: 'text-link', href: 'catalogo.html', text: 'Voltar ao catálogo' })
+            ? el('a', { class: 'button button-dark', href: 'pedido.html', text: T.tela.pedirPersonalizado })
+            : el('a', { class: 'button button-dark', href: pedidoHref, text: T.tela.fazerPedido }),
+          el('a', { class: 'text-link', href: 'catalogo.html', text: T.tela.voltarCatalogo })
         ])
       ])
     );
@@ -226,8 +232,8 @@ import { SUPABASE } from '../lib/supabase-config.js';
     const produtoBox = document.getElementById('produto-escolhido');
     const id = new URLSearchParams(location.search).get('produto');
 
-    C.TAMANHOS.forEach((t) => form.elements.tamanho.append(el('option', { value: t, text: t })));
-    C.ORCAMENTOS.forEach((t) => form.elements.orcamento.append(el('option', { value: t, text: t })));
+    T.tamanhos.forEach((t) => form.elements.tamanho.append(el('option', { value: t, text: t })));
+    T.orcamentos.forEach((t) => form.elements.orcamento.append(el('option', { value: t, text: t })));
 
     // Enquanto o produto do link não carrega (ou se falhar), não dá para saber se está indisponível: o pedido fica bloqueado.
     let produto = null;
@@ -250,7 +256,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
       e.preventDefault();
       if (bloqueado) { resumo.hidden = true; produtoBox.scrollIntoView({ behavior: 'smooth' }); return; }
       const d = dados();
-      const { valido, erros } = C.validarPedido(d, produto);
+      const { valido, erros } = C.validarPedido(d, produto, LINGUA);
       marcarErros(erros);
       if (!valido) {
         resumo.hidden = true;
@@ -259,7 +265,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
         else produtoBox.scrollIntoView({ behavior: 'smooth' });
         return;
       }
-      const mensagem = C.montarMensagem(d, produto);
+      const mensagem = C.montarMensagem(d, produto, LINGUA);
       resumoTexto.textContent = mensagem;
       enviar.href = C.montarLinkWhatsApp(mensagem);
       resumo.hidden = false;
@@ -277,26 +283,26 @@ import { SUPABASE } from '../lib/supabase-config.js';
 
       if (r.erro && id) {
         bloqueado = true;
-        const tentar = el('button', { class: 'button button-light', type: 'button', text: 'Tentar de novo' });
+        const tentar = el('button', { class: 'button button-light', type: 'button', text: T.tela.tentarDeNovo });
         tentar.addEventListener('click', () => location.reload());
         produtoBox.hidden = false;
-        produtoBox.append(el('p', { role: 'alert', text: 'Não foi possível carregar o produto do link. Verifique sua conexão e tente de novo.' }), tentar);
+        produtoBox.append(el('p', { role: 'alert', text: T.tela.erroProdutoLink }), tentar);
       } else if (id && !produto) {
         produtoBox.hidden = false;
-        produtoBox.append(el('p', { role: 'alert', text: 'O produto do link não foi encontrado. Você pode seguir com um arranjo personalizado.' }));
+        produtoBox.append(el('p', { role: 'alert', text: T.tela.produtoLinkAusente }));
       } else if (produto) {
         produtoBox.hidden = false;
         produtoBox.append(
-          el('img', { src: produto.fotos[0], alt: '', width: 96, height: 120 }),
+          el('img', { src: foto(produto.fotos[0]), alt: '', width: 96, height: 120 }),
           el('div', {}, [
-            el('p', { class: 'eyebrow', text: 'Produto escolhido' }),
+            el('p', { class: 'eyebrow', text: T.tela.produtoEscolhido }),
             el('p', { class: 'product-name', text: produto.nome }),
-            el('p', { text: C.formatarPreco(produto.preco) }),
-            el('a', { href: 'pedido.html', text: 'Remover e pedir personalizado' })
+            el('p', { text: preco(produto) }),
+            el('a', { href: 'pedido.html', text: T.tela.removerEPedir })
           ])
         );
         if (produto.disponibilidade === 'indisponivel') {
-          produtoBox.append(el('p', { class: 'field-error', role: 'alert', text: C.validarPedido({}, produto).erros.produto }));
+          produtoBox.append(el('p', { class: 'field-error', role: 'alert', text: C.validarPedido({}, produto, LINGUA).erros.produto }));
         }
       }
     };

@@ -1,4 +1,7 @@
+import { interfaceDe } from '../i18n/interface.js';
+
 document.documentElement.classList.add('js');
+const T = interfaceDe(document.documentElement.lang).tela;
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.documentElement;
@@ -12,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!menuToggle || !siteNav) return;
     siteNav.classList.toggle('is-open', open);
     menuToggle.setAttribute('aria-expanded', String(open));
-    menuToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+    menuToggle.setAttribute('aria-label', open ? T.fecharMenu : T.abrirMenu);
   };
   if (menuToggle && siteNav) {
     menuToggle.addEventListener('click', () => setMenu(!siteNav.classList.contains('is-open')));
@@ -84,6 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   update();
+
+  document.querySelectorAll('[data-lingua]').forEach((link) => link.addEventListener('click', () => {
+    link.href = link.getAttribute('href').split(/[?#]/)[0] + location.search;
+  }));
 
   const year = document.querySelector('[data-year]');
   if (year) year.textContent = new Date().getFullYear();

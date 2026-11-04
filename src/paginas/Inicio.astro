@@ -1,0 +1,138 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import Varal from '../components/Varal.astro';
+import Chamada from '../components/Chamada.astro';
+import { linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+import { raizDe, linkWhatsApp, INSTAGRAM } from '../i18n/rotas.js';
+const lingua = linguaValida(Astro.props.lingua);
+const s = siteDe(lingua);
+const t = s.inicio;
+const c = s.comum;
+const r = raizDe(lingua);
+const conversa = linkWhatsApp(c.whatsapp.servico);
+const fotosVaral = [
+  ['capim5.webp', 1200, 1600], ['oficina-presente-vivo.webp', 1350, 1800], ['oficina-guirlanda.webp', 960, 1194], ['capim6.webp', 1200, 1600],
+  ['oficina-arranjo-180.webp', 1350, 1800], ['capim4.webp', 1200, 1600], ['oficina-escapularios.webp', 960, 1106], ['oficina-hero.webp', 1254, 1254]
+].map(([arquivo, largura, altura], i) => ({ src: r + 'imagens/web/' + arquivo, largura, altura, titulo: t.varal[i][0], legenda: t.varal[i][1], alt: t.varal[i][2] }));
+const fotosInsta = [['capim5.webp', 1200, 1600], ['oficina-acao.webp', 1254, 1254], ['capim6.webp', 1200, 1600], ['oficina-guirlanda.webp', 960, 1194], ['capim2.webp', 1600, 2400], ['oficina-arranjo-vaso.webp', 1080, 1350]];
+const sv = t.servicos;
+---
+<Base titulo={t.titulo} descricao={t.descricao} og atual="inicio" whatsapp={c.whatsapp.servico} lingua={lingua} arquivo="index.html">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="hero-script reveal-line" style="--i:0">{t.lema}</p>
+        <h1><span class="line reveal-line" style="--i:1">{t.linha1}</span> <span class="line reveal-line" style="--i:2" set:html={t.linha2} /></h1>
+        <p class="lead reveal-line" style="--i:3">{t.lead}</p>
+        <div class="actions reveal-line" style="--i:4"><a class="button button-dark" href="servicos.html">{t.conhecer} <Icone nome="seta" /></a><a class="text-link" href={conversa} target="_blank" rel="noopener">{t.falar} <Icone nome="seta-diagonal" /></a></div>
+      </div>
+      <figure class="hero-media">
+        <div class="hero-frame"><img src={r + 'imagens/web/capim1.webp'} alt={t.heroAlt} width="1600" height="1066" fetchpriority="high"></div>
+        <figcaption class="hero-tag"><strong>{t.selo}</strong>{t.seloTexto}</figcaption>
+      </figure>
+    </div>
+  </section>
+  <section class="section varal-secao" aria-labelledby="varal-titulo">
+    <div class="wrap varal-cabeca reveal">
+      <h2 id="varal-titulo" set:html={t.varalTitulo} />
+      <p class="lead">{t.varalLead}</p>
+    </div>
+    <Varal rotulo={t.varalRotulo} lingua={lingua} fotos={fotosVaral} />
+  </section>
+
+  <section class="section manifesto" style="padding-top:clamp(48px,6vw,88px)">
+    <div class="wrap reveal">
+      <img class="sprig" src={r + 'imagens/botanico-02.png'} alt="" aria-hidden="true" width="74" height="99" loading="lazy">
+      <p class="quote" set:html={t.manifesto} />
+      <p class="manifesto-sign">{t.fundadora}</p>
+    </div>
+  </section>
+
+  <section class="section" id="servicos" style="padding-top:0">
+    <div class="wrap">
+      <div class="services-head reveal">
+        <h2 set:html={t.servicosTitulo} />
+        <p class="lead">{t.servicosLead}</p>
+      </div>
+
+      <article class="service">
+        <figure class="service-media reveal-img"><img src={r + 'imagens/web/capim5.webp'} alt={sv.assinatura.alt} width="1200" height="1600" loading="lazy"></figure>
+        <div class="service-copy reveal">
+          <p class="service-for">{sv.assinatura.para}</p>
+          <h3>{c.servicos.assinatura}</h3>
+          <p>{sv.assinatura.texto}</p>
+          <ul class="service-points">{sv.assinatura.pontos.map((p) => <li>{p}</li>)}</ul>
+          <a class="text-link" href="assinatura-floral.html">{sv.assinatura.link} <Icone nome="seta" /></a>
+        </div>
+      </article>
+
+      <article class="service service-reverse">
+        <figure class="service-media reveal-img"><img src={r + 'imagens/web/capim2.webp'} alt={sv.eternizacao.alt} width="1600" height="2400" loading="lazy"></figure>
+        <div class="service-copy reveal">
+          <p class="service-for">{sv.eternizacao.para}</p>
+          <h3>{c.servicos.eternizacao}</h3>
+          <p>{sv.eternizacao.texto}</p>
+          <ul class="service-points">{sv.eternizacao.pontos.map((p) => <li>{p}</li>)}</ul>
+          <a class="text-link" href="eternizacao-de-flores.html">{sv.eternizacao.link} <Icone nome="seta" /></a>
+        </div>
+      </article>
+
+      <article class="service">
+        <figure class="service-media reveal-img"><img src={r + 'imagens/web/oficina-hero.webp'} alt={sv.oficinas.alt} width="1254" height="1254" loading="lazy"></figure>
+        <div class="service-copy reveal">
+          <p class="service-for">{sv.oficinas.para}</p>
+          <h3>{c.servicos.oficinas}</h3>
+          <p>{sv.oficinas.texto}</p>
+          <ul class="service-points">{sv.oficinas.pontos.map((p) => <li>{p}</li>)}</ul>
+          <a class="text-link" href="oficinas-florais.html">{sv.oficinas.link} <Icone nome="seta" /></a>
+        </div>
+      </article>
+
+      <article class="service service-reverse">
+        <div class="gift-strip service-media" style="box-shadow:none;background:none;border-radius:0">
+          <figure class="reveal-img"><img src={r + 'imagens/web/capim6.webp'} alt={sv.arranjos.alts[0]} width="1200" height="1600" loading="lazy"></figure>
+          <figure class="reveal-img" style="--d:120ms"><img src={r + 'imagens/web/capim4.webp'} alt={sv.arranjos.alts[1]} width="1200" height="1600" loading="lazy"></figure>
+          <figure class="reveal-img"><img src={r + 'imagens/web/oficina-presente-vivo.webp'} alt={sv.arranjos.alts[2]} width="1350" height="1800" loading="lazy"></figure>
+        </div>
+        <div class="service-copy reveal">
+          <p class="service-for">{sv.arranjos.para}</p>
+          <h3>{c.servicos.arranjos}</h3>
+          <p>{sv.arranjos.texto}</p>
+          <ul class="service-points">{sv.arranjos.pontos.map((p) => <li>{p}</li>)}</ul>
+          <a class="text-link" href="arranjos-e-presentes.html">{sv.arranjos.link} <Icone nome="seta" /></a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="night section">
+    <img class="night-sprig" src={r + 'imagens/botanico-01.png'} alt="" aria-hidden="true" width="260" height="347" loading="lazy">
+    <div class="wrap atelier">
+      <figure class="atelier-photo reveal-img"><img src={r + 'imagens/web/juliana-luque-oficina.webp'} alt={t.atelieAlt} width="1200" height="1800" loading="lazy"></figure>
+      <div class="atelier-copy reveal">
+        <h2 set:html={t.atelieTitulo} />
+        {t.atelieTexto.map((p) => <p>{p}</p>)}
+        <p class="signature"><Fragment set:html={t.atelieAssinatura} /><small>{t.fundadora}</small></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap insta">
+      <div class="reveal">
+        <h2 set:html={t.instaTitulo} />
+        <p class="lead">{t.instaLead}</p>
+        <a class="insta-handle" href={INSTAGRAM} target="_blank" rel="noopener"><Icone nome="instagram" /> @capimurbano.ateliefloral</a>
+      </div>
+      <div class="insta-grid reveal" style="--d:120ms">
+        {fotosInsta.map(([arquivo, largura, altura], i) => (
+          <a href={INSTAGRAM} target="_blank" rel="noopener" aria-label={t.instaVer + t.insta[i]}><img src={r + 'imagens/web/' + arquivo} alt="" width={largura} height={altura} loading="lazy"></a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Chamada titulo={t.ctaTitulo} texto={t.ctaLead} mensagem={c.whatsapp.servico} lingua={lingua} />
+</Base>

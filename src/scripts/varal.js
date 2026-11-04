@@ -1,6 +1,9 @@
 /* Varal de fotos: arraste o cordão (ou use as setas) e as fotos deslizam, balançando nos prendedores.
    A foto do meio é a ativa. Com "menos movimento" no sistema, não há balanço nem autoplay. */
 import { clamp, alturaCordao, passoMola, passoBalanco, maisProxima, proximaFoto, doisDigitos } from '../lib/varal-core.js';
+import { interfaceDe } from '../i18n/interface.js';
+
+const T = interfaceDe(document.documentElement.lang).tela;
 
 function iniciarVaral(raiz) {
   const cartoes = [...raiz.querySelectorAll('.varal-cartao')];
@@ -43,7 +46,7 @@ function iniciarVaral(raiz) {
     titulo.textContent = c.dataset.titulo || '';
     sub.textContent = c.dataset.legenda || '';
     contador.textContent = doisDigitos(ativo + 1);
-    anuncio.textContent = 'Foto ' + (ativo + 1) + ' de ' + n + (c.dataset.titulo ? ': ' + c.dataset.titulo : '');
+    anuncio.textContent = T.fotoDoVaral(ativo + 1, n, c.dataset.titulo);
     legenda.classList.remove('is-entrando'); void legenda.offsetWidth; legenda.classList.add('is-entrando');
   };
 
@@ -98,7 +101,7 @@ function iniciarVaral(raiz) {
     botaoPausa.addEventListener('click', () => {
       pausado = !pausado;
       botaoPausa.setAttribute('aria-pressed', String(pausado));
-      botaoPausa.setAttribute('aria-label', pausado ? 'Continuar a passagem automática' : 'Pausar a passagem automática');
+      botaoPausa.setAttribute('aria-label', pausado ? T.continuar : T.pausar);
     });
   }
 

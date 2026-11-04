@@ -1,33 +1,36 @@
 /* Regras do catálogo e do pedido (sem acesso ao DOM, para poder ser testado em Node). */
+import { INTERFACE, interfaceDe } from '../i18n/interface.js';
+
+const PT = INTERFACE['pt-BR'];
 const WHATSAPP = '5548991765295';
 const TIPOS_FOTO = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png' };
 const TAMANHO_MAX_FOTO = 2 * 1024 * 1024;
 
-const DISPONIBILIDADE = {
-  'disponivel': 'Disponível',
-  'sob-encomenda': 'Sob encomenda',
-  'indisponivel': 'Indisponível'
-};
+const DISPONIBILIDADE = { ...PT.disponibilidade };
 
 const FAIXAS_PRECO = {
-  'ate-100': { rotulo: 'Até R$ 100', min: 0, max: 100 },
-  '100-200': { rotulo: 'R$ 100 a R$ 200', min: 100, max: 200 },
-  'acima-200': { rotulo: 'Acima de R$ 200', min: 200, max: Infinity },
-  'orcamento': { rotulo: 'Sob orçamento' }
+  'ate-100': { rotulo: PT.faixas['ate-100'], min: 0, max: 100 },
+  '100-200': { rotulo: PT.faixas['100-200'], min: 100, max: 200 },
+  'acima-200': { rotulo: PT.faixas['acima-200'], min: 200, max: Infinity },
+  'orcamento': { rotulo: PT.faixas.orcamento }
 };
 
-const TAMANHOS = ['Pequeno', 'Médio', 'Grande', 'Não sei, quero sugestão'];
-const ORCAMENTOS = ['Até R$ 100', 'R$ 100 a R$ 200', 'R$ 200 a R$ 400', 'Acima de R$ 400', 'Prefiro conversar'];
+const TAMANHOS = PT.tamanhos.slice();
+const ORCAMENTOS = PT.orcamentos.slice();
 
-const AVISO_SEM_INFO = 'Não informado. Consulte o ateliê pelo WhatsApp.';
+const AVISO_SEM_INFO = PT.semInfo;
+
+const temTexto = (valor) => typeof valor === 'string' && valor.trim() !== '';
 
 /* Texto do cadastro, ou um aviso claro quando a informação não foi preenchida (US04). */
-const textoOuAviso = (valor) => (typeof valor === 'string' && valor.trim() ? valor.trim() : AVISO_SEM_INFO);
+const textoOuAviso = (valor, lingua) => (temTexto(valor) ? valor.trim() : interfaceDe(lingua).semInfo);
 
-const formatarPreco = (preco) =>
-  typeof preco === 'number' && isFinite(preco)
-    ? 'R$ ' + preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : 'Sob orçamento';
+const formatarPreco = (preco, lingua) => {
+  const t = interfaceDe(lingua);
+  return typeof preco === 'number' && isFinite(preco)
+    ? 'R$ ' + preco.toLocaleString(t.numeros, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : t.sobOrcamento;
+};
 
 const unicos = (produtos, campo) =>
   [...new Set(produtos.flatMap((p) => p[campo] || []))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
@@ -49,14 +52,14 @@ function filtrarProdutos(produtos, filtros = {}) {
   });
 }
 
-const ROTULOS_FILTROS = { ocasiao: 'Ocasião', cor: 'Cor', faixa: 'Faixa de preço' };
-function descreverFiltros(filtros = {}) {
-  return Object.entries(ROTULOS_FILTROS)
+function descreverFiltros(filtros = {}, lingua) {
+  const t = interfaceDe(lingua);
+  return Object.entries(t.filtros)
     .filter(([campo]) => (filtros[campo] || '').trim())
     .map(([campo, rotulo]) => {
       const valor = filtros[campo].trim();
-      const faixa = campo === 'faixa' && FAIXAS_PRECO[valor];
-      return { campo, rotulo, valor: faixa ? faixa.rotulo : valor };
+      const faixa = campo === 'faixa' && FAIXAS_PRECO[valor] && t.faixas[valor];
+      return { campo, rotulo, valor: faixa || valor };
     });
 }
 
@@ -70,35 +73,36 @@ const ehUrlHttp = (valor) => {
 };
 
 /* Valida o pedido. Retorna { valido, erros: { campo: mensagem } }. */
-function validarPedido(dados, produto) {
+function validarPedido(dados, produto, lingua) {
+  const t = interfaceDe(lingua).erros;
   const erros = {};
   const nome = (dados.nome || '').trim();
-  if (nome.length < 2) erros.nome = 'Informe seu nome.';
-  if (produto && produto.disponibilidade === 'indisponivel') {
-    erros.produto = 'Este produto está indisponível no momento. Escolha outro ou faça um pedido personalizado.';
-  }
+  if (nome.length < 2) erros.nome = t.nome;
+  if (produto && produto.disponibilidade === 'indisponivel') erros.produto = t.produto;
   const qtd = Number(dados.quantidade);
-  if (!Number.isInteger(qtd) || qtd < 1 || qtd > 99) erros.quantidade = 'Informe uma quantidade entre 1 e 99.';
-  if (!(dados.ocasiao || '').trim()) erros.ocasiao = 'Informe a ocasião ou a finalidade.';
-  if (!(dados.cores || '').trim()) erros.cores = 'Informe ao menos uma cor preferida.';
+  if (!Number.isInteger(qtd) || qtd < 1 || qtd > 99) erros.quantidade = t.quantidade;
+  if (!(dados.ocasiao || '').trim()) erros.ocasiao = t.ocasiao;
+  if (!(dados.cores || '').trim()) erros.cores = t.cores;
   const ref = (dados.referencia || '').trim();
-  if (ref && !ehUrlHttp(ref)) erros.referencia = 'Use um link completo, começando com http:// ou https://.';
+  if (ref && !ehUrlHttp(ref)) erros.referencia = t.referencia;
   return { valido: Object.keys(erros).length === 0, erros };
 }
 
-function montarMensagem(dados, produto) {
-  const linhas = ['Oi, Capim Urbano! Quero fazer um pedido pelo site.', ''];
-  linhas.push('*Produto:* ' + (produto ? produto.nome : 'Arranjo personalizado (sem produto do catálogo)'));
-  if (produto) linhas.push('*Preço de referência:* ' + formatarPreco(produto.preco));
-  linhas.push('*Quantidade:* ' + Number(dados.quantidade));
-  linhas.push('*Ocasião:* ' + dados.ocasiao.trim());
-  linhas.push('*Cores preferidas:* ' + dados.cores.trim());
-  if ((dados.tamanho || '').trim()) linhas.push('*Tamanho:* ' + dados.tamanho.trim());
-  if ((dados.orcamento || '').trim()) linhas.push('*Orçamento:* ' + dados.orcamento.trim());
-  if ((dados.referencia || '').trim()) linhas.push('*Referência visual:* ' + dados.referencia.trim());
-  if ((dados.observacoes || '').trim()) linhas.push('*Observações:* ' + dados.observacoes.trim());
-  linhas.push('*Nome:* ' + dados.nome.trim());
-  linhas.push('', 'Aguardo a confirmação de disponibilidade e valor final.');
+function montarMensagem(dados, produto, lingua) {
+  const t = interfaceDe(lingua).mensagem;
+  const campo = (rotulo, valor) => '*' + rotulo + ':* ' + valor;
+  const linhas = [t.abertura, ''];
+  linhas.push(campo(t.produto, produto ? produto.nome : t.personalizado));
+  if (produto) linhas.push(campo(t.preco, formatarPreco(produto.preco, lingua)));
+  linhas.push(campo(t.quantidade, Number(dados.quantidade)));
+  linhas.push(campo(t.ocasiao, dados.ocasiao.trim()));
+  linhas.push(campo(t.cores, dados.cores.trim()));
+  if (temTexto(dados.tamanho)) linhas.push(campo(t.tamanho, dados.tamanho.trim()));
+  if (temTexto(dados.orcamento)) linhas.push(campo(t.orcamento, dados.orcamento.trim()));
+  if (temTexto(dados.referencia)) linhas.push(campo(t.referencia, dados.referencia.trim()));
+  if (temTexto(dados.observacoes)) linhas.push(campo(t.observacoes, dados.observacoes.trim()));
+  linhas.push(campo(t.nome, dados.nome.trim()));
+  linhas.push('', t.fechamento);
   return linhas.join('\n');
 }
 
@@ -203,6 +207,6 @@ async function carregarProdutos(padrao, cliente) {
 
 export {
   WHATSAPP, TIPOS_FOTO, TAMANHO_MAX_FOTO, DISPONIBILIDADE, FAIXAS_PRECO, TAMANHOS, ORCAMENTOS,
-  AVISO_SEM_INFO, textoOuAviso, formatarPreco, unicos, filtrarProdutos, descreverFiltros, validarPedido, montarMensagem,
+  AVISO_SEM_INFO, temTexto, textoOuAviso, formatarPreco, unicos, filtrarProdutos, descreverFiltros, validarPedido, montarMensagem,
   montarLinkWhatsApp, slug, validarProduto, linhaParaProduto, produtoParaLinha, validarArquivoFoto, caminhoFoto, criarCliente, carregarProdutos
 };

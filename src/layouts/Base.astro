@@ -2,6 +2,9 @@
 import '../styles/styles.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { LINGUAS, LINGUA_PADRAO, linguaValida, pastaDaLingua } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+import { raizDe } from '../i18n/rotas.js';
 
 interface Props {
   titulo: string;
@@ -10,7 +13,7 @@ interface Props {
   og?: boolean;
   /** Valor de data-page: o script da página usa para saber o que montar. */
   pagina?: string;
-  /** Rótulo do item do menu marcado como página atual. */
+  /** Chave do item do menu marcado como página atual. */
   atual?: string;
   /** Mensagem inicial do WhatsApp no rodapé. */
   whatsapp?: string;
@@ -18,18 +21,26 @@ interface Props {
   admin?: boolean;
   /** Página de erro 404: serve em qualquer caminho, então fixa a base dos links relativos e sai dos buscadores. */
   erro404?: boolean;
+  lingua?: string;
+  arquivo?: string;
 }
-const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false, erro404 = false } = Astro.props;
+const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false, erro404 = false, arquivo = 'index.html' } = Astro.props;
+const lingua = linguaValida(Astro.props.lingua);
+const t = siteDe(lingua);
+const r = raizDe(lingua);
 
 // Endereços absolutos (compartilhamento e buscadores) só existem na publicação, quando SITE_URL está definido.
 const raiz = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const absoluta = (caminho: string) => (Astro.site ? new URL(raiz + caminho, Astro.site).href : caminho);
-const canonica = Astro.site && !admin && !erro404
+const traduzida = !admin && !erro404;
+const canonica = Astro.site && traduzida
   ? new URL(Astro.url.pathname.replace(/index\.html$/, ''), Astro.site).href
   : undefined;
+const enderecoEm = (l: string) => absoluta(pastaDaLingua(l) + (arquivo === 'index.html' ? '' : arquivo));
+const alternativas = Astro.site && traduzida ? LINGUAS.map((l) => ({ l, href: enderecoEm(l) })) : [];
 ---
 <!doctype html>
-<html lang="pt-BR">
+<html lang={lingua} data-raiz={r}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -38,10 +49,13 @@ const canonica = Astro.site && !admin && !erro404
   {descricao && <meta name="description" content={descricao} />}
   {(admin || erro404) && <meta name="robots" content="noindex, nofollow" />}
   {canonica && <link rel="canonical" href={canonica} />}
+  {alternativas.map((a) => <link rel="alternate" hreflang={a.l} href={a.href} />)}
+  {alternativas.length > 0 && <link rel="alternate" hreflang="x-default" href={enderecoEm(LINGUA_PADRAO)} />}
   <meta name="theme-color" content="#f4f1ea">
   {og && <>
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="pt_BR">
+    <meta property="og:locale" content={t.meta.ogLocale}>
+    {LINGUAS.filter((l) => l !== lingua).map((l) => <meta property="og:locale:alternate" content={siteDe(l).meta.ogLocale} />)}
     <meta property="og:site_name" content="Capim Urbano Ateliê Floral">
     <meta property="og:title" content={titulo}>
     <meta property="og:description" content={descricao}>
@@ -49,31 +63,31 @@ const canonica = Astro.site && !admin && !erro404
     {canonica && <meta property="og:url" content={canonica} />}
     <meta name="twitter:card" content="summary_large_image">
   </>}
-  <link rel="icon" href="imagens/web/capimlogo.webp" type="image/webp">
+  <link rel="icon" href={r + 'imagens/web/capimlogo.webp'} type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
   {!admin && <script is:inline>document.documentElement.classList.add('js')</script>}
 </head>
 <body data-page={pagina}>
-  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+  <a class="skip-link" href="#conteudo">{t.comum.pular}</a>
   {admin ? (
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="brand-mark" href="index.html" aria-label="Capim Urbano, página inicial"><img src="imagens/marca/logo-sobre-papel.webp" alt="" width="708" height="459"></a>
+        <a class="brand-mark" href="index.html" aria-label={t.comum.inicioRotulo}><img src="imagens/marca/logo-sobre-papel.webp" alt="" width="708" height="459"></a>
         <nav class="site-nav" aria-label="Navegação"><a href="catalogo.html">Ver catálogo</a></nav>
       </div>
     </header>
   ) : (
     <>
       <div class="scroll-progress" aria-hidden="true"></div>
-      <Header atual={atual} />
+      <Header atual={atual} lingua={lingua} arquivo={arquivo} />
     </>
   )}
   <main id="conteudo">
     <slot />
   </main>
-  {!admin && <Footer whatsapp={whatsapp} />}
+  {!admin && <Footer whatsapp={whatsapp} lingua={lingua} />}
   {!admin && <script>import '../scripts/site.js';</script>}
 </body>
 </html>

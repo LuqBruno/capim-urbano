@@ -29,6 +29,7 @@ Planejamento, requisitos e andamento ficam no Trello:
 | **O que é** | Site institucional + catálogo + pedido personalizado + administração de produtos |
 | **Feito com** | [Astro](https://astro.build/) (site estático), JavaScript no navegador, CSS próprio e [Supabase](https://supabase.com/) (banco, login e fotos) |
 | **Quem usa** | Clientes (catálogo e pedido), a administradora (`admin.html`) e a equipe técnica |
+| **Idiomas** | Português na raiz do site, inglês em `en/` e espanhol em `es/`, com seletor de idioma no cabeçalho. Os dados dos produtos vêm do banco em português |
 | **Como publica** | A cada push na `main`, o GitHub Actions faz o build e publica a pasta `dist/` no GitHub Pages (veja [Publicação](#publicação)) |
 | **Como os produtos mudam** | A administradora salva em `admin.html` e o catálogo mostra para todos, **sem refazer o build** |
 
@@ -102,7 +103,7 @@ O site é publicado no **GitHub Pages** pelo workflow [`.github/workflows/deploy
 
 ## Páginas
 
-Cada página fica em `src/pages/<nome>.astro` e é publicada como `<nome>.html`.
+O corpo de cada página pública fica em `src/paginas/<Nome>.astro` e recebe a língua. `src/pages/<nome>.astro` publica a versão em português como `<nome>.html`, e `src/pages/[lingua]/[pagina].astro` publica as versões em inglês e espanhol como `en/<nome>.html` e `es/<nome>.html`. Os nomes dos arquivos são os mesmos nas três línguas, então o seletor de idioma leva à mesma página (e mantém `?id=` do produto). A administração e a página 404 existem só em português.
 
 | Página | Endereço | Descrição |
 |---|---|---|
@@ -120,7 +121,7 @@ Mapeamento com o Trello: US01, US02, US04, **US06**, RN01 (regras), RN02, NFR01 
 - Produto **indisponível** aparece no catálogo, mas **não pode ser pedido**. Produto **desativado** não aparece.
 - O pedido exige nome, quantidade (1 a 99), ocasião e cores. Tamanho, orçamento, link de referência e observações são opcionais. O WhatsApp só abre depois do resumo e da confirmação do cliente. Disponibilidade e valor final são confirmados no atendimento.
 - Se a busca dos produtos falhar, o catálogo mostra uma mensagem com "Tentar de novo". Os produtos padrão de `src/lib/catalogo-dados.js` **não** aparecem no lugar, para não mostrar preço ou disponibilidade desatualizados. Só quando `src/lib/supabase-config.js` não está configurado o site usa esse catálogo padrão.
-- Número do WhatsApp: `5548991765295`, definido em `src/lib/catalogo-core.js` (`WHATSAPP`, usado também pelo rodapé) e nos links `wa.me` das páginas.
+- Número do WhatsApp: `5548991765295`, definido só em `src/lib/catalogo-core.js` (`WHATSAPP`). Todos os links `wa.me` do site são montados a partir dele.
 - Cada produto tem: `id`, `nome`, `categoria`, `descricao`, `fotos[]`, `preco` (número, ou `null` para "sob orçamento"), `disponibilidade` (`disponivel`, `sob-encomenda` ou `indisponivel`), `prazo`, `durabilidade`, `cuidados`, `ocasioes[]`, `cores[]` e `ativo`. Detalhes no [modelo de dados](docs/modelo-de-dados.md).
 
 ## Estrutura do projeto
@@ -128,12 +129,17 @@ Mapeamento com o Trello: US01, US02, US04, **US06**, RN01 (regras), RN02, NFR01 
 ```
 astro.config.mjs            configuração do Astro (saída estática, páginas como nome.html)
 package.json                scripts e dependências (astro e @supabase/supabase-js)
-src/pages/*.astro           uma página por arquivo (index, servicos, catalogo, produto, pedido, admin…)
+src/pages/*.astro           uma página por arquivo; as públicas só chamam o componente de src/paginas/ em português
+src/pages/[lingua]/[pagina].astro  gera as páginas públicas em en/ e es/
+src/paginas/                corpo das páginas públicas (Inicio, Catalogo, Produto, Pedido, Servicos…), com a prop lingua
+src/i18n/site.js            textos das páginas nas três línguas
+src/i18n/interface.js       línguas, textos usados pelos scripts e pelo core (preço, erros, mensagem do WhatsApp)
+src/i18n/rotas.js           prefixo dos arquivos fora da raiz, links entre línguas e links do WhatsApp
 src/pages/404.astro         página de erro (404.html), fora dos buscadores
 src/pages/robots.txt.js     gera robots.txt (esconde admin.html e aponta o sitemap)
-src/pages/sitemap.xml.js    gera sitemap.xml das páginas públicas
+src/pages/sitemap.xml.js    gera sitemap.xml das páginas públicas nas três línguas, com os endereços alternativos
 src/layouts/Base.astro      <head>, cabeçalho, rodapé e scripts comuns a todas as páginas
-src/components/             Header.astro (menu com página atual), Footer.astro e Icone.astro (ícones de traço)
+src/components/             Header.astro (menu com página atual e seletor de idioma), Footer.astro, Icone.astro (ícones de traço), Varal.astro, Chamada.astro (chamada final), Passos.astro e Migalhas.astro
 src/styles/styles.css       estilos de todo o site (tokens em :root)
 src/scripts/site.js         menu, animações e rolagem do site institucional
 src/scripts/catalogo.js     interface do catálogo, produto e pedido
@@ -154,8 +160,8 @@ docs/                       manual, modelo de dados, matriz de requisitos, plano
 ## Testes
 
 ```bash
-npm test             # regras de negócio (filtros, validação, WhatsApp, cadastro, conversão com o banco) e física do varal
-npm run test:e2e     # constrói o site e testa as telas: fluxo, responsividade (375/768/1280px) e acessibilidade básica
+npm test             # regras de negócio (filtros, validação, WhatsApp, cadastro, conversão com o banco), física do varal e traduções
+npm run test:e2e     # constrói o site e testa as telas: fluxo, responsividade (375/768/1280px), acessibilidade e as versões em inglês e espanhol
 ```
 
 - Os testes de tela abrem o `dist/` e usam o pacote `playwright` (`npm i -g playwright`, com `NODE_PATH` apontando para a pasta global de módulos) e um Chromium. Sem o pacote, eles são ignorados. Use `CHROMIUM_PATH=/caminho/do/chromium` para apontar um navegador específico.
@@ -177,7 +183,8 @@ npm run test:e2e     # constrói o site e testa as telas: fluxo, responsividade 
 2. **Conta de administradora:** o cadastro público de usuários está desligado (03/11/2026) e existe uma única conta com permissão de escrita. A senha atual é curta; troque por uma de 12 caracteres ou mais, em *Authentication → Users* do Supabase. A proteção contra senhas vazadas só existe no plano Pro. Detalhes em [docs/supabase-plano.md](docs/supabase-plano.md).
 3. **Referência visual no pedido é um link**, não um upload. O cliente pode enviar a imagem direto na conversa do WhatsApp.
 4. **Plano gratuito do Supabase** pausa o projeto depois de 7 dias sem uso, o que tira o catálogo do ar (já aconteceu em 01/11/2026). O workflow `verificar-catalogo.yml` consulta o catálogo a cada 3 dias, o que conta como uso e, se o projeto já estiver pausado, falha e o GitHub avisa por e-mail. Para eliminar a pausa de vez, avalie um plano pago antes de divulgar.
-5. **Testes manuais que a automação não cobre:** leitor de tela real, Safari e Firefox, aparelhos físicos. A automação cobre contraste e regras WCAG 2.2 AA com o axe-core, em todas as páginas, em celular e desktop.
+5. **Traduções:** os textos em inglês e espanhol foram escritos a partir do português e ainda precisam da revisão do Product Owner ou de alguém fluente. Nome, categoria, descrição, prazo, cuidados, ocasiões e cores dos produtos vêm do banco e aparecem em português nas três versões; traduzi-los exige colunas novas e campos novos na administração. As mensagens do WhatsApp enviadas pelas versões em inglês e espanhol chegam ao ateliê nessas línguas.
+6. **Testes manuais que a automação não cobre:** leitor de tela real, Safari e Firefox, aparelhos físicos. A automação cobre contraste e regras WCAG 2.2 AA com o axe-core, em todas as páginas, em celular e desktop.
 
 ## Créditos
 

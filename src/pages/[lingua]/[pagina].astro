@@ -1,0 +1,12 @@
+---
+import { PAGINAS } from '../../paginas/indice.js';
+import { LINGUAS_TRADUZIDAS, PAGINAS_TRADUZIDAS } from '../../i18n/rotas.js';
+
+export function getStaticPaths() {
+  return LINGUAS_TRADUZIDAS.flatMap((lingua) => PAGINAS_TRADUZIDAS.map((pagina) => ({ params: { lingua, pagina } })));
+}
+
+const { lingua, pagina } = Astro.params;
+const Pagina = PAGINAS[pagina];
+---
+<Pagina lingua={lingua} />

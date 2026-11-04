@@ -7,6 +7,7 @@
 3. **Pedido** ("Fazer pedido"): informe nome, quantidade, ocasião e cores. Tamanho, faixa de orçamento, link de referência e observações são opcionais. Clique em **Revisar pedido**: o resumo aparece e o botão **Enviar pelo WhatsApp** abre a conversa com a mensagem pronta. Nada é enviado antes de você confirmar no WhatsApp.
 4. **Produto indisponível** não aceita pedido. A página oferece o pedido de um arranjo personalizado.
 5. A **disponibilidade e o valor final** são sempre confirmados no atendimento.
+6. **Idioma:** o seletor PT · EN · ES no cabeçalho (no celular, dentro do menu) leva à mesma página em português, inglês ou espanhol. Os nomes e as descrições dos produtos continuam em português, e a mensagem do WhatsApp sai na língua escolhida.
 
 ## Para a administradora (`admin.html`)
 
@@ -40,5 +41,6 @@ A conta da administradora foi criada sem senha conhecida. Para definir a sua: no
 - Publicar produtos: não há publicação. A administradora salva em `admin.html` e o catálogo lê direto do Supabase. `src/lib/catalogo-dados.js` só é usado quando `src/lib/supabase-config.js` está sem configuração.
 - Banco: o SQL está em `supabase/migrations/`. Mudanças no banco entram como arquivo novo ali e são aplicadas no projeto.
 - Os testes de tela simulam o Supabase e não usam a rede.
-- Mudar o número do WhatsApp: `WHATSAPP` em `src/lib/catalogo-core.js` e os links `wa.me` das páginas.
+- Mudar o número do WhatsApp: só a constante `WHATSAPP` em `src/lib/catalogo-core.js`; todos os links do site são montados a partir dela.
+- Textos do site: ficam em `src/i18n/site.js` (páginas) e `src/i18n/interface.js` (catálogo, produto, pedido e mensagens), sempre nas três línguas. `npm test` avisa se faltar uma tradução.
 - Detalhes dos dados: [modelo-de-dados.md](modelo-de-dados.md). Rastreabilidade: [matriz-de-requisitos.md](matriz-de-requisitos.md). Qualidade: [relatorio-qualidade.md](relatorio-qualidade.md).

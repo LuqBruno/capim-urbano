@@ -1,23 +1,34 @@
 ---
-// Cabeçalho do site. "atual" é o rótulo do item do menu que representa a página (aria-current).
-const { atual } = Astro.props;
+// Cabeçalho do site. "atual" é a chave do item do menu que representa a página (aria-current).
+import { LINGUAS, NOMES_LINGUAS, SIGLAS_LINGUAS, linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+import { raizDe, linkNaLingua } from '../i18n/rotas.js';
+const { atual, arquivo = 'index.html' } = Astro.props;
+const lingua = linguaValida(Astro.props.lingua);
+const t = siteDe(lingua).comum;
+const r = raizDe(lingua);
 const itens = [
-  { href: 'index.html', rotulo: 'Início' },
-  { href: 'catalogo.html', rotulo: 'Catálogo' },
-  { href: 'servicos.html', rotulo: 'Serviços' },
-  { href: 'assinatura-floral.html', rotulo: 'Assinatura' },
-  { href: 'eternizacao-de-flores.html', rotulo: 'Eternização' },
-  { href: 'oficinas-florais.html', rotulo: 'Oficinas' },
-  { href: 'arranjos-e-presentes.html', rotulo: 'Arranjos' },
-  { href: 'contato.html', rotulo: 'Conversar', classe: 'nav-contact' }
+  { chave: 'inicio', href: 'index.html' },
+  { chave: 'catalogo', href: 'catalogo.html' },
+  { chave: 'servicos', href: 'servicos.html' },
+  { chave: 'assinatura', href: 'assinatura-floral.html' },
+  { chave: 'eternizacao', href: 'eternizacao-de-flores.html' },
+  { chave: 'oficinas', href: 'oficinas-florais.html' },
+  { chave: 'arranjos', href: 'arranjos-e-presentes.html' },
+  { chave: 'conversar', href: 'contato.html', classe: 'nav-contact' }
 ];
 ---
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand-mark" href="index.html" aria-label="Capim Urbano, página inicial"><img src="imagens/marca/logo-sobre-papel.webp" alt="" width="708" height="459"></a>
-    <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
-    <nav class="site-nav" id="menu" aria-label="Navegação principal">
-      {itens.map((i) => <a class={i.classe} href={i.href} aria-current={i.rotulo === atual ? 'page' : undefined}>{i.rotulo}</a>)}
+    <a class="brand-mark" href="index.html" aria-label={t.inicioRotulo}><img src={r + 'imagens/marca/logo-sobre-papel.webp'} alt="" width="708" height="459"></a>
+    <button class="menu-toggle" type="button" aria-label={t.abrirMenu} aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+    <nav class="site-nav" id="menu" aria-label={t.navRotulo}>
+      {itens.map((i) => <a class={i.classe} href={i.href} aria-current={i.chave === atual ? 'page' : undefined}>{t.menu[i.chave]}</a>)}
+      <ul class="linguas" aria-label={t.linguas}>
+        {LINGUAS.map((l) => (
+          <li><a href={linkNaLingua(lingua, l, arquivo)} hreflang={l} lang={l} aria-current={l === lingua ? 'true' : undefined} data-lingua>{SIGLAS_LINGUAS[l]}<span class="sr-only"> {NOMES_LINGUAS[l]}</span></a></li>
+        ))}
+      </ul>
     </nav>
   </div>
 </header>

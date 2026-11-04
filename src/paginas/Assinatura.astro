@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import Migalhas from '../components/Migalhas.astro';
+import Passos from '../components/Passos.astro';
+import Chamada from '../components/Chamada.astro';
+import { linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+import { raizDe } from '../i18n/rotas.js';
+const lingua = linguaValida(Astro.props.lingua);
+const s = siteDe(lingua);
+const t = s.assinatura;
+const c = s.comum;
+const r = raizDe(lingua);
+---
+<Base titulo={t.titulo} descricao={t.descricao} og atual="assinatura" whatsapp={c.whatsapp.assinatura} lingua={lingua} arquivo="assinatura-floral.html">
+  <section class="page-hero">
+    <div class="wrap">
+      <Migalhas atual={c.servicos.assinatura} lingua={lingua} />
+      <div class="page-hero-grid">
+        <h1 class="reveal" set:html={t.h1} />
+        <div class="page-hero-note reveal" style="--d:120ms"><p>{t.nota}</p></div>
+      </div>
+    <figure class="page-banner reveal-img" style="margin-top:clamp(40px,6vw,72px)"><img src={r + 'imagens/web/capim1.webp'} alt={t.bannerAlt} width="1600" height="1066" fetchpriority="high"></figure>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap split">
+      <figure class="split-media reveal-img"><img src={r + 'imagens/web/capim5.webp'} alt={t.fotoAlt} width="1200" height="1600" loading="lazy"></figure>
+      <div class="prose reveal">
+        <h2 set:html={t.h2} />
+        {t.texto.map((p) => <p>{p}</p>)}
+        <ul class="chips">{t.chips.map((x) => <li>{x}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+  <Passos titulo={t.passosTitulo} passos={t.passos} />
+  <Chamada titulo={t.ctaTitulo} texto={t.ctaLead} botao={t.ctaBotao} mensagem={c.whatsapp.assinatura} lingua={lingua} />
+</Base>

@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import Migalhas from '../components/Migalhas.astro';
+import Passos from '../components/Passos.astro';
+import Chamada from '../components/Chamada.astro';
+import { linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+import { raizDe, linkWhatsApp } from '../i18n/rotas.js';
+const lingua = linguaValida(Astro.props.lingua);
+const s = siteDe(lingua);
+const t = s.oficinas;
+const c = s.comum;
+const r = raizDe(lingua);
+const galeria = [['oficina-hero.webp', 1254, 1254, 'tall'], ['oficina-acao.webp', 1254, 1254], ['oficina-presente-vivo.webp', 1350, 1800]];
+const formatos = [['oficina-arranjo-180.webp', 1350, 1800], ['oficina-guirlanda.webp', 960, 1194], ['oficina-arranjo-vaso.webp', 1080, 1350], ['oficina-escapularios.webp', 960, 1106]];
+---
+<Base titulo={t.titulo} descricao={t.descricao} og atual="oficinas" whatsapp={c.whatsapp.oficina} lingua={lingua} arquivo="oficinas-florais.html">
+  <section class="page-hero">
+    <div class="wrap">
+      <Migalhas atual={t.migalha} lingua={lingua} />
+      <div class="page-hero-grid">
+        <h1 class="reveal" set:html={t.h1} />
+        <div class="page-hero-note reveal" style="--d:120ms"><p>{t.nota}</p><div class="actions" style="margin-top:22px"><a class="button button-dark" href={linkWhatsApp(c.whatsapp.oficina)} target="_blank" rel="noopener"><Icone nome="whatsapp" /> {t.organizar}</a><a class="text-link" href="#formatos">{t.verFormatos} <Icone nome="seta" /></a></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0" aria-label={t.galeria}>
+    <div class="wrap gallery">
+      {galeria.map(([arquivo, largura, altura, classe], i) => <figure class:list={[classe, 'reveal-img']}><img src={r + 'imagens/web/' + arquivo} alt={t.galeriaAlts[i]} width={largura} height={altura} loading="lazy"></figure>)}
+    </div>
+  </section>
+  <section class="section manifesto" style="padding-top:0">
+    <div class="wrap reveal"><p class="quote" set:html={t.frase} /></div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="steps-head reveal"><h2 set:html={t.publicosTitulo} /></div>
+      <div class="audiences">
+        {t.publicos.map(([h, p], i) => <article class="reveal" style={i ? `--d:${i * 100}ms` : undefined}><h3>{h}</h3><p>{p}</p></article>)}
+      </div>
+    </div>
+  </section>
+  <section class="night section">
+    <img class="night-sprig" src={r + 'imagens/botanico-01.png'} alt="" aria-hidden="true" width="260" height="347" loading="lazy">
+    <div class="wrap split">
+      <div class="reveal"><h2 set:html={t.beneficiosTitulo} /><p>{t.beneficiosTexto}</p></div>
+      <ul class="benefits reveal" style="--d:120ms">{t.beneficios.map((b) => <li>{b}</li>)}</ul>
+    </div>
+  </section>
+  <section class="section" id="formatos">
+    <div class="wrap">
+      <div class="steps-head reveal"><h2 set:html={t.formatosTitulo} /></div>
+      <div class="formats">{formatos.map(([arquivo, largura, altura], i) => <figure class="format reveal" style={`--d:${i * 90}ms`}><div class="format-img"><img src={r + 'imagens/web/' + arquivo} alt={t.formatos[i][1]} width={largura} height={altura} loading="lazy"></div><figcaption>{t.formatos[i][0]}</figcaption></figure>)}</div>
+    </div>
+  </section>
+  <Passos titulo={t.passosTitulo} passos={t.passos} nota={t.passosNota} />
+  <section class="section" style="padding-top:0">
+    <div class="wrap split">
+      <figure class="split-media reveal-img"><img src={r + 'imagens/web/juliana-luque-oficina.webp'} alt={t.conduzAlt} width="1200" height="1800" loading="lazy"></figure>
+      <div class="prose reveal">
+        <h2 set:html={t.conduzTitulo} />
+        {t.conduzTexto.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+  <Chamada titulo={t.ctaTitulo} texto={t.ctaLead} botao={t.ctaBotao} mensagem={c.whatsapp.oficina} lingua={lingua} />
+</Base>

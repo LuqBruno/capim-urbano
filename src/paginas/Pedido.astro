@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import { linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+const lingua = linguaValida(Astro.props.lingua);
+const s = siteDe(lingua);
+const t = s.pedido;
+---
+<Base titulo={t.titulo} descricao={t.descricao} pagina="pedido" atual="catalogo" whatsapp={s.comum.whatsapp.encomenda} lingua={lingua} arquivo="pedido.html">
+  <section class="page-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label={s.comum.voceEstaEm}><a href="catalogo.html">{s.comum.menu.catalogo}</a><span aria-hidden="true">/</span><span aria-current="page">{t.migalha}</span></nav>
+      <div class="page-hero-grid">
+        <h1 set:html={t.h1} />
+        <div class="page-hero-note"><p>{t.nota}</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap order-layout">
+      <div>
+        <div id="produto-escolhido" class="chosen" hidden></div>
+        <form id="pedido" class="order-form" novalidate>
+          <div class="field" data-campo="nome"><label for="p-nome">{t.nome} <span class="req">{t.obrigatorio}</span></label><input id="p-nome" name="nome" type="text" autocomplete="name" required><p class="field-error" id="e-nome" role="alert" hidden></p></div>
+          <div class="field" data-campo="quantidade"><label for="p-qtd">{t.quantidade} <span class="req">{t.obrigatorio}</span></label><input id="p-qtd" name="quantidade" type="number" inputmode="numeric" min="1" max="99" value="1" required><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="ocasiao"><label for="p-ocasiao">{t.ocasiao} <span class="req">{t.obrigatorio}</span></label><input id="p-ocasiao" name="ocasiao" type="text" list="ocasioes-sugeridas" placeholder={t.ocasiaoEx} required><datalist id="ocasioes-sugeridas"></datalist><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="cores"><label for="p-cores">{t.cores} <span class="req">{t.obrigatorio}</span></label><input id="p-cores" name="cores" type="text" placeholder={t.coresEx} required><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="tamanho"><label for="p-tamanho">{t.tamanho}</label><select id="p-tamanho" name="tamanho"><option value="">{t.selecione}</option></select><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="orcamento"><label for="p-orcamento">{t.orcamento}</label><select id="p-orcamento" name="orcamento"><option value="">{t.selecione}</option></select><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="referencia"><label for="p-ref">{t.referencia}</label><input id="p-ref" name="referencia" type="url" inputmode="url" placeholder="https://…" aria-describedby="d-ref"><p class="hint" id="d-ref">{t.referenciaDica}</p><p class="field-error" role="alert" hidden></p></div>
+          <div class="field" data-campo="observacoes"><label for="p-obs">{t.observacoes}</label><textarea id="p-obs" name="observacoes" rows="4" placeholder={t.observacoesEx}></textarea><p class="field-error" role="alert" hidden></p></div>
+          <button class="button button-dark" type="submit">{t.revisar}</button>
+        </form>
+      </div>
+      <aside id="resumo" class="summary" tabindex="-1" aria-labelledby="resumo-titulo" hidden>
+        <h2 id="resumo-titulo">{t.resumo}</h2>
+        <pre id="resumo-texto"></pre>
+        <a id="enviar-whatsapp" class="button button-dark" href="#" target="_blank" rel="noopener">{t.enviar}</a>
+        <p class="hint">{t.enviarDica}</p>
+      </aside>
+    </div>
+  </section>
+  <script>import '../scripts/catalogo.js';</script>
+</Base>

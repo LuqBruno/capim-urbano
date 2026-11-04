@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import { linguaValida, interfaceDe } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+const lingua = linguaValida(Astro.props.lingua);
+const s = siteDe(lingua);
+const t = s.produto;
+---
+<Base titulo={t.titulo} descricao={t.descricao} pagina="produto" atual="catalogo" whatsapp={s.comum.whatsapp.encomenda} lingua={lingua} arquivo="produto.html">
+  <section class="section" style="padding-top:clamp(40px,6vw,80px)">
+    <div class="wrap">
+      <div id="produto" class="product-detail"><p role="status">{interfaceDe(lingua).tela.carregandoProduto}</p></div>
+    </div>
+  </section>
+  <script>import '../scripts/catalogo.js';</script>
+</Base>

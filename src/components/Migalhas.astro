@@ -1,0 +1,8 @@
+---
+import { linguaValida } from '../i18n/interface.js';
+import { siteDe } from '../i18n/site.js';
+interface Props { atual: string; lingua?: string; }
+const c = siteDe(linguaValida(Astro.props.lingua)).comum;
+const { atual } = Astro.props;
+---
+<nav class="crumbs" aria-label={c.voceEstaEm}><a href="index.html">{c.menu.inicio}</a><span aria-hidden="true">/</span><a href="servicos.html">{c.menu.servicos}</a><span aria-hidden="true">/</span><span aria-current="page">{atual}</span></nav>

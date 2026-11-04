@@ -1,0 +1,10 @@
+---
+interface Props { titulo: string; passos: string[][]; nota?: string; }
+const { titulo, passos, nota } = Astro.props;
+---
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="steps-head reveal"><h2 set:html={titulo} /></div>
+    <ol class="steps">{passos.map(([h, p], i) => <li class="reveal" style={`--d:${i * 100}ms`}><h3>{h}</h3><p>{p}</p></li>)}</ol>{nota && <p class="note">{nota}</p>}
+  </div>
+</section>
