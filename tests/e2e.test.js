@@ -196,6 +196,24 @@ test('catálogo: filtros combinam, mostram estado vazio e limpam (US02)', opts, 
   await ctx.close();
 });
 
+test('catálogo: filtros aplicados viram etiquetas removíveis uma a uma (US02)', opts, async () => {
+  const { ctx, page } = await abrir(VIEWPORTS.desktop, 'catalogo.html?ocasiao=Decora%C3%A7%C3%A3o&cor=Terracota');
+  assert.strictEqual(await page.locator('#catalogo-esqueleto').isHidden(), true, 'o esqueleto some depois da carga');
+  const rotulos = async () => (await page.locator('#filtros-ativos .etiqueta').allTextContents()).map((t) => t.replace(/\s+/g, ' ').trim());
+  assert.deepStrictEqual(await rotulos(), ['Ocasião Decoração, remover filtro', 'Cor Terracota, remover filtro']);
+  const antes = await page.locator('.product-card').count();
+  await page.locator('#filtros-ativos .etiqueta').first().click();
+  assert.deepStrictEqual(await rotulos(), ['Cor Terracota, remover filtro']);
+  assert.strictEqual(await page.inputValue('#f-ocasiao'), '');
+  assert.strictEqual(await page.evaluate(() => document.activeElement.id), 'f-ocasiao', 'o foco vai ao filtro removido');
+  assert.ok((await page.locator('.product-card').count()) >= antes);
+  assert.ok(!/ocasiao=/.test(page.url()) && /cor=Terracota/.test(page.url()));
+  await page.locator('#filtros-ativos .etiqueta').first().click();
+  assert.strictEqual(await page.locator('#filtros-ativos').isVisible(), false);
+  assert.strictEqual(await page.locator('.product-card').count(), PADRAO.length);
+  await ctx.close();
+});
+
 test('pedido: valida, mostra resumo e gera link do WhatsApp (US03, US05)', opts, async () => {
   const { ctx, page } = await abrir(VIEWPORTS.desktop, 'pedido.html?produto=vaso-terracota-capim');
   await page.click('button[type=submit]');

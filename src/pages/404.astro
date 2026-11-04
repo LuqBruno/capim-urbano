@@ -3,12 +3,19 @@ import Base from '../layouts/Base.astro';
 ---
 <Base titulo="Página não encontrada | Capim Urbano" erro404>
   <section class="page-hero">
-    <div class="wrap">
-      <h1>Essa página <em>não está por aqui.</em></h1>
-      <p class="lead">O endereço pode ter mudado ou ter sido digitado de outro jeito. Volte ao início ou veja o catálogo de flores desidratadas.</p>
-      <div class="actions">
-        <a class="button button-dark" href="index.html">Voltar ao início</a>
-        <a class="button button-light" href="catalogo.html">Ver o catálogo</a>
+    <div class="wrap page-hero-grid">
+      <div>
+        <h1>Essa página <em>não está por aqui.</em></h1>
+        <p class="lead">O endereço pode ter mudado ou ter sido digitado de outro jeito. Volte ao início ou veja o catálogo de flores desidratadas.</p>
+        <div class="actions">
+          <a class="button button-dark" href="index.html">Voltar ao início</a>
+          <a class="button button-light" href="catalogo.html">Ver o catálogo</a>
+        </div>
+      </div>
+      <div class="ficha-404" aria-hidden="true">
+        <img src="imagens/botanico-02.png" alt="" width="74" height="99">
+        <strong>Nº 404</strong>
+        <span>espécime não catalogado</span>
       </div>
     </div>
   </section>

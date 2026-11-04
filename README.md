@@ -194,6 +194,12 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 | Espécime preso com fita | fita translúcida no topo de cada produto do catálogo |
 | Ficha numerada | cartão do produto com "Nº 01, Nº 02…" (ordem do catálogo) e a "Ficha da peça" na página do produto |
 | Varal de secagem | logo abaixo da abertura, sobre uma faixa sálvia: fotos do ateliê como polaroids presas num cordão que cede, na home (`src/components/Varal.astro`): arraste, clique, use ←/→ ou os botões; balançam conforme a velocidade e há botão de pausar o autoplay |
+| Etiquetas amarradas | filtros aplicados no catálogo viram etiquetas de arquivo (ilhós e linha), removíveis uma a uma |
+| Mural de recortes | fotos do Instagram na home coladas com fita e levemente tortas; passar o mouse "alisa" o recorte |
+| Carimbo da coleção | selo "Herbário Capim Urbano · Tubarão · SC" no canto do rodapé, que gira só com a rolagem (parado com menos movimento) |
+| Esqueleto em arcos | enquanto o catálogo carrega, três espécimes em silhueta, presos com fita |
+| Etiqueta do pedido | o resumo do pedido é uma ficha presa com fita, com o título na borda, e entra com uma leve inclinação |
+| Espécime não catalogado | a página 404 traz uma ficha "Nº 404" com o raminho |
 
 Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/styles.css`, no bloco "Herbário Capim Urbano".
 

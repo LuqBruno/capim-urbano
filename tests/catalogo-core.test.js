@@ -182,3 +182,13 @@ test('cuidados, durabilidade e prazo: texto ou aviso quando ausente (US04)', () 
   assert.strictEqual(C.textoOuAviso('  Longe da água  '), 'Longe da água');
   for (const vazio of ['', '   ', undefined, null, 42]) assert.strictEqual(C.textoOuAviso(vazio), C.AVISO_SEM_INFO);
 });
+
+test('filtros aplicados viram etiquetas legíveis, na ordem dos campos (US02)', () => {
+  assert.deepStrictEqual(C.descreverFiltros({}), []);
+  assert.deepStrictEqual(C.descreverFiltros({ ocasiao: '', cor: 'Vinho', faixa: '' }), [{ campo: 'cor', rotulo: 'Cor', valor: 'Vinho' }]);
+  assert.deepStrictEqual(C.descreverFiltros({ faixa: 'acima-200', ocasiao: 'Decoração' }), [
+    { campo: 'ocasiao', rotulo: 'Ocasião', valor: 'Decoração' },
+    { campo: 'faixa', rotulo: 'Faixa de preço', valor: 'Acima de R$ 200' }
+  ]);
+  assert.deepStrictEqual(C.descreverFiltros({ faixa: 'inexistente' }), [{ campo: 'faixa', rotulo: 'Faixa de preço', valor: 'inexistente' }]);
+});

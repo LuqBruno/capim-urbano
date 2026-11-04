@@ -2,7 +2,7 @@
 
 ## Para o cliente
 
-1. **Catálogo** (`catalogo.html`): veja os produtos e filtre por **ocasião**, **cor** e **faixa de preço**. Os filtros se combinam. Se nada combinar, aparece uma mensagem com o botão "Limpar filtros" e o atalho para um arranjo personalizado. O link do catálogo filtrado pode ser compartilhado.
+1. **Catálogo** (`catalogo.html`): veja os produtos e filtre por **ocasião**, **cor** e **faixa de preço**. Os filtros se combinam e cada filtro aplicado aparece como uma etiqueta abaixo deles, que pode ser removida uma a uma (o botão "Limpar filtros" tira todas). Se nada combinar, aparece uma mensagem com o botão "Limpar filtros" e o atalho para um arranjo personalizado. O link do catálogo filtrado pode ser compartilhado.
 2. **Produto** (clique no cartão): fotos, preço (ou "Sob orçamento"), disponibilidade, **prazo de produção ou entrega**, **durabilidade** e **cuidados**. Quando o ateliê não preencheu uma dessas informações, a página avisa e orienta a perguntar pelo WhatsApp.
 3. **Pedido** ("Fazer pedido"): informe nome, quantidade, ocasião e cores. Tamanho, faixa de orçamento, link de referência e observações são opcionais. Clique em **Revisar pedido**: o resumo aparece e o botão **Enviar pelo WhatsApp** abre a conversa com a mensagem pronta. Nada é enviado antes de você confirmar no WhatsApp.
 4. **Produto indisponível** não aceita pedido. A página oferece o pedido de um arranjo personalizado.

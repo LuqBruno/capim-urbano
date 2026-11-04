@@ -62,11 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Scroll: progress, header state, gentle hero drift
   const progress = document.querySelector('.scroll-progress');
+  const carimbo = document.querySelector('.carimbo');
   let ticking = false;
   const update = () => {
     const y = window.scrollY;
     const max = document.documentElement.scrollHeight - window.innerHeight;
     if (progress) progress.style.setProperty('--p', max > 0 ? Math.min(1, y / max).toFixed(4) : 0);
+    if (carimbo && !reduceMotion) carimbo.style.setProperty('--giro', (y * 0.06).toFixed(2) + 'deg');
     if (header) header.classList.toggle('is-scrolled', y > 12);
     if (heroImg && !reduceMotion && root.classList.contains('hero-settled')) {
       const s = 1 + Math.min(y, 700) / 700 * 0.06;

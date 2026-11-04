@@ -18,8 +18,18 @@ import { SUPABASE } from '../lib/supabase-config.js';
     return node;
   };
 
+  const icone = (d) => {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'icon'); svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(ns, 'path'); path.setAttribute('d', d);
+    svg.append(path);
+    return svg;
+  };
+
   let ativos = [];
   const porId = (id) => ativos.find((p) => p.id === id);
+  const numeroEspecime = (p) => 'Nº ' + String(ativos.indexOf(p) + 1).padStart(2, '0');
 
   /* Busca os produtos no Supabase. Retorna { produtos, origem, erro }; o erro vira a tela "Tentar de novo". */
   async function carregar() {
@@ -39,6 +49,8 @@ import { SUPABASE } from '../lib/supabase-config.js';
     const lista = document.getElementById('lista-produtos');
     const vazio = document.getElementById('catalogo-vazio');
     const contagem = document.getElementById('catalogo-contagem');
+    const etiquetas = document.getElementById('filtros-ativos');
+    const esqueleto = document.getElementById('catalogo-esqueleto');
     const form = document.getElementById('filtros');
     const selOcasiao = form.elements.ocasiao;
     const selCor = form.elements.cor;
@@ -59,11 +71,10 @@ import { SUPABASE } from '../lib/supabase-config.js';
 
     const cartao = (p) => {
       const href = 'produto.html?id=' + encodeURIComponent(p.id);
-      const numero = 'Nº ' + String(ativos.indexOf(p) + 1).padStart(2, '0');
       return el('li', { class: 'product-card' }, [
         el('a', { href, class: 'product-link' }, [
           el('div', { class: 'product-media' }, [el('img', { src: p.fotos[0], alt: p.nome, width: 800, height: 1000, loading: 'lazy' })]),
-          el('div', { class: 'product-body', 'data-especime': numero }, [
+          el('div', { class: 'product-body', 'data-especime': numeroEspecime(p) }, [
             el('div', { class: 'product-meta' }, [el('span', { text: p.categoria }), badge(p)]),
             el('h2', { text: p.nome }),
             el('p', { class: 'product-price', text: C.formatarPreco(p.preco) }),
@@ -73,8 +84,20 @@ import { SUPABASE } from '../lib/supabase-config.js';
       ]);
     };
 
+    const etiqueta = (f) => {
+      const botao = el('button', { type: 'button', class: 'etiqueta' }, [
+        el('span', { class: 'etiqueta-chave', text: f.rotulo }), ' ', el('span', { text: f.valor }),
+        el('span', { class: 'sr-only', text: ', remover filtro' }), icone('M6 6l12 12M18 6 6 18')
+      ]);
+      botao.addEventListener('click', () => { form.elements[f.campo].value = ''; desenhar(); form.elements[f.campo].focus(); });
+      return el('li', {}, [botao]);
+    };
+
     const desenhar = () => {
       const filtros = { ocasiao: selOcasiao.value, cor: selCor.value, faixa: selFaixa.value };
+      const aplicados = C.descreverFiltros(filtros);
+      etiquetas.replaceChildren(...aplicados.map(etiqueta));
+      etiquetas.hidden = aplicados.length === 0;
       const resultado = C.filtrarProdutos(ativos, filtros);
       lista.replaceChildren(...resultado.map(cartao));
       vazio.hidden = resultado.length > 0;
@@ -87,10 +110,12 @@ import { SUPABASE } from '../lib/supabase-config.js';
 
     // Estados: carregando, erro (com "Tentar de novo"), vazio e lista.
     const carregarEDesenhar = async () => {
-      erroBox.hidden = true; vazio.hidden = true; lista.hidden = true;
+      erroBox.hidden = true; vazio.hidden = true; lista.hidden = true; etiquetas.hidden = true;
       lista.replaceChildren();
+      esqueleto.hidden = false;
       contagem.textContent = 'Carregando produtos…';
       const r = await carregar();
+      esqueleto.hidden = true;
       if (r.erro) {
         contagem.textContent = '';
         erroBox.hidden = false;
@@ -169,7 +194,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
         el('p', { class: 'product-price big', text: C.formatarPreco(p.preco) }),
         el('p', {}, [badge(p)]),
         el('p', { class: 'lead', text: p.descricao }),
-        el('dl', { class: 'specs', 'aria-label': 'Cuidados, durabilidade e prazo' }, [
+        el('dl', { class: 'specs', 'data-ficha': 'Ficha da peça · ' + numeroEspecime(p), 'aria-label': 'Cuidados, durabilidade e prazo' }, [
           info('Prazo de produção ou entrega', p.prazo, true), info('Durabilidade', p.durabilidade, true), info('Cuidados', p.cuidados, true),
           info('Ocasiões', (p.ocasioes || []).join(', ')), info('Cores', (p.cores || []).join(', '))
         ]),

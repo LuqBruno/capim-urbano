@@ -49,6 +49,17 @@ function filtrarProdutos(produtos, filtros = {}) {
   });
 }
 
+const ROTULOS_FILTROS = { ocasiao: 'Ocasião', cor: 'Cor', faixa: 'Faixa de preço' };
+function descreverFiltros(filtros = {}) {
+  return Object.entries(ROTULOS_FILTROS)
+    .filter(([campo]) => (filtros[campo] || '').trim())
+    .map(([campo, rotulo]) => {
+      const valor = filtros[campo].trim();
+      const faixa = campo === 'faixa' && FAIXAS_PRECO[valor];
+      return { campo, rotulo, valor: faixa ? faixa.rotulo : valor };
+    });
+}
+
 const ehUrlHttp = (valor) => {
   try {
     const u = new URL(valor);
@@ -192,6 +203,6 @@ async function carregarProdutos(padrao, cliente) {
 
 export {
   WHATSAPP, TIPOS_FOTO, TAMANHO_MAX_FOTO, DISPONIBILIDADE, FAIXAS_PRECO, TAMANHOS, ORCAMENTOS,
-  AVISO_SEM_INFO, textoOuAviso, formatarPreco, unicos, filtrarProdutos, validarPedido, montarMensagem,
+  AVISO_SEM_INFO, textoOuAviso, formatarPreco, unicos, filtrarProdutos, descreverFiltros, validarPedido, montarMensagem,
   montarLinkWhatsApp, slug, validarProduto, linhaParaProduto, produtoParaLinha, validarArquivoFoto, caminhoFoto, criarCliente, carregarProdutos
 };
