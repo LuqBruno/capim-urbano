@@ -69,9 +69,9 @@ import { SUPABASE } from '../lib/supabase-config.js';
       opcoes(selFaixa, Object.entries(C.FAIXAS_PRECO).map(([k, f]) => [k, f.rotulo]));
     };
 
-    const cartao = (p) => {
+    const cartao = (p, i) => {
       const href = 'produto.html?id=' + encodeURIComponent(p.id);
-      return el('li', { class: 'product-card' }, [
+      return el('li', { class: 'product-card', style: '--i:' + i }, [
         el('a', { href, class: 'product-link' }, [
           el('div', { class: 'product-media' }, [el('img', { src: p.fotos[0], alt: p.nome, width: 800, height: 1000, loading: 'lazy' })]),
           el('div', { class: 'product-body', 'data-especime': numeroEspecime(p) }, [
@@ -179,8 +179,14 @@ import { SUPABASE } from '../lib/supabase-config.js';
     if (miniaturas) miniaturas.addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b) return;
-      principal.src = b.querySelector('img').src;
       miniaturas.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const nova = b.querySelector('img').src;
+      const trocar = () => { principal.src = nova; };
+      const copia = new Image(); copia.src = nova;
+      copia.decode().catch(() => {}).then(() => {
+        if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(trocar);
+        else trocar();
+      });
     });
 
     const pedidoHref = 'pedido.html?produto=' + encodeURIComponent(p.id);

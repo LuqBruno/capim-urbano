@@ -200,6 +200,7 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 | Esqueleto em arcos | enquanto o catálogo carrega, três espécimes em silhueta, presos com fita |
 | Etiqueta do pedido | o resumo do pedido é uma ficha presa com fita, com o título na borda, e entra com uma leve inclinação |
 | Espécime não catalogado | a página 404 traz uma ficha "Nº 404" com o raminho |
+| Folhear o arquivo | o movimento do site: a página vira como uma folha ao navegar (transições de visualização, com o cabeçalho parado), a foto do produto é desvendada pelo arco e a ficha chega em ordem, as fichas do catálogo pousam em sequência quando os filtros mudam, a foto "vira" ao trocar a miniatura e as fotos grandes respiram levemente com a rolagem. Tudo em CSS e tudo para com `prefers-reduced-motion` |
 
 Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/styles.css`, no bloco "Herbário Capim Urbano".
 

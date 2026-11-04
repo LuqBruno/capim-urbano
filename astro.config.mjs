@@ -12,5 +12,6 @@ export default defineConfig({
   site: process.env.SITE_URL || undefined,
   base: process.env.BASE_PATH || '/',
   build: { format: 'file' },
-  trailingSlash: 'never'
+  trailingSlash: 'never',
+  vite: { build: { cssMinify: false } }
 });
