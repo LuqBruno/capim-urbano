@@ -18,13 +18,20 @@ const fotosVaral = [
 ].map(([arquivo, largura, altura], i) => ({ src: r + 'imagens/web/' + arquivo, largura, altura, titulo: t.varal[i][0], legenda: t.varal[i][1], alt: t.varal[i][2] }));
 const fotosInsta = [['capim5.webp', 1200, 1600], ['oficina-acao.webp', 1254, 1254], ['capim6.webp', 1200, 1600], ['oficina-guirlanda.webp', 960, 1194], ['capim2.webp', 1600, 2400], ['oficina-arranjo-vaso.webp', 1080, 1350]];
 const sv = t.servicos;
+const servicos = [
+  { chave: 'assinatura', href: 'assinatura-floral.html', foto: ['capim5.webp', 1200, 1600] },
+  { chave: 'eternizacao', href: 'eternizacao-de-flores.html', foto: ['capim2.webp', 1600, 2400] },
+  { chave: 'oficinas', href: 'oficinas-florais.html', foto: ['oficina-hero.webp', 1254, 1254] },
+  { chave: 'arranjos', href: 'arranjos-e-presentes.html' }
+];
+const presentes = [['capim6.webp', 1200, 1600], ['capim4.webp', 1200, 1600], ['oficina-presente-vivo.webp', 1350, 1800]];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="inicio" whatsapp={c.whatsapp.servico} lingua={lingua} arquivo="index.html">
   <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
+    <div class="wrap grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-end gap-[clamp(28px,5vw,80px)] max-820:grid-cols-1">
+      <div class="pb-[clamp(8px,3vw,48px)] max-820:pb-0">
         <p class="hero-script reveal-line" style="--i:0">{t.lema}</p>
-        <h1><span class="line reveal-line" style="--i:1">{t.linha1}</span> <span class="line reveal-line" style="--i:2" set:html={t.linha2} /></h1>
+        <h1 class="text-[clamp(3.3rem,7vw,6rem)]"><span class="block reveal-line" style="--i:1">{t.linha1}</span> <span class="block reveal-line" style="--i:2" set:html={t.linha2} /></h1>
         <p class="lead reveal-line" style="--i:3">{t.lead}</p>
         <div class="actions reveal-line" style="--i:4"><a class="button button-dark" href="servicos.html">{t.conhecer} <Icone nome="seta" /></a><a class="text-link" href={conversa} target="_blank" rel="noopener">{t.falar} <Icone nome="seta-diagonal" /></a></div>
       </div>
@@ -42,89 +49,64 @@ const sv = t.servicos;
     <Varal rotulo={t.varalRotulo} lingua={lingua} fotos={fotosVaral} />
   </section>
 
-  <section class="section manifesto" style="padding-top:clamp(48px,6vw,88px)">
+  <section class="section relative pt-[clamp(48px,6vw,88px)] text-center">
     <div class="wrap reveal">
       <img class="sprig" src={r + 'imagens/botanico-02.png'} alt="" aria-hidden="true" width="74" height="99" loading="lazy">
       <p class="quote" set:html={t.manifesto} />
-      <p class="manifesto-sign">{t.fundadora}</p>
+      <p class="mt-[34px] mb-0 text-[.95rem] text-muted">{t.fundadora}</p>
     </div>
   </section>
 
-  <section class="section" id="servicos" style="padding-top:0">
+  <section class="section pt-0" id="servicos">
     <div class="wrap">
-      <div class="services-head reveal">
-        <h2 set:html={t.servicosTitulo} />
-        <p class="lead">{t.servicosLead}</p>
+      <div class="reveal mb-[clamp(48px,7vw,96px)] grid grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] items-end gap-10 max-820:grid-cols-1">
+        <h2 class="mb-0" set:html={t.servicosTitulo} />
+        <p class="lead mb-[6px]">{t.servicosLead}</p>
       </div>
 
-      <article class="service">
-        <figure class="service-media reveal-img"><img src={r + 'imagens/web/capim5.webp'} alt={sv.assinatura.alt} width="1200" height="1600" loading="lazy"></figure>
-        <div class="service-copy reveal">
-          <p class="service-for">{sv.assinatura.para}</p>
-          <h3>{c.servicos.assinatura}</h3>
-          <p>{sv.assinatura.texto}</p>
-          <ul class="service-points">{sv.assinatura.pontos.map((p) => <li>{p}</li>)}</ul>
-          <a class="text-link" href="assinatura-floral.html">{sv.assinatura.link} <Icone nome="seta" /></a>
-        </div>
-      </article>
-
-      <article class="service service-reverse">
-        <figure class="service-media reveal-img"><img src={r + 'imagens/web/capim2.webp'} alt={sv.eternizacao.alt} width="1600" height="2400" loading="lazy"></figure>
-        <div class="service-copy reveal">
-          <p class="service-for">{sv.eternizacao.para}</p>
-          <h3>{c.servicos.eternizacao}</h3>
-          <p>{sv.eternizacao.texto}</p>
-          <ul class="service-points">{sv.eternizacao.pontos.map((p) => <li>{p}</li>)}</ul>
-          <a class="text-link" href="eternizacao-de-flores.html">{sv.eternizacao.link} <Icone nome="seta" /></a>
-        </div>
-      </article>
-
-      <article class="service">
-        <figure class="service-media reveal-img"><img src={r + 'imagens/web/oficina-hero.webp'} alt={sv.oficinas.alt} width="1254" height="1254" loading="lazy"></figure>
-        <div class="service-copy reveal">
-          <p class="service-for">{sv.oficinas.para}</p>
-          <h3>{c.servicos.oficinas}</h3>
-          <p>{sv.oficinas.texto}</p>
-          <ul class="service-points">{sv.oficinas.pontos.map((p) => <li>{p}</li>)}</ul>
-          <a class="text-link" href="oficinas-florais.html">{sv.oficinas.link} <Icone nome="seta" /></a>
-        </div>
-      </article>
-
-      <article class="service service-reverse">
-        <div class="gift-strip service-media" style="box-shadow:none;background:none;border-radius:0">
-          <figure class="reveal-img"><img src={r + 'imagens/web/capim6.webp'} alt={sv.arranjos.alts[0]} width="1200" height="1600" loading="lazy"></figure>
-          <figure class="reveal-img" style="--d:120ms"><img src={r + 'imagens/web/capim4.webp'} alt={sv.arranjos.alts[1]} width="1200" height="1600" loading="lazy"></figure>
-          <figure class="reveal-img"><img src={r + 'imagens/web/oficina-presente-vivo.webp'} alt={sv.arranjos.alts[2]} width="1350" height="1800" loading="lazy"></figure>
-        </div>
-        <div class="service-copy reveal">
-          <p class="service-for">{sv.arranjos.para}</p>
-          <h3>{c.servicos.arranjos}</h3>
-          <p>{sv.arranjos.texto}</p>
-          <ul class="service-points">{sv.arranjos.pontos.map((p) => <li>{p}</li>)}</ul>
-          <a class="text-link" href="arranjos-e-presentes.html">{sv.arranjos.link} <Icone nome="seta" /></a>
-        </div>
-      </article>
+      {servicos.map(({ chave, href, foto }, i) => {
+        const d = sv[chave];
+        const lado = i % 2 ? 'order-2 max-820:order-none' : '';
+        return (
+          <article class:list={['service grid grid-cols-2 items-center gap-[clamp(32px,7vw,112px)] py-[clamp(40px,6vw,80px)] max-820:grid-cols-1', i > 0 && 'border-t border-line']}>
+            {foto ? (
+              <figure class:list={['service-media reveal-img', lado]}><img src={r + 'imagens/web/' + foto[0]} alt={d.alt} width={foto[1]} height={foto[2]} loading="lazy"></figure>
+            ) : (
+              <div class:list={['gift-strip service-media rounded-none bg-transparent shadow-none', lado]}>
+                {presentes.map(([arquivo, largura, altura], j) => <figure class="reveal-img" style={j === 1 ? '--d:120ms' : undefined}><img src={r + 'imagens/web/' + arquivo} alt={d.alts[j]} width={largura} height={altura} loading="lazy"></figure>)}
+              </div>
+            )}
+            <div class="reveal max-w-[31rem]">
+              <p class="mt-0 mb-[18px] font-serif text-[1.25rem] text-olive italic">{d.para}</p>
+              <h3 class="text-[clamp(2.3rem,4vw,3.4rem)] leading-[1.02]">{c.servicos[chave]}</h3>
+              <p class="text-muted">{d.texto}</p>
+              <ul class="mt-[26px] mb-[34px] grid list-none gap-[10px] p-0">{d.pontos.map((p) => <li class="flex items-baseline gap-[14px] text-[.96rem] text-graphite before:h-px before:w-[14px] before:flex-none before:-translate-y-1 before:bg-acento before:content-['']">{p}</li>)}</ul>
+              <a class="text-link" href={href}>{d.link} <Icone nome="seta" /></a>
+            </div>
+          </article>
+        );
+      })}
     </div>
   </section>
 
   <section class="night section">
     <img class="night-sprig" src={r + 'imagens/botanico-01.png'} alt="" aria-hidden="true" width="260" height="347" loading="lazy">
-    <div class="wrap atelier">
+    <div class="wrap grid grid-cols-[minmax(0,.8fr)_minmax(0,1fr)] items-center gap-[clamp(36px,7vw,110px)] max-820:grid-cols-1">
       <figure class="atelier-photo reveal-img"><img src={r + 'imagens/web/juliana-luque-oficina.webp'} alt={t.atelieAlt} width="1200" height="1800" loading="lazy"></figure>
-      <div class="atelier-copy reveal">
+      <div class="reveal [&_p]:max-w-[33rem]">
         <h2 set:html={t.atelieTitulo} />
         {t.atelieTexto.map((p) => <p>{p}</p>)}
-        <p class="signature"><Fragment set:html={t.atelieAssinatura} /><small>{t.fundadora}</small></p>
+        <p class="mt-11 mb-0 font-serif text-[clamp(1.9rem,3vw,2.5rem)] leading-[1.1] italic"><Fragment set:html={t.atelieAssinatura} /><small class="mt-[14px] block font-sans text-[.9rem] text-night-muted not-italic">{t.fundadora}</small></p>
       </div>
     </div>
   </section>
 
   <section class="section">
-    <div class="wrap insta">
+    <div class="wrap grid grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] items-center gap-[clamp(32px,6vw,96px)] max-820:grid-cols-1">
       <div class="reveal">
         <h2 set:html={t.instaTitulo} />
         <p class="lead">{t.instaLead}</p>
-        <a class="insta-handle" href={INSTAGRAM} target="_blank" rel="noopener"><Icone nome="instagram" /> @capimurbano.ateliefloral</a>
+        <a class="mt-[10px] inline-flex items-center gap-3 font-serif text-[clamp(1.5rem,2.4vw,2rem)] text-acento italic no-underline hover:underline [&_.icon]:size-[.9em]" href={INSTAGRAM} target="_blank" rel="noopener"><Icone nome="instagram" /> @capimurbano.ateliefloral</a>
       </div>
       <div class="insta-grid reveal" style="--d:120ms">
         {fotosInsta.map(([arquivo, largura, altura], i) => (

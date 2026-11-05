@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
 import Migalhas from '../components/Migalhas.astro';
 import Passos from '../components/Passos.astro';
 import Chamada from '../components/Chamada.astro';
@@ -13,20 +14,14 @@ const c = s.comum;
 const r = raizDe(lingua);
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="assinatura" whatsapp={c.whatsapp.assinatura} lingua={lingua} arquivo="assinatura-floral.html">
-  <section class="page-hero">
-    <div class="wrap">
-      <Migalhas atual={c.servicos.assinatura} lingua={lingua} />
-      <div class="page-hero-grid">
-        <h1 class="reveal" set:html={t.h1} />
-        <div class="page-hero-note reveal" style="--d:120ms"><p>{t.nota}</p></div>
-      </div>
-    <figure class="page-banner reveal-img" style="margin-top:clamp(40px,6vw,72px)"><img src={r + 'imagens/web/capim1.webp'} alt={t.bannerAlt} width="1600" height="1066" fetchpriority="high"></figure>
-    </div>
-  </section>
+  <Topo titulo={t.h1} nota={t.nota}>
+    <Migalhas slot="migalhas" atual={c.servicos.assinatura} lingua={lingua} />
+    <figure class="page-banner reveal-img mt-[clamp(40px,6vw,72px)]"><img src={r + 'imagens/web/capim1.webp'} alt={t.bannerAlt} width="1600" height="1066" fetchpriority="high"></figure>
+  </Topo>
   <section class="section">
-    <div class="wrap split">
+    <div class="wrap grid grid-cols-2 items-center gap-[clamp(32px,7vw,112px)] max-820:grid-cols-1">
       <figure class="split-media reveal-img"><img src={r + 'imagens/web/capim5.webp'} alt={t.fotoAlt} width="1200" height="1600" loading="lazy"></figure>
-      <div class="prose reveal">
+      <div class="reveal [&_p]:max-w-[34rem] [&_p]:text-muted">
         <h2 set:html={t.h2} />
         {t.texto.map((p) => <p>{p}</p>)}
         <ul class="chips">{t.chips.map((x) => <li>{x}</li>)}</ul>

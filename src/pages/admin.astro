@@ -39,7 +39,7 @@ import Base from '../layouts/Base.astro';
             <div class="field admin-busca"><label for="busca">Buscar produto</label><input id="busca" type="search" placeholder="Nome ou categoria" autocomplete="off"></div>
           </div>
           <p id="admin-status" class="admin-status" role="status" aria-live="polite"></p>
-          <div class="table-wrap">
+          <div class="overflow-x-auto">
             <table class="admin-table">
               <caption class="sr-only">Produtos cadastrados</caption>
               <thead><tr><th scope="col">Produto</th><th scope="col">Preço</th><th scope="col">Disponibilidade</th><th scope="col">No catálogo</th><th scope="col">Ações</th></tr></thead>

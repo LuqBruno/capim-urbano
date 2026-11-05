@@ -2,9 +2,9 @@
 interface Props { titulo: string; passos: string[][]; nota?: string; }
 const { titulo, passos, nota } = Astro.props;
 ---
-<section class="section" style="padding-top:0">
+<section class="section pt-0">
   <div class="wrap">
-    <div class="steps-head reveal"><h2 set:html={titulo} /></div>
-    <ol class="steps">{passos.map(([h, p], i) => <li class="reveal" style={`--d:${i * 100}ms`}><h3>{h}</h3><p>{p}</p></li>)}</ol>{nota && <p class="note">{nota}</p>}
+    <div class="reveal mb-[clamp(40px,5vw,72px)] max-w-[40rem]"><h2 set:html={titulo} /></div>
+    <ol class="m-0 grid list-none grid-cols-3 gap-[clamp(20px,3vw,44px)] p-0 [counter-reset:step] max-820:grid-cols-1 max-820:gap-9">{passos.map(([h, p], i) => <li class="reveal relative border-t border-line-strong pt-[30px] [counter-increment:step] before:mb-[26px] before:block before:font-serif before:text-[1.5rem] before:text-acento before:italic before:[font-variant-numeric:lining-nums] before:content-[counter(step,decimal-leading-zero)]" style={`--d:${i * 100}ms`}><h3 class="text-[1.75rem]">{h}</h3><p class="text-[.97rem] text-muted">{p}</p></li>)}</ol>{nota && <p class="mt-10 mb-0 max-w-[46rem] rounded-sm bg-paper-2 px-6 py-5 text-[.94rem] text-muted">{nota}</p>}
   </div>
 </section>

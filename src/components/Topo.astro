@@ -1,0 +1,15 @@
+---
+interface Props { titulo: string; nota?: string; revelar?: boolean; }
+const { titulo, nota, revelar = true } = Astro.props;
+const animar = revelar ? 'reveal' : '';
+---
+<section class="pt-[clamp(56px,9vw,120px)] pb-[clamp(48px,6vw,80px)]">
+  <div class="wrap">
+    <slot name="migalhas" />
+    <div class="grid grid-cols-[minmax(0,1.25fr)_minmax(0,.75fr)] items-end gap-[clamp(32px,6vw,96px)] max-820:grid-cols-1">
+      <h1 class:list={[animar, 'mb-0 text-[clamp(2.9rem,6.2vw,5.4rem)]']} set:html={titulo} />
+      <div class:list={[animar, 'border-t border-line-strong pt-[22px]']} style={revelar ? '--d:120ms' : undefined}><p class="text-muted">{nota}</p><slot name="nota" /></div>
+    </div>
+    <slot />
+  </div>
+</section>

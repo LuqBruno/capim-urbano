@@ -1,5 +1,5 @@
 ---
-import '../styles/styles.css';
+import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { LINGUAS, LINGUA_PADRAO, linguaValida, pastaDaLingua } from '../i18n/interface.js';
@@ -70,10 +70,10 @@ const alternativas = Astro.site && traduzida ? LINGUAS.map((l) => ({ l, href: en
   {!admin && <script is:inline>document.documentElement.classList.add('js')</script>}
 </head>
 <body data-page={pagina}>
-  <a class="skip-link" href="#conteudo">{t.comum.pular}</a>
+  <a class="absolute -top-[60px] left-3 z-200 rounded-sm bg-ink px-4 py-[10px] text-white no-underline transition-[top] duration-200 focus:top-3" href="#conteudo">{t.comum.pular}</a>
   {admin ? (
     <header class="site-header">
-      <div class="wrap header-inner">
+      <div class="wrap flex h-[78px] items-center justify-between gap-6">
         <a class="brand-mark" href="index.html" aria-label={t.comum.inicioRotulo}><img src="imagens/marca/logo-sobre-papel.webp" alt="" width="708" height="459"></a>
         <nav class="site-nav" aria-label="Navegação"><a href="catalogo.html">Ver catálogo</a></nav>
       </div>

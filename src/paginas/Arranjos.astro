@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
 import Migalhas from '../components/Migalhas.astro';
 import Passos from '../components/Passos.astro';
 import Chamada from '../components/Chamada.astro';
@@ -11,26 +12,20 @@ const s = siteDe(lingua);
 const t = s.arranjos;
 const c = s.comum;
 const r = raizDe(lingua);
-const galeria = [['capim6.webp', 1200, 1600, 'tall'], ['capim4.webp', 1200, 1600], ['capim5.webp', 1200, 1600]];
+const galeria = [['capim6.webp', 1200, 1600, 'row-span-2 max-820:col-span-full max-820:row-auto max-820:aspect-[4/3]'], ['capim4.webp', 1200, 1600], ['capim5.webp', 1200, 1600]];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="arranjos" whatsapp={c.whatsapp.encomenda} lingua={lingua} arquivo="arranjos-e-presentes.html">
-  <section class="page-hero">
-    <div class="wrap">
-      <Migalhas atual={c.servicos.arranjos} lingua={lingua} />
-      <div class="page-hero-grid">
-        <h1 class="reveal" set:html={t.h1} />
-        <div class="page-hero-note reveal" style="--d:120ms"><p>{t.nota}</p></div>
-      </div>
-    </div>
-  </section>
-  <section class="section" style="padding-top:0">
+  <Topo titulo={t.h1} nota={t.nota}>
+    <Migalhas slot="migalhas" atual={c.servicos.arranjos} lingua={lingua} />
+  </Topo>
+  <section class="section pt-0">
     <div class="wrap gallery">
       {galeria.map(([arquivo, largura, altura, classe], i) => <figure class:list={[classe, 'reveal-img']}><img src={r + 'imagens/web/' + arquivo} alt={t.galeriaAlts[i]} width={largura} height={altura} loading="lazy"></figure>)}
     </div>
   </section>
-  <section class="section" style="padding-top:0">
-    <div class="wrap split">
-      <div class="prose reveal">
+  <section class="section pt-0">
+    <div class="wrap grid grid-cols-2 items-center gap-[clamp(32px,7vw,112px)] max-820:grid-cols-1">
+      <div class="reveal [&_p]:max-w-[34rem] [&_p]:text-muted">
         <h2 set:html={t.h2} />
         {t.texto.map((p) => <p>{p}</p>)}
         <ul class="chips">{t.chips.map((x) => <li>{x}</li>)}</ul>

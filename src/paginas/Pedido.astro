@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
 import { linguaValida } from '../i18n/interface.js';
 import { siteDe } from '../i18n/site.js';
 const lingua = linguaValida(Astro.props.lingua);
@@ -7,20 +8,14 @@ const s = siteDe(lingua);
 const t = s.pedido;
 ---
 <Base titulo={t.titulo} descricao={t.descricao} pagina="pedido" atual="catalogo" whatsapp={s.comum.whatsapp.encomenda} lingua={lingua} arquivo="pedido.html">
-  <section class="page-hero">
-    <div class="wrap">
-      <nav class="crumbs" aria-label={s.comum.voceEstaEm}><a href="catalogo.html">{s.comum.menu.catalogo}</a><span aria-hidden="true">/</span><span aria-current="page">{t.migalha}</span></nav>
-      <div class="page-hero-grid">
-        <h1 set:html={t.h1} />
-        <div class="page-hero-note"><p>{t.nota}</p></div>
-      </div>
-    </div>
-  </section>
-  <section class="section" style="padding-top:0">
-    <div class="wrap order-layout">
+  <Topo titulo={t.h1} nota={t.nota} revelar={false}>
+    <nav slot="migalhas" class="crumbs" aria-label={s.comum.voceEstaEm}><a href="catalogo.html">{s.comum.menu.catalogo}</a><span aria-hidden="true">/</span><span aria-current="page">{t.migalha}</span></nav>
+  </Topo>
+  <section class="section pt-0">
+    <div class="wrap grid grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] items-start gap-[clamp(28px,6vw,80px)] max-980:grid-cols-1">
       <div>
         <div id="produto-escolhido" class="chosen" hidden></div>
-        <form id="pedido" class="order-form" novalidate>
+        <form id="pedido" class="grid gap-5" novalidate>
           <div class="field" data-campo="nome"><label for="p-nome">{t.nome} <span class="req">{t.obrigatorio}</span></label><input id="p-nome" name="nome" type="text" autocomplete="name" required><p class="field-error" id="e-nome" role="alert" hidden></p></div>
           <div class="field" data-campo="quantidade"><label for="p-qtd">{t.quantidade} <span class="req">{t.obrigatorio}</span></label><input id="p-qtd" name="quantidade" type="number" inputmode="numeric" min="1" max="99" value="1" required><p class="field-error" role="alert" hidden></p></div>
           <div class="field" data-campo="ocasiao"><label for="p-ocasiao">{t.ocasiao} <span class="req">{t.obrigatorio}</span></label><input id="p-ocasiao" name="ocasiao" type="text" list="ocasioes-sugeridas" placeholder={t.ocasiaoEx} required><datalist id="ocasioes-sugeridas"></datalist><p class="field-error" role="alert" hidden></p></div>

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
 import { linguaValida, interfaceDe } from '../i18n/interface.js';
 import { siteDe } from '../i18n/site.js';
 import { raizDe } from '../i18n/rotas.js';
@@ -11,23 +12,16 @@ const r = raizDe(lingua);
 const filtros = [['ocasiao', 'f-ocasiao'], ['cor', 'f-cor'], ['faixa', 'f-faixa']];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} pagina="catalogo" atual="catalogo" whatsapp={s.comum.whatsapp.encomenda} lingua={lingua} arquivo="catalogo.html">
-  <section class="page-hero">
+  <Topo titulo={t.h1} nota={t.nota} revelar={false} />
+  <section class="section pt-0">
     <div class="wrap">
-      <div class="page-hero-grid">
-        <h1 set:html={t.h1} />
-        <div class="page-hero-note"><p>{t.nota}</p></div>
-      </div>
-    </div>
-  </section>
-  <section class="section" style="padding-top:0">
-    <div class="wrap">
-      <form id="filtros" class="filters" aria-label={t.filtrar}>
+      <form id="filtros" class="grid grid-cols-[repeat(3,minmax(0,1fr))_auto] items-end gap-4 border-b border-line-strong pb-7 max-980:grid-cols-2 max-560:grid-cols-1" aria-label={t.filtrar}>
         {filtros.map(([nome, id]) => <div class="field"><label for={id}>{i.filtros[nome]}</label><select id={id} name={nome}><option value="">{t.todas}</option></select></div>)}
         <button class="button button-light" type="reset">{t.limpar}</button>
       </form>
       <p id="catalogo-contagem" class="count" role="status" aria-live="polite">{i.tela.carregando}</p>
       <ul id="filtros-ativos" class="etiquetas" aria-label={t.aplicados} hidden></ul>
-      <ul id="catalogo-esqueleto" class="product-grid esqueleto" aria-hidden="true">
+      <ul id="catalogo-esqueleto" class="esqueleto m-0 grid list-none grid-cols-3 gap-x-5 gap-y-[clamp(20px,3vw,40px)] p-0 max-980:grid-cols-2 max-560:grid-cols-1" aria-hidden="true">
         <li><div class="esqueleto-arco"></div><div class="esqueleto-ficha"><span></span><span></span><span></span></div></li>
         <li><div class="esqueleto-arco"></div><div class="esqueleto-ficha"><span></span><span></span><span></span></div></li>
         <li><div class="esqueleto-arco"></div><div class="esqueleto-ficha"><span></span><span></span><span></span></div></li>
@@ -38,7 +32,7 @@ const filtros = [['ocasiao', 'f-ocasiao'], ['cor', 'f-cor'], ['faixa', 'f-faixa'
         <p set:html={t.erroTexto} />
         <div class="actions"><button id="tentar-de-novo" class="button button-dark" type="button">{i.tela.tentarDeNovo}</button></div>
       </div>
-      <ul id="lista-produtos" class="product-grid"></ul>
+      <ul id="lista-produtos" class="m-0 grid list-none grid-cols-3 gap-x-5 gap-y-[clamp(20px,3vw,40px)] p-0 max-980:grid-cols-2 max-560:grid-cols-1"></ul>
       <div id="catalogo-vazio" class="empty" hidden>
         <img class="sprig" src={r + 'imagens/botanico-02.png'} alt="" aria-hidden="true" width="74" height="99" loading="lazy">
         <h2>{t.vazioTitulo}</h2>

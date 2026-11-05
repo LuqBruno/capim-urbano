@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
 import Icone from '../components/Icone.astro';
 import { linguaValida } from '../i18n/interface.js';
 import { siteDe } from '../i18n/site.js';
@@ -11,23 +12,18 @@ const c = s.comum;
 const topicos = [c.whatsapp.assinatura, c.whatsapp.eternizacao, c.whatsapp.oficina, c.whatsapp.encomenda];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="conversar" whatsapp={c.whatsapp.servico} lingua={lingua} arquivo="contato.html">
-  <section class="page-hero">
-    <div class="wrap page-hero-grid">
-      <h1 class="reveal" set:html={t.h1} />
-      <div class="page-hero-note reveal" style="--d:120ms"><p>{t.nota}</p></div>
-    </div>
-  </section>
-  <section class="section" style="padding-top:0">
-    <div class="wrap contact-grid">
+  <Topo titulo={t.h1} nota={t.nota} />
+  <section class="section pt-0">
+    <div class="wrap grid grid-cols-3 gap-[14px] max-820:grid-cols-1">
       <a class="contact-option is-primary reveal" href={linkWhatsApp(c.whatsapp.servico)} target="_blank" rel="noopener"><Icone nome="whatsapp" /><strong>WhatsApp</strong><span>{t.whatsappTexto}</span></a>
       <a class="contact-option reveal" style="--d:100ms" href={INSTAGRAM} target="_blank" rel="noopener"><Icone nome="instagram" /><strong>Instagram</strong><span>@capimurbano.ateliefloral</span></a>
       <div class="contact-option reveal" style="--d:200ms"><Icone nome="local" /><strong>{t.local}</strong><span>{t.localTexto}</span></div>
     </div>
   </section>
-  <section class="section" style="padding-top:0">
+  <section class="section pt-0">
     <div class="wrap">
-      <div class="steps-head reveal"><h2 set:html={t.topicosTitulo} /></div>
-      <div class="topics">{topicos.map((mensagem, i) => <a class="topic reveal" style={`--d:${i * 80}ms`} href={linkWhatsApp(mensagem)} target="_blank" rel="noopener"><h3>{t.topicos[i]}</h3><span>{t.comecar} <Icone nome="seta-diagonal" /></span></a>)}</div>
+      <div class="reveal mb-[clamp(40px,5vw,72px)] max-w-[40rem]"><h2 set:html={t.topicosTitulo} /></div>
+      <div class="grid grid-cols-4 gap-[14px] max-1080:grid-cols-2 max-520:gap-3">{topicos.map((mensagem, i) => <a class="group reveal flex flex-col justify-between gap-[18px] border-t border-line-strong pt-6 pb-[6px] no-underline" style={`--d:${i * 80}ms`} href={linkWhatsApp(mensagem)} target="_blank" rel="noopener"><h3 class="m-0 text-[1.65rem] transition-colors duration-300 group-hover:text-acento">{t.topicos[i]}</h3><span class="inline-flex items-center gap-2 text-[.9rem] text-muted">{t.comecar} <Icone nome="seta-diagonal" /></span></a>)}</div>
     </div>
   </section>
 </Base>

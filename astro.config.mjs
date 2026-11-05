@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
 
 // Site estático. format: 'file' gera catalogo.html, produto.html etc., mantendo os endereços do site anterior
 // (os links e o Supabase continuam funcionando sem redirecionamento). Os produtos vêm do Supabase no navegador,
@@ -13,5 +14,5 @@ export default defineConfig({
   base: process.env.BASE_PATH || '/',
   build: { format: 'file' },
   trailingSlash: 'never',
-  vite: { build: { cssMinify: false } }
+  vite: { plugins: [tailwindcss({ optimize: { minify: false } })], build: { cssMinify: false } }
 });

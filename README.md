@@ -27,7 +27,7 @@ Planejamento, requisitos e andamento ficam no Trello:
 | | |
 |---|---|
 | **O que é** | Site institucional + catálogo + pedido personalizado + administração de produtos |
-| **Feito com** | [Astro](https://astro.build/) (site estático), JavaScript no navegador, CSS próprio e [Supabase](https://supabase.com/) (banco, login e fotos) |
+| **Feito com** | [Astro](https://astro.build/) (site estático), JavaScript no navegador, [Tailwind CSS](https://tailwindcss.com/) 4 e [Supabase](https://supabase.com/) (banco, login e fotos) |
 | **Quem usa** | Clientes (catálogo e pedido), a administradora (`admin.html`) e a equipe técnica |
 | **Idiomas** | Português na raiz do site, inglês em `en/` e espanhol em `es/`, com seletor de idioma no cabeçalho. Os dados dos produtos vêm do banco em português |
 | **Como publica** | A cada push na `main`, o GitHub Actions faz o build e publica a pasta `dist/` no GitHub Pages (veja [Publicação](#publicação)) |
@@ -139,8 +139,8 @@ src/pages/404.astro         página de erro (404.html), fora dos buscadores
 src/pages/robots.txt.js     gera robots.txt (esconde admin.html e aponta o sitemap)
 src/pages/sitemap.xml.js    gera sitemap.xml das páginas públicas nas três línguas, com os endereços alternativos
 src/layouts/Base.astro      <head>, cabeçalho, rodapé e scripts comuns a todas as páginas
-src/components/             Header.astro (menu com página atual e seletor de idioma), Footer.astro, Icone.astro (ícones de traço), Varal.astro, Chamada.astro (chamada final), Passos.astro e Migalhas.astro
-src/styles/styles.css       estilos de todo o site (tokens em :root)
+src/components/             Header.astro (menu com página atual e seletor de idioma), Footer.astro, Icone.astro (ícones de traço), Varal.astro, Topo.astro (título e nota das páginas internas), Chamada.astro (chamada final), Passos.astro e Migalhas.astro
+src/styles/global.css       Tailwind (tema com as cores, fontes e medidas da marca), base, componentes e o herbário
 src/scripts/site.js         menu, animações e rolagem do site institucional
 src/scripts/catalogo.js     interface do catálogo, produto e pedido
 src/scripts/admin.js        interface da administração
@@ -209,11 +209,11 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 | Espécime não catalogado | a página 404 traz uma ficha "Nº 404" com o raminho |
 | Folhear o arquivo | o movimento do site: a página vira como uma folha ao navegar (transições de visualização, com o cabeçalho parado), a foto do produto é desvendada pelo arco e a ficha chega em ordem, as fichas do catálogo pousam em sequência quando os filtros mudam, a foto "vira" ao trocar a miniatura e as fotos grandes respiram levemente com a rolagem. Tudo em CSS e tudo para com `prefers-reduced-motion` |
 
-Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/styles.css`, no bloco "Herbário Capim Urbano".
+Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa pede menos animação no sistema (`prefers-reduced-motion`). O CSS do conceito fica no fim de `src/styles/global.css`, depois dos componentes, para vencer as regras anteriores.
 
 
 - **Marca:** a logo oficial (letras grafite e "ateliê floral" manuscrito) está em `public/imagens/marca/`: `logo-sobre-papel.webp` (manuscrito em sálvia, usada no cabeçalho) e `logo-sobre-salvia.webp` (manuscrito branco, usada no rodapé, que reproduz o cartão da marca).
 - **Paleta da marca** (medida na logo): sálvia `#b1aa97`, grafite `#5b5852` e branco, sobre papel claro `#f6f4ef`. O destaque de textos e links é o sálvia-grafite `#6e6a5a` (`--acento`). Texto sobre sálvia usa `#3d3b36` (`--sobre-salvia`) para manter o contraste AA. O vinho fica só para erro e "indisponível".
 - **Tipografia:** **Quicksand** no texto, **Cormorant Garamond** em peso leve nos títulos e **Allura** no manuscrito "plantar beleza, colher alegria", como nos posts da marca.
-- Os tokens ficam no início de `src/styles/styles.css`.
+- Os tokens ficam no `@theme` de `src/styles/global.css` e viram classes do Tailwind (`bg-paper`, `text-acento`, `font-serif`, `rounded-arch`…). A paleta padrão do Tailwind está desligada: só existem as cores da marca.
 - Meta de acessibilidade: foco visível, rótulos em todos os campos, mensagens de erro com `role="alert"` e navegação por teclado.

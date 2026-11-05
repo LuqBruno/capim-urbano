@@ -7,9 +7,9 @@ const s = siteDe(lingua);
 const t = s.produto;
 ---
 <Base titulo={t.titulo} descricao={t.descricao} pagina="produto" atual="catalogo" whatsapp={s.comum.whatsapp.encomenda} lingua={lingua} arquivo="produto.html">
-  <section class="section" style="padding-top:clamp(40px,6vw,80px)">
+  <section class="section pt-[clamp(40px,6vw,80px)]">
     <div class="wrap">
-      <div id="produto" class="product-detail"><p role="status">{interfaceDe(lingua).tela.carregandoProduto}</p></div>
+      <div id="produto" class="grid grid-cols-2 items-start gap-[clamp(28px,6vw,80px)] max-980:grid-cols-1"><p role="status">{interfaceDe(lingua).tela.carregandoProduto}</p></div>
     </div>
   </section>
   <script>import '../scripts/catalogo.js';</script>

@@ -12,10 +12,10 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 | US06 | Administradora cadastra, edita e desativa produtos, com validação, refletindo no catálogo | atendido | `src/pages/admin.astro`, `src/scripts/admin.js`, `supabase/migrations/` | `e2e` (login inválido e válido, cadastro com foto, edição, desativar, estados), `core` (conversão banco ↔ produto, foto); RLS verificada no Supabase |
 | RN01 | Disponibilidade, preço e prazo; indisponível não gera pedido; alterações aparecem no catálogo | atendido (vale para todos os clientes) | `validarPedido`, `filtrarProdutos`, tabela `produtos` | `core` (indisponível), `e2e` (edição reflete no catálogo e bloqueia pedido, inclusive em outra aba de visitante) |
 | RN02 | Personalização com resumo e validação antes do WhatsApp | atendido | `validarPedido`, `src/paginas/Pedido.astro` | `core`, `e2e` |
-| NFR01 | Responsivo em celular, tablet e desktop | atendido | `src/styles/styles.css` | `e2e` (5 páginas em 375, 768 e 1280 px) |
+| NFR01 | Responsivo em celular, tablet e desktop | atendido | `src/styles/global.css` (Tailwind) e classes utilitárias nas páginas | `e2e` (5 páginas em 375, 768 e 1280 px) |
 | NFR02 | Acessibilidade, desempenho e estados de carregamento, vazio e erro | atendido (falta só a verificação manual com leitor de tela e outros navegadores) | todo o site | `e2e` (axe-core WCAG 2.2 AA em todas as páginas, rótulos, `alt`, `lang`, teclado, estados de carregando, vazio e erro); [relatório](relatorio-qualidade.md) |
 | REQ01 | Requisitos funcionais e não funcionais do MVP | parcial | este documento | todos |
-| DS01 | Design system (paleta, tipografia, componentes) | parcial | tokens em `src/styles/styles.css` | n/a (wireframes e protótipo ficam no Trello/Figma) |
+| DS01 | Design system (paleta, tipografia, componentes) | parcial | tokens no `@theme` de `src/styles/global.css` (Tailwind CSS 4), componentes `.astro` em `src/components/` | n/a (wireframes e protótipo ficam no Trello/Figma) |
 | DEV01 | Estrutura técnica, modelo de dados, WhatsApp e testes | atendido (testes de regressão automáticos) | `src/lib/catalogo-core.js`, `tests/` | 36 testes de regras + 63 de telas |
 
 ## Fora do Trello
@@ -23,6 +23,7 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 | Pedido | Situação | Onde está | Testes |
 |---|---|---|---|
 | Site em inglês e espanhol, além do português | atendido nas páginas públicas (administração e 404 só em português; dados dos produtos em português; traduções a revisar) | `src/i18n/`, `src/paginas/`, `src/pages/[lingua]/[pagina].astro` | `i18n` (chaves das três línguas, preço, validação, mensagem, RN01 em toda língua), `e2e` (páginas sem erro, seletor de idioma, catálogo em espanhol, pedido em inglês, axe) |
+| Estilo com Tailwind CSS no lugar do CSS próprio | atendido (mesmo visual; componentes reaproveitados, estados dos scripts e herbário seguem em `@layer components`) | `astro.config.mjs`, `src/styles/global.css`, classes utilitárias em `src/paginas/` e `src/components/` | `e2e` (telas, rolagem horizontal, axe em celular e desktop) |
 
 ## Por que US03 e US05 estão parciais
 

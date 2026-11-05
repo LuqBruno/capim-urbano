@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
 import Icone from '../components/Icone.astro';
 import Passos from '../components/Passos.astro';
 import Chamada from '../components/Chamada.astro';
@@ -19,13 +20,8 @@ const itens = [
 ];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="servicos" whatsapp={c.whatsapp.servico} lingua={lingua} arquivo="servicos.html">
-  <section class="page-hero">
-    <div class="wrap page-hero-grid">
-      <h1 class="reveal" set:html={t.h1} />
-      <div class="page-hero-note reveal" style="--d:120ms"><p>{t.nota}</p></div>
-    </div>
-  </section>
-  <section class="section" style="padding-top:0">
+  <Topo titulo={t.h1} nota={t.nota} />
+  <section class="section pt-0">
     <div class="wrap"><ul class="service-index" aria-label={t.indice}>{itens.map(([chave, href, foto], i) => <li class="reveal" style={`--d:${i * 80}ms`}><a href={href}><img src={r + 'imagens/web/' + foto} alt="" width="120" height="150" loading="lazy"><div><h2>{c.servicos[chave]}</h2><p>{t.itens[chave]}</p></div><span class="round" aria-hidden="true"><Icone nome="seta" /></span></a></li>)}</ul></div>
   </section>
   <Passos titulo={t.passosTitulo} passos={t.passos} />
