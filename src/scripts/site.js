@@ -4,7 +4,6 @@ document.documentElement.classList.add('js');
 const T = interfaceDe(document.documentElement.lang).tela;
 
 document.addEventListener('DOMContentLoaded', () => {
-  const root = document.documentElement;
   const header = document.querySelector('.site-header');
   const menuToggle = document.querySelector('.menu-toggle');
   const siteNav = document.querySelector('.site-nav');
@@ -31,20 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Hero unveil (the one authored moment)
-  const hero = document.querySelector('.hero');
-  const heroImg = hero && hero.querySelector('.hero-frame img');
-  const startHero = () => requestAnimationFrame(() => {
-    root.classList.add('is-loaded');
-    setTimeout(() => root.classList.add('hero-settled'), 2500);
-  });
-  if (heroImg && !heroImg.complete) {
-    heroImg.addEventListener('load', startHero, { once: true });
-    heroImg.addEventListener('error', startHero, { once: true });
-    setTimeout(startHero, 1200);
-  } else {
-    startHero();
-  }
+  // O hero da home tem script próprio (src/scripts/hero.js).
 
   // Reveal on scroll
   const revealEls = document.querySelectorAll('.reveal, .reveal-img');
@@ -63,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     revealEls.forEach((el) => el.classList.add('in-view', 'done'));
   }
 
-  // Scroll: progress, header state, gentle hero drift
+  // Scroll: progress and header state
   const progress = document.querySelector('.scroll-progress');
   const carimbo = document.querySelector('.carimbo');
   let ticking = false;
@@ -73,10 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (progress) progress.style.setProperty('--p', max > 0 ? Math.min(1, y / max).toFixed(4) : 0);
     if (carimbo && !reduceMotion) carimbo.style.setProperty('--giro', (y * 0.06).toFixed(2) + 'deg');
     if (header) header.classList.toggle('is-scrolled', y > 12);
-    if (heroImg && !reduceMotion && root.classList.contains('hero-settled')) {
-      const s = 1 + Math.min(y, 700) / 700 * 0.06;
-      heroImg.style.setProperty('--hero-scale', s.toFixed(4));
-    }
     ticking = false;
   };
   const onScroll = () => {

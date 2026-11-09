@@ -9,14 +9,14 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 | US03 | Pedido personalizado com ocasião, cores, tamanho, orçamento, observações e referência | parcial | `src/paginas/Pedido.astro` | `core` (validação), `e2e` (pedido) |
 | US04 | Cuidados, durabilidade e prazo por produto, legíveis em qualquer tela | atendido | `src/paginas/Produto.astro`, `textoOuAviso` | `core` (aviso), `e2e` (produto com e sem dados) |
 | US05 | Mensagem de WhatsApp com produto, quantidade e personalizações | parcial | `montarMensagem`, `montarLinkWhatsApp` | `core` (mensagem, link), `e2e` (pedido) |
-| US06 | Administradora cadastra, edita e desativa produtos, com validação, refletindo no catálogo | atendido | `src/pages/admin.astro`, `src/scripts/admin.js`, `supabase/migrations/` | `e2e` (login inválido e válido, cadastro com foto, edição, desativar, estados), `core` (conversão banco ↔ produto, foto); RLS verificada no Supabase |
+| US06 | Administradora cadastra, edita e desativa produtos, com validação, refletindo no catálogo | atendido | `src/pages/admin.astro`, `src/scripts/admin.js`, `supabase/migrations/` | `e2e` (login inválido e válido, cadastro com foto, edição, desativar, estados, filtro rápido por situação), `core` (conversão banco ↔ produto, foto, `filtrarAdmin`); RLS verificada no Supabase |
 | RN01 | Disponibilidade, preço e prazo; indisponível não gera pedido; alterações aparecem no catálogo | atendido (vale para todos os clientes) | `validarPedido`, `filtrarProdutos`, tabela `produtos` | `core` (indisponível), `e2e` (edição reflete no catálogo e bloqueia pedido, inclusive em outra aba de visitante) |
 | RN02 | Personalização com resumo e validação antes do WhatsApp | atendido | `validarPedido`, `src/paginas/Pedido.astro` | `core`, `e2e` |
 | NFR01 | Responsivo em celular, tablet e desktop | atendido | `src/styles/global.css` (Tailwind) e classes utilitárias nas páginas | `e2e` (5 páginas em 375, 768 e 1280 px) |
 | NFR02 | Acessibilidade, desempenho e estados de carregamento, vazio e erro | atendido (falta só a verificação manual com leitor de tela e outros navegadores) | todo o site | `e2e` (axe-core WCAG 2.2 AA em todas as páginas, rótulos, `alt`, `lang`, teclado, estados de carregando, vazio e erro); [relatório](relatorio-qualidade.md) |
 | REQ01 | Requisitos funcionais e não funcionais do MVP | parcial | este documento | todos |
 | DS01 | Design system (paleta, tipografia, componentes) | parcial | tokens no `@theme` de `src/styles/global.css` (Tailwind CSS 4), componentes `.astro` em `src/components/` | n/a (wireframes e protótipo ficam no Trello/Figma) |
-| DEV01 | Estrutura técnica, modelo de dados, WhatsApp e testes | atendido (testes de regressão automáticos) | `src/lib/catalogo-core.js`, `tests/` | 36 testes de regras + 63 de telas |
+| DEV01 | Estrutura técnica, modelo de dados, WhatsApp e testes | atendido (testes de regressão automáticos) | `src/lib/catalogo-core.js`, `tests/` | 37 testes de regras + 65 de telas |
 
 ## Fora do Trello
 

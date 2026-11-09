@@ -148,6 +148,32 @@ function linhaParaProduto(l) {
   };
 }
 
+/* Administração: situações do filtro rápido e a contagem de cada uma.
+   "catalogo" = visível para o cliente (ativo), "fora" = desativado, "indisponivel" = no banco como indisponível. */
+const SITUACOES_ADMIN = {
+  todos: 'Todos',
+  catalogo: 'No catálogo',
+  fora: 'Fora do catálogo',
+  indisponivel: 'Indisponíveis'
+};
+
+function naSituacao(p, situacao) {
+  if (situacao === 'catalogo') return p.ativo !== false;
+  if (situacao === 'fora') return p.ativo === false;
+  if (situacao === 'indisponivel') return p.disponibilidade === 'indisponivel';
+  return true;
+}
+
+function contarSituacoes(lista) {
+  return Object.fromEntries(Object.keys(SITUACOES_ADMIN).map((s) => [s, (lista || []).filter((p) => naSituacao(p, s)).length]));
+}
+
+/* Busca (nome ou categoria, sem acento e sem maiúsculas) combinada com a situação. */
+function filtrarAdmin(lista, { termo = '', situacao = 'todos' } = {}) {
+  const t = slug(termo);
+  return (lista || []).filter((p) => naSituacao(p, situacao) && (!t || slug(p.nome + ' ' + (p.categoria || '')).includes(t)));
+}
+
 /* Produto do cadastro -> linha para gravar. Texto opcional vazio vira null; não envia criado_em/atualizado_em. */
 function produtoParaLinha(p) {
   const opcional = (t) => (typeof t === 'string' && t.trim() ? t.trim() : null);
@@ -208,5 +234,5 @@ async function carregarProdutos(padrao, cliente) {
 export {
   WHATSAPP, TIPOS_FOTO, TAMANHO_MAX_FOTO, DISPONIBILIDADE, FAIXAS_PRECO, TAMANHOS, ORCAMENTOS,
   AVISO_SEM_INFO, temTexto, textoOuAviso, formatarPreco, unicos, filtrarProdutos, descreverFiltros, validarPedido, montarMensagem,
-  montarLinkWhatsApp, slug, validarProduto, linhaParaProduto, produtoParaLinha, validarArquivoFoto, caminhoFoto, criarCliente, carregarProdutos
+  montarLinkWhatsApp, slug, validarProduto, SITUACOES_ADMIN, contarSituacoes, filtrarAdmin, linhaParaProduto, produtoParaLinha, validarArquivoFoto, caminhoFoto, criarCliente, carregarProdutos
 };

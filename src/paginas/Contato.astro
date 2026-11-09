@@ -23,7 +23,7 @@ const topicos = [c.whatsapp.assinatura, c.whatsapp.eternizacao, c.whatsapp.ofici
   <section class="section pt-0">
     <div class="wrap">
       <div class="reveal mb-[clamp(40px,5vw,72px)] max-w-[40rem]"><h2 set:html={t.topicosTitulo} /></div>
-      <div class="grid grid-cols-4 gap-[14px] max-1080:grid-cols-2 max-520:gap-3">{topicos.map((mensagem, i) => <a class="group reveal flex flex-col justify-between gap-[18px] border-t border-line-strong pt-6 pb-[6px] no-underline" style={`--d:${i * 80}ms`} href={linkWhatsApp(mensagem)} target="_blank" rel="noopener"><h3 class="m-0 text-[1.65rem] transition-colors duration-300 group-hover:text-acento">{t.topicos[i]}</h3><span class="inline-flex items-center gap-2 text-[.9rem] text-muted">{t.comecar} <Icone nome="seta-diagonal" /></span></a>)}</div>
+      <div class="grid grid-cols-4 gap-[14px] max-1080:grid-cols-2 max-520:gap-3">{topicos.map((mensagem, i) => <a class="group reveal flex flex-col justify-between gap-[18px] border-t border-line-strong pt-6 pb-[6px] no-underline" style={`--d:${i * 80}ms`} href={linkWhatsApp(mensagem)} target="_blank" rel="noopener"><h3 class="m-0 text-[clamp(1.2rem,4.6vw,1.65rem)] transition-colors duration-300 group-hover:text-acento">{t.topicos[i]}</h3><span class="inline-flex items-center gap-2 text-[.9rem] text-muted">{t.comecar} <Icone nome="seta-diagonal" /></span></a>)}</div>
     </div>
   </section>
 </Base>

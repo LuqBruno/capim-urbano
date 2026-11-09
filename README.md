@@ -145,6 +145,7 @@ src/scripts/site.js         menu, animações e rolagem do site institucional
 src/scripts/catalogo.js     interface do catálogo, produto e pedido
 src/scripts/admin.js        interface da administração
 src/scripts/varal.js        interação e animação do varal de fotos da home
+src/scripts/hero.js         abertura da home: campo de capim em canvas, janela em arco que abre com a rolagem e reação ao ponteiro
 src/lib/catalogo-core.js    regras de negócio, sem DOM (módulo ES testável em Node)
 src/lib/varal-core.js       física do varal (cordão, mola e balanço), sem DOM e testada em Node
 src/lib/catalogo-dados.js   produtos padrão (os mesmos do banco); reserva quando o Supabase não está configurado
@@ -197,12 +198,12 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 | Elemento do herbário | Onde aparece |
 |---|---|
 | Papel de arquivo | grão sutil no fundo de papel de todas as páginas |
-| Janela em arco de estufa | foto principal da home (com um arco sálvia deslocado atrás, como papel recortado), fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
+| Atravessar o capim | abertura da home (`src/scripts/hero.js`): um campo de capim-dos-pampas desenhado em canvas com perspectiva real fica na frente da foto principal, em arco. O ponteiro gira a câmera e sopra as hastes; ao rolar, o palco fica preso, a câmera entra no campo (que se dissolve) e a janela em arco se abre até a tela inteira, terminando na ficha "Natureza preservada". Com menos movimento ou sem JavaScript, texto e foto em arco ficam parados |
+| Janela em arco de estufa | foto principal da home, fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
 | Espécime preso com fita | fita translúcida no topo de cada produto do catálogo |
 | Ficha numerada | cartão do produto com "Nº 01, Nº 02…" (ordem do catálogo) e a "Ficha da peça" na página do produto |
-| Varal de secagem | logo abaixo da abertura, sobre uma faixa sálvia: fotos do ateliê como polaroids presas num cordão que cede, na home (`src/components/Varal.astro`): arraste, clique, use ←/→ ou os botões; balançam conforme a velocidade e há botão de pausar o autoplay |
+| Varal de secagem | apoio discreto na seção do Instagram, perto do fim da home: fotos do ateliê como polaroids presas num cordão que cede (`src/components/Varal.astro`), menores e sem autoplay; arraste, clique, use ←/→ ou os botões. O componente ainda aceita `autoplay` (com botão de pausa) se for usado em outro lugar |
 | Etiquetas amarradas | filtros aplicados no catálogo viram etiquetas de arquivo (ilhós e linha), removíveis uma a uma |
-| Mural de recortes | fotos do Instagram na home coladas com fita e levemente tortas; passar o mouse "alisa" o recorte |
 | Carimbo da coleção | selo "Herbário Capim Urbano · Tubarão · SC" no canto do rodapé, que gira só com a rolagem (parado com menos movimento) |
 | Esqueleto em arcos | enquanto o catálogo carrega, três espécimes em silhueta, presos com fita |
 | Etiqueta do pedido | o resumo do pedido é uma ficha presa com fita, com o título na borda, e entra com uma leve inclinação |
@@ -214,6 +215,6 @@ Os elementos decorativos têm `aria-hidden` e o movimento para quando a pessoa p
 
 - **Marca:** a logo oficial (letras grafite e "ateliê floral" manuscrito) está em `public/imagens/marca/`: `logo-sobre-papel.webp` (manuscrito em sálvia, usada no cabeçalho) e `logo-sobre-salvia.webp` (manuscrito branco, usada no rodapé, que reproduz o cartão da marca).
 - **Paleta da marca** (medida na logo): sálvia `#b1aa97`, grafite `#5b5852` e branco, sobre papel claro `#f6f4ef`. O destaque de textos e links é o sálvia-grafite `#6e6a5a` (`--acento`). Texto sobre sálvia usa `#3d3b36` (`--sobre-salvia`) para manter o contraste AA. O vinho fica só para erro e "indisponível".
-- **Tipografia:** **Quicksand** no texto, **Cormorant Garamond** em peso leve nos títulos e **Allura** no manuscrito "plantar beleza, colher alegria", como nos posts da marca.
+- **Tipografia:** **Montserrat**, a fonte oficial da loja, no texto e nos títulos (títulos em peso leve, 300, com espaçamento negativo; destaques em itálico), e **Allura** só no manuscrito "plantar beleza, colher alegria". O token `font-serif` continua existindo com o papel de "título/destaque", na mesma família.
 - Os tokens ficam no `@theme` de `src/styles/global.css` e viram classes do Tailwind (`bg-paper`, `text-acento`, `font-serif`, `rounded-arch`…). A paleta padrão do Tailwind está desligada: só existem as cores da marca.
 - Meta de acessibilidade: foco visível, rótulos em todos os campos, mensagens de erro com `role="alert"` e navegação por teclado.

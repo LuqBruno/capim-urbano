@@ -23,6 +23,9 @@ import { SUPABASE } from '../lib/supabase-config.js';
   const resumo = document.getElementById('admin-resumo');
   const previas = document.getElementById('previas');
   const nomesArquivos = document.getElementById('arquivos-nomes');
+  const filtros = document.getElementById('filtros');
+  let situacao = 'todos';
+  const formEmBaixo = window.matchMedia('(max-width: 980px)');
 
   Object.entries(C.DISPONIBILIDADE).forEach(([v, t]) => {
     const o = document.createElement('option'); o.value = v; o.textContent = t; form.elements.disponibilidade.append(o);
@@ -81,16 +84,35 @@ import { SUPABASE } from '../lib/supabase-config.js';
       indisponiveis + (indisponiveis === 1 ? ' indisponível' : ' indisponíveis');
   };
 
+  // Filtro rápido: contagem em cada botão e o escolhido marcado com aria-pressed.
+  const atualizarFiltros = () => {
+    const n = C.contarSituacoes(produtos);
+    filtros.querySelectorAll('[data-situacao]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.dataset.situacao === situacao));
+      b.querySelector('[data-contagem]').textContent = n[b.dataset.situacao];
+    });
+  };
+  filtros.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-situacao]');
+    if (!b) return;
+    situacao = b.dataset.situacao;
+    desenhar();
+  });
+
   const destacarEdicao = () => {
     tabela.querySelectorAll('tr[data-id]').forEach((tr) => tr.classList.toggle('is-editando', tr.dataset.id === editandoId));
   };
 
   function desenhar() {
     atualizarResumo();
+    atualizarFiltros();
     if (produtos.length === 0) { linhaDeEstado('Nenhum produto cadastrado. Use "Novo produto" para começar.'); return; }
-    const termo = C.slug(busca.value);
-    const visiveis = termo ? produtos.filter((p) => C.slug(p.nome + ' ' + p.categoria).includes(termo)) : produtos;
-    if (visiveis.length === 0) { linhaDeEstado('Nenhum produto encontrado para "' + busca.value.trim() + '".'); return; }
+    const visiveis = C.filtrarAdmin(produtos, { termo: busca.value, situacao });
+    if (visiveis.length === 0) {
+      const onde = situacao === 'todos' ? '' : ' em "' + C.SITUACOES_ADMIN[situacao] + '"';
+      linhaDeEstado(busca.value.trim() ? 'Nenhum produto encontrado para "' + busca.value.trim() + '"' + onde + '.' : 'Nenhum produto' + onde + '.');
+      return;
+    }
     tabela.replaceChildren(...visiveis.map((p) => {
       const tr = document.createElement('tr');
       tr.dataset.id = p.id;
@@ -217,7 +239,9 @@ import { SUPABASE } from '../lib/supabase-config.js';
     marcarErros({});
     atualizarPrevias();
     destacarEdicao();
-    form.elements.nome.focus();
+    // No celular e no tablet o formulário fica abaixo da lista: leva a pessoa até ele.
+    if (formEmBaixo.matches) form.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    form.elements.nome.focus({ preventScroll: formEmBaixo.matches });
   }
 
   async function alternarAtivo(p) {
@@ -338,6 +362,7 @@ import { SUPABASE } from '../lib/supabase-config.js';
     mostrar('admin');
     avisar('');
     busca.value = '';
+    situacao = 'todos';
     limparForm();
     await carregarLista();
   }

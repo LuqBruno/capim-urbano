@@ -192,3 +192,21 @@ test('filtros aplicados viram etiquetas legíveis, na ordem dos campos (US02)', 
   ]);
   assert.deepStrictEqual(C.descreverFiltros({ faixa: 'inexistente' }), [{ campo: 'faixa', rotulo: 'Faixa de preço', valor: 'inexistente' }]);
 });
+
+test('administração: filtro rápido por situação combina com a busca e conta cada situação', () => {
+  const lista = [
+    { nome: 'Vaso Terracota', categoria: 'Vasos', ativo: true, disponibilidade: 'disponivel' },
+    { nome: 'Guirlanda', categoria: 'Decoração', ativo: false, disponibilidade: 'sob-encomenda' },
+    { nome: 'Vaso branco', categoria: 'Vasos', ativo: true, disponibilidade: 'indisponivel' },
+    { nome: 'Difusor', categoria: 'Presentes', ativo: false, disponibilidade: 'indisponivel' }
+  ];
+  assert.deepStrictEqual(C.contarSituacoes(lista), { todos: 4, catalogo: 2, fora: 2, indisponivel: 2 });
+  assert.deepStrictEqual(C.contarSituacoes([]), { todos: 0, catalogo: 0, fora: 0, indisponivel: 0 });
+  const nomes = (r) => r.map((p) => p.nome);
+  assert.deepStrictEqual(nomes(C.filtrarAdmin(lista)), ['Vaso Terracota', 'Guirlanda', 'Vaso branco', 'Difusor']);
+  assert.deepStrictEqual(nomes(C.filtrarAdmin(lista, { situacao: 'fora' })), ['Guirlanda', 'Difusor']);
+  assert.deepStrictEqual(nomes(C.filtrarAdmin(lista, { termo: 'VASO', situacao: 'catalogo' })), ['Vaso Terracota', 'Vaso branco']);
+  assert.deepStrictEqual(nomes(C.filtrarAdmin(lista, { termo: 'decoracao' })), ['Guirlanda']);
+  assert.deepStrictEqual(nomes(C.filtrarAdmin(lista, { termo: 'vaso', situacao: 'indisponivel' })), ['Vaso branco']);
+  assert.deepStrictEqual(Object.keys(C.SITUACOES_ADMIN), ['todos', 'catalogo', 'fora', 'indisponivel']);
+});

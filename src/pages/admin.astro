@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { SITUACOES_ADMIN } from '../lib/catalogo-core.js';
 ---
 <Base titulo={"Administração do catálogo | Capim Urbano"} pagina="admin" admin>
   <p id="admin-carregando" class="wrap table-state" role="status">Carregando…</p>
@@ -35,8 +36,13 @@ import Base from '../layouts/Base.astro';
       <div class="admin-layout">
         <div class="admin-lista">
           <div class="admin-ferramentas">
-            <button class="button button-dark" type="button" id="novo">Novo produto</button>
             <div class="field admin-busca"><label for="busca">Buscar produto</label><input id="busca" type="search" placeholder="Nome ou categoria" autocomplete="off"></div>
+            <button class="button button-dark" type="button" id="novo">Novo produto</button>
+          </div>
+          <div class="admin-filtros" id="filtros" role="group" aria-label="Mostrar produtos">
+            {Object.entries(SITUACOES_ADMIN).map(([chave, rotulo]) => (
+              <button type="button" class="admin-filtro" data-situacao={chave} aria-pressed={chave === 'todos' ? 'true' : 'false'}>{rotulo} <span class="admin-filtro-n" data-contagem={chave}>0</span></button>
+            ))}
           </div>
           <p id="admin-status" class="admin-status" role="status" aria-live="polite"></p>
           <div class="overflow-x-auto">

@@ -635,23 +635,66 @@ test('varal: botões, teclado e arrasto trocam a foto ativa; legenda e anúncio 
   await ctx.close();
 });
 
-test('varal: botão de pausa alterna; com menos movimento não há autoplay nem pausa', opts, async () => {
-  const { ctx, page } = await abrir(VIEWPORTS.celular, 'index.html');
-  await page.waitForSelector('[data-varal].is-pronto', { state: 'attached' });
-  const pausa = page.locator('[data-pausa]');
-  assert.strictEqual(await pausa.getAttribute('aria-pressed'), 'false');
-  await pausa.scrollIntoViewIfNeeded();
-  await pausa.click();
-  assert.strictEqual(await pausa.getAttribute('aria-pressed'), 'true');
-  assert.match(await pausa.getAttribute('aria-label'), /Continuar/);
+test('varal da home é discreto: sem autoplay e sem botão de pausa, com ou sem menos movimento', opts, async () => {
+  for (const reducedMotion of ['no-preference', 'reduce']) {
+    const ctx = await navegador.newContext({ viewport: VIEWPORTS.celular, reducedMotion });
+    await simularSupabase(ctx, novoBanco());
+    const page = await ctx.newPage();
+    await page.goto(base + 'index.html');
+    await page.waitForSelector('[data-varal].is-pronto', { state: 'attached' });
+    assert.strictEqual(await page.getAttribute('[data-varal]', 'data-autoplay'), '0');
+    assert.strictEqual(await page.locator('[data-pausa]').isHidden(), true, 'sem autoplay, o botão de pausa some (' + reducedMotion + ')');
+    await ctx.close();
+  }
+});
+
+test('hero: rolagem abre a janela até a tela inteira; com menos movimento fica estático', opts, async () => {
+  for (const viewport of [VIEWPORTS.desktop, VIEWPORTS.celular]) {
+    const { ctx, page, erros } = await abrir(viewport, 'index.html');
+    await page.waitForSelector('[data-hero].is-cinema');
+    const recorte = () => page.evaluate(() => document.querySelector('.hero-janela').style.clipPath);
+    assert.match(await recorte(), /round [1-9]/, 'começa em arco');
+    const curso = await page.evaluate(() => { const c = document.querySelector('[data-hero]'); return c.offsetHeight - c.querySelector('.hero-palco').offsetHeight; });
+    assert.ok(curso > 200, 'o palco fica preso durante a rolagem');
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round(curso * 0.92));
+    await page.waitForFunction(() => /^inset\(0px\)$/.test(document.querySelector('.hero-janela').style.clipPath));
+    assert.strictEqual(await page.evaluate(() => document.querySelector('.hero-texto').style.visibility), 'hidden', 'o texto sai e não fica focável invisível');
+    await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('[data-hero]')).getPropertyValue('--legenda')) > 0.95); // a ficha aparece
+    assert.strictEqual(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'rolagem horizontal');
+    assert.deepStrictEqual(erros, []);
+    await ctx.close();
+  }
+  const ctx = await navegador.newContext({ viewport: VIEWPORTS.celular, reducedMotion: 'reduce' });
+  await simularSupabase(ctx, novoBanco());
+  const page = await ctx.newPage();
+  await page.goto(base + 'index.html');
+  await page.waitForSelector('[data-hero].is-entrou');
+  assert.strictEqual(await page.locator('[data-hero].is-cinema').count(), 0);
+  assert.strictEqual(await page.evaluate(() => getComputedStyle(document.querySelector('.hero-texto h1 .hero-entra')).opacity), '1');
+  assert.ok(await page.locator('.hero-foto img').isVisible());
   await ctx.close();
-  const ctx2 = await navegador.newContext({ viewport: VIEWPORTS.celular, reducedMotion: 'reduce' });
-  await simularSupabase(ctx2, novoBanco());
-  const p2 = await ctx2.newPage();
-  await p2.goto(base + 'index.html');
-  await p2.waitForSelector('[data-varal].is-pronto', { state: 'attached' });
-  assert.strictEqual(await p2.locator('[data-pausa]').isHidden(), true, 'sem autoplay, o botão de pausa some');
-  await ctx2.close();
+});
+
+test('administração: filtro rápido por situação, com contagem e combinado com a busca', opts, async () => {
+  const banco = novoBanco();
+  banco.linhas[1].ativo = false;
+  const { ctx, page, erros } = await abrirAdminLogada(VIEWPORTS.desktop, banco);
+  const linhas = () => page.locator('#tabela tr[data-id]').count();
+  const total = banco.linhas.length;
+  assert.strictEqual(await page.textContent('[data-contagem="todos"]'), String(total));
+  assert.strictEqual(await page.textContent('[data-contagem="fora"]'), '1');
+  await page.click('[data-situacao="fora"]');
+  assert.strictEqual(await page.getAttribute('[data-situacao="fora"]', 'aria-pressed'), 'true');
+  assert.strictEqual(await linhas(), 1);
+  await page.click('[data-situacao="catalogo"]');
+  assert.strictEqual(await linhas(), total - 1);
+  await page.fill('#busca', 'zzz');
+  assert.match(await page.textContent('#tabela'), /Nenhum produto encontrado para "zzz" em "No catálogo"/);
+  await page.fill('#busca', '');
+  await page.click('[data-situacao="todos"]');
+  assert.strictEqual(await linhas(), total);
+  assert.deepStrictEqual(erros, []);
+  await ctx.close();
 });
 
 /* ---------- Inglês e espanhol ---------- */

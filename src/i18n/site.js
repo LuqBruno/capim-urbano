@@ -35,8 +35,8 @@ const ptBR = {
     conhecer: 'Conhecer os serviços', falar: 'Falar no WhatsApp',
     heroAlt: 'Composição de estúdio com arranjos de flores desidratadas em tons de creme, vinho e dourado ao redor de uma cadeira de madeira',
     selo: 'Natureza preservada', seloTexto: 'Flores que acompanham a vida por muito mais tempo, sem perder a poesia.',
-    varalTitulo: 'Pendurado no <em>varal.</em>',
-    varalLead: 'Peças e oficinas do ateliê, presas como flores secando. Arraste o varal, clique numa foto ou use as setas.',
+    varalLead: 'Arraste o varal, toque numa foto ou use as setas.',
+    rolar: 'Role para entrar no ateliê',
     varalRotulo: 'Fotos do ateliê',
     varal: [
       ['Vaso terracota', 'Vaso de cerâmica terracota com capim tingido em laranja queimado', 'Vaso de cerâmica terracota com capim tingido em laranja queimado'],
@@ -64,8 +64,6 @@ const ptBR = {
     atelieAlt: 'Juliana Luque, fundadora da Capim Urbano, segurando um buquê de flores desidratadas',
     instaTitulo: 'O dia a dia do ateliê, <em>flor por flor.</em>',
     instaLead: 'Bastidores, novas composições, oficinas e encomendas que ganharam casa. Acompanhe no Instagram.',
-    instaVer: 'Ver no Instagram: ',
-    insta: ['arranjo de capim laranja', 'oficina floral', 'vaso escultural', 'guirlanda', 'flores preservadas', 'arranjo em vaso'],
     ctaTitulo: 'Qual história você quer contar com <em>flores?</em>',
     ctaLead: 'Conte a sua ideia, mesmo que ainda esteja só no sentimento. A gente encontra o melhor caminho juntos.'
   },
@@ -244,8 +242,8 @@ const en = {
     conhecer: 'Explore the services', falar: 'Chat on WhatsApp',
     heroAlt: 'Studio composition with dried flower arrangements in cream, wine and gold tones around a wooden chair',
     selo: 'Nature, preserved', seloTexto: 'Flowers that stay with you for much longer, without losing their poetry.',
-    varalTitulo: 'Hung on the <em>line.</em>',
-    varalLead: 'Pieces and workshops from the atelier, pinned up like flowers drying. Drag the line, click a photo or use the arrows.',
+    varalLead: 'Drag the line, tap a photo or use the arrows.',
+    rolar: 'Scroll to step inside',
     varalRotulo: 'Photos from the atelier',
     varal: [
       ['Terracotta vase', 'Terracotta ceramic vase with grass dyed burnt orange', 'Terracotta ceramic vase with grass dyed burnt orange'],
@@ -273,8 +271,6 @@ const en = {
     atelieAlt: 'Juliana Luque, founder of Capim Urbano, holding a dried flower bouquet',
     instaTitulo: 'Everyday life at the atelier, <em>flower by flower.</em>',
     instaLead: 'Behind the scenes, new compositions, workshops and commissions that found a home. Follow along on Instagram.',
-    instaVer: 'View on Instagram: ',
-    insta: ['orange grass arrangement', 'floral workshop', 'sculptural vase', 'wreath', 'preserved flowers', 'vase arrangement'],
     ctaTitulo: 'What story would you like to tell with <em>flowers?</em>',
     ctaLead: "Tell us your idea, even if it's still just a feeling. We'll find the best path together."
   },
@@ -453,8 +449,8 @@ const es = {
     conhecer: 'Conocer los servicios', falar: 'Escribir por WhatsApp',
     heroAlt: 'Composición de estudio con arreglos de flores secas en tonos crema, vino y dorado alrededor de una silla de madera',
     selo: 'Naturaleza preservada', seloTexto: 'Flores que acompañan la vida por mucho más tiempo, sin perder la poesía.',
-    varalTitulo: 'Colgado en el <em>tendedero.</em>',
-    varalLead: 'Piezas y talleres del atelier, prendidos como flores secándose. Arrastra el tendedero, haz clic en una foto o usa las flechas.',
+    varalLead: 'Arrastra el tendedero, toca una foto o usa las flechas.',
+    rolar: 'Desliza para entrar al atelier',
     varalRotulo: 'Fotos del atelier',
     varal: [
       ['Florero de terracota', 'Florero de cerámica de terracota con pasto teñido de naranja quemado', 'Florero de cerámica de terracota con pasto teñido de naranja quemado'],
@@ -482,8 +478,6 @@ const es = {
     atelieAlt: 'Juliana Luque, fundadora de Capim Urbano, sosteniendo un ramo de flores secas',
     instaTitulo: 'El día a día del atelier, <em>flor por flor.</em>',
     instaLead: 'Detrás de escena, nuevas composiciones, talleres y encargos que encontraron un hogar. Síguenos en Instagram.',
-    instaVer: 'Ver en Instagram: ',
-    insta: ['arreglo de pasto naranja', 'taller floral', 'florero escultural', 'corona floral', 'flores preservadas', 'arreglo en florero'],
     ctaTitulo: '¿Qué historia quieres contar con <em>flores?</em>',
     ctaLead: 'Cuéntanos tu idea, aunque todavía sea solo un sentimiento. Juntos encontramos el mejor camino.'
   },
