@@ -611,11 +611,11 @@ test('varal: botões, teclado e arrasto trocam a foto ativa; legenda e anúncio 
   const ativa = () => page.textContent('.varal-contador b');
   const esperar = (n) => page.waitForFunction((v) => document.querySelector('.varal-contador b').textContent === v, n);
   assert.strictEqual(await ativa(), '01');
-  assert.strictEqual(await page.textContent('.varal-titulo'), 'Vaso terracota');
+  assert.strictEqual(await page.textContent('.varal-titulo'), 'Cone floral');
   await page.click('[data-proxima]');
   await esperar('02');
-  assert.match(await page.textContent('[data-anuncio]'), /^Foto 2 de 8: Para presentear$/);
-  assert.strictEqual(await page.textContent('.varal-titulo'), 'Para presentear');
+  assert.match(await page.textContent('[data-anuncio]'), /^Foto 2 de 8: Mesa de oficina$/);
+  assert.strictEqual(await page.textContent('.varal-titulo'), 'Mesa de oficina');
   assert.strictEqual(await page.locator('.varal-cartao[data-on="1"]').count(), 1);
   await varal.focus();
   await page.keyboard.press('ArrowRight');
@@ -673,6 +673,32 @@ test('hero: rolagem abre a janela até a tela inteira; com menos movimento fica 
   assert.strictEqual(await page.evaluate(() => getComputedStyle(document.querySelector('.hero-texto h1 .hero-entra')).opacity), '1');
   assert.ok(await page.locator('.hero-foto img').isVisible());
   await ctx.close();
+});
+
+test('entrada "o ateliê desperta": uma vez por sessão, nunca com menos movimento, e o texto nunca depende dela', opts, async () => {
+  const { ctx, page, erros } = await abrir(VIEWPORTS.desktop, 'index.html');
+  assert.strictEqual(await page.evaluate(() => sessionStorage.getItem('capim-desperta')), '1');
+  await page.waitForFunction(() => !document.documentElement.classList.contains('desperta')); // a classe sai sozinha
+  const visivel = () => page.evaluate(() => [...document.querySelectorAll('.hero-entra')].every((e) => getComputedStyle(e).opacity === '1' && getComputedStyle(e).clipPath === 'none'));
+  assert.strictEqual(await visivel(), true, 'depois da entrada não sobra estilo nos textos');
+  await page.goto(base + 'servicos.html');
+  await page.goto(base + 'index.html');
+  assert.strictEqual(await page.evaluate(() => document.documentElement.classList.contains('desperta')), false, 'ao voltar, o conteúdo aparece pronto');
+  assert.strictEqual(await visivel(), true);
+  assert.deepStrictEqual(erros, []);
+  await ctx.close();
+  const ctx2 = await navegador.newContext({ viewport: VIEWPORTS.celular, reducedMotion: 'reduce' });
+  await simularSupabase(ctx2, novoBanco());
+  const p2 = await ctx2.newPage();
+  await p2.goto(base + 'index.html');
+  assert.strictEqual(await p2.evaluate(() => document.documentElement.classList.contains('desperta')), false);
+  await ctx2.close();
+  const ctx3 = await navegador.newContext({ viewport: VIEWPORTS.celular, javaScriptEnabled: false });
+  const p3 = await ctx3.newPage();
+  await p3.goto(base + 'index.html');
+  assert.ok(await p3.locator('.hero-texto h1').isVisible(), 'sem JavaScript o título aparece');
+  assert.ok(await p3.locator('.hero-foto img').isVisible());
+  await ctx3.close();
 });
 
 test('administração: filtro rápido por situação, com contagem e combinado com a busca', opts, async () => {

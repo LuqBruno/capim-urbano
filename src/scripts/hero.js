@@ -168,6 +168,17 @@ if (cena) {
   const vento = { x: -9999, forca: 0 };
   let progressoSuave = 0;
 
+  /* Entrada "o ateliê desperta": só quando o <head> ligou .desperta. O relógio é o da página (performance.now()
+     conta desde a navegação, como as animações CSS), então foto, texto e capim andam juntos; se o script chegar
+     tarde, a entrada já terminou e a foto aparece no lugar. Devolve quanto falta (1 → 0). */
+  const comEntrada = document.documentElement.classList.contains('desperta');
+  const ENTRADA_INICIO = 160, ENTRADA_DURACAO = 1150;
+  const faltaEntrada = () => {
+    if (!comEntrada) return 0;
+    const t = limitar((performance.now() - ENTRADA_INICIO) / ENTRADA_DURACAO);
+    return Math.pow(1 - t, 3);
+  };
+
   function progresso() {
     const r = cena.getBoundingClientRect();
     const curso = r.height - palco.offsetHeight;
@@ -181,14 +192,16 @@ if (cena) {
     const some = suave(limitar(p / 0.32));              // texto saindo
     const legenda = suave(limitar((p - 0.66) / 0.16));  // ficha "Natureza preservada"
 
-    const t = mistura(g.t, 0, abre), l = mistura(g.l, 0, abre), d = mistura(g.d, 0, abre), b = mistura(g.b, 0, abre);
+    // Na entrada a janela começa um pouco mais fechada e a foto um pouco maior; a rolagem assume conforme abre.
+    const en = faltaEntrada() * (1 - abre);
+    const t = mistura(g.t, 0, abre) + g.h * 0.12 * en, l = mistura(g.l, 0, abre) + g.w * 0.07 * en, d = mistura(g.d, 0, abre) + g.w * 0.07 * en, b = mistura(g.b, 0, abre);
     const raio = mistura(g.w / 2, 0, abre);
     const base = mistura(10, 0, abre);
     janela.style.clipPath = `inset(${t.toFixed(1)}px ${d.toFixed(1)}px ${b.toFixed(1)}px ${l.toFixed(1)}px round ${raio.toFixed(1)}px ${raio.toFixed(1)}px ${base.toFixed(1)}px ${base.toFixed(1)}px)`;
 
     // A foto começa enquadrada dentro do arco (como uma janela pequena) e vira o palco inteiro.
     const k0 = Math.max(g.w / W, g.h / H) * 1.06;
-    const k = mistura(k0, 1.0, abre) * mistura(1, 1.04, limitar((p - 0.62) / 0.38));
+    const k = mistura(k0, 1.0, abre) * mistura(1, 1.04, limitar((p - 0.62) / 0.38)) * (1 + (celular ? 0.04 : 0.07) * en);
     const cxJanela = (g.l + (W - g.d)) / 2 - W / 2;
     const cyJanela = (g.t + (H - g.b)) / 2 - H / 2;
     const px = ponteiro.x * mistura(10, 16, abre);

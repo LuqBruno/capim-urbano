@@ -145,6 +145,7 @@ src/scripts/site.js         menu, animações e rolagem do site institucional
 src/scripts/catalogo.js     interface do catálogo, produto e pedido
 src/scripts/admin.js        interface da administração
 src/scripts/varal.js        interação e animação do varal de fotos da home
+src/lib/fotos.js            versões menores das fotos (srcset) e foco do enquadramento por dispositivo
 src/scripts/hero.js         abertura da home: campo de capim em canvas, janela em arco que abre com a rolagem e reação ao ponteiro
 src/lib/catalogo-core.js    regras de negócio, sem DOM (módulo ES testável em Node)
 src/lib/varal-core.js       física do varal (cordão, mola e balanço), sem DOM e testada em Node
@@ -199,6 +200,7 @@ O site segue o conceito **Herbário Capim Urbano**: como o ateliê preserva flor
 |---|---|
 | Papel de arquivo | grão sutil no fundo de papel de todas as páginas |
 | Atravessar o capim | abertura da home (`src/scripts/hero.js`): um campo de capim-dos-pampas desenhado em canvas com perspectiva real fica na frente da foto principal, em arco. O ponteiro gira a câmera e sopra as hastes; ao rolar, o palco fica preso, a câmera entra no campo (que se dissolve) e a janela em arco se abre até a tela inteira, terminando na ficha "Natureza preservada". Com menos movimento ou sem JavaScript, texto e foto em arco ficam parados |
+| O ateliê desperta | entrada da home na primeira visita da sessão (cerca de 1,4 s): marca e menu surgem, o título é revelado por linhas, a foto abre no arco e o capim aparece por último. Ao voltar de outra página, ou com menos movimento, o conteúdo aparece pronto |
 | Janela em arco de estufa | foto principal da home, fotos do catálogo e do produto, foto do ateliê (token `--arch`) |
 | Espécime preso com fita | fita translúcida no topo de cada produto do catálogo |
 | Ficha numerada | cartão do produto com "Nº 01, Nº 02…" (ordem do catálogo) e a "Ficha da peça" na página do produto |

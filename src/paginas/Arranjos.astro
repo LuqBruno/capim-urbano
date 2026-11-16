@@ -6,21 +6,23 @@ import Passos from '../components/Passos.astro';
 import Chamada from '../components/Chamada.astro';
 import { linguaValida } from '../i18n/interface.js';
 import { siteDe } from '../i18n/site.js';
+import { fonte } from '../lib/fotos.js';
 import { raizDe } from '../i18n/rotas.js';
 const lingua = linguaValida(Astro.props.lingua);
 const s = siteDe(lingua);
 const t = s.arranjos;
 const c = s.comum;
 const r = raizDe(lingua);
-const galeria = [['capim6.webp', 1200, 1600, 'row-span-2 max-820:col-span-full max-820:row-auto max-820:aspect-[4/3]'], ['capim4.webp', 1200, 1600], ['capim5.webp', 1200, 1600]];
+const galeria = [['presentes-box-afeto.webp', 1086, 1448], ['presentes-buque-petit.webp', 1086, 1448], ['presentes-arranjo-vinho.webp', 1086, 1448]];
+const formatos = [['presentes-cone-floral.webp', 1086, 1448], ['presentes-garrafinha-alegria.webp', 1086, 1448], ['presentes-cartoes-florais.webp', 1086, 1448], ['presentes-kit-aromatico.webp', 1024, 1280]];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="arranjos" whatsapp={c.whatsapp.encomenda} lingua={lingua} arquivo="arranjos-e-presentes.html">
   <Topo titulo={t.h1} nota={t.nota}>
     <Migalhas slot="migalhas" atual={c.servicos.arranjos} lingua={lingua} />
   </Topo>
   <section class="section pt-0">
-    <div class="wrap gallery">
-      {galeria.map(([arquivo, largura, altura, classe], i) => <figure class:list={[classe, 'reveal-img']}><img src={r + 'imagens/web/' + arquivo} alt={t.galeriaAlts[i]} width={largura} height={altura} loading="lazy"></figure>)}
+    <div class="wrap galeria-pecas">
+      {galeria.map(([arquivo, largura, altura], i) => <figure class="reveal-img" style={i ? `--d:${i * 120}ms` : undefined}><img src={r + 'imagens/web/' + arquivo} {...fonte(r, arquivo, largura, '(max-width: 560px) 92vw, 30vw')} alt={t.galeriaAlts[i]} width={largura} height={altura} loading="lazy"></figure>)}
     </div>
   </section>
   <section class="section pt-0">
@@ -31,6 +33,12 @@ const galeria = [['capim6.webp', 1200, 1600, 'row-span-2 max-820:col-span-full m
         <ul class="chips">{t.chips.map((x) => <li>{x}</li>)}</ul>
       </div>
       <figure class="split-media reveal-img"><img src={r + 'imagens/web/oficina-presente-vivo.webp'} alt={t.fotoAlt} width="1350" height="1800" loading="lazy"></figure>
+    </div>
+  </section>
+  <section class="section pt-0" aria-labelledby="formatos-titulo">
+    <div class="wrap">
+      <div class="reveal mb-[clamp(32px,4vw,56px)] max-w-[40rem]"><h2 id="formatos-titulo" set:html={t.formatosTitulo} /></div>
+      <div class="grid grid-cols-4 gap-[14px] max-1080:grid-cols-2 max-520:gap-3">{formatos.map(([arquivo, largura, altura], i) => <figure class="group reveal m-0" style={`--d:${i * 90}ms`}><div class="overflow-hidden rounded-lg bg-paper-3"><img class="aspect-[3/4] w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-104" src={r + 'imagens/web/' + arquivo} {...fonte(r, arquivo, largura, '(max-width: 1080px) 46vw, 23vw')} alt={t.formatos[i][1]} width={largura} height={altura} loading="lazy"></div><figcaption class="pt-4 text-[1.1rem] leading-[1.2] text-ink max-520:text-[.98rem]">{t.formatos[i][0]}</figcaption></figure>)}</div>
     </div>
   </section>
   <Passos titulo={t.passosTitulo} passos={t.passos} nota={t.passosNota} />

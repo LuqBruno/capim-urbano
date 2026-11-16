@@ -16,7 +16,7 @@ Rastreabilidade entre os cards do Trello, o código e os testes. Situação: **a
 | NFR02 | Acessibilidade, desempenho e estados de carregamento, vazio e erro | atendido (falta só a verificação manual com leitor de tela e outros navegadores) | todo o site | `e2e` (axe-core WCAG 2.2 AA em todas as páginas, rótulos, `alt`, `lang`, teclado, estados de carregando, vazio e erro); [relatório](relatorio-qualidade.md) |
 | REQ01 | Requisitos funcionais e não funcionais do MVP | parcial | este documento | todos |
 | DS01 | Design system (paleta, tipografia, componentes) | parcial | tokens no `@theme` de `src/styles/global.css` (Tailwind CSS 4), componentes `.astro` em `src/components/` | n/a (wireframes e protótipo ficam no Trello/Figma) |
-| DEV01 | Estrutura técnica, modelo de dados, WhatsApp e testes | atendido (testes de regressão automáticos) | `src/lib/catalogo-core.js`, `tests/` | 37 testes de regras + 65 de telas |
+| DEV01 | Estrutura técnica, modelo de dados, WhatsApp e testes | atendido (testes de regressão automáticos) | `src/lib/catalogo-core.js`, `tests/` | 37 testes de regras + 66 de telas |
 
 ## Fora do Trello
 

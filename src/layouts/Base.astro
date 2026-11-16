@@ -19,12 +19,14 @@ interface Props {
   whatsapp?: string;
   /** Administração: cabeçalho simples, sem rodapé, sem animações e fora dos buscadores. */
   admin?: boolean;
+  /** Home: liga a entrada "o ateliê desperta" (uma vez por sessão de navegação, nunca com menos movimento). */
+  desperta?: boolean;
   /** Página de erro 404: serve em qualquer caminho, então fixa a base dos links relativos e sai dos buscadores. */
   erro404?: boolean;
   lingua?: string;
   arquivo?: string;
 }
-const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false, erro404 = false, arquivo = 'index.html' } = Astro.props;
+const { titulo, descricao, og = false, pagina, atual, whatsapp = '', admin = false, erro404 = false, desperta = false, arquivo = 'index.html' } = Astro.props;
 const lingua = linguaValida(Astro.props.lingua);
 const t = siteDe(lingua);
 const r = raizDe(lingua);
@@ -68,6 +70,8 @@ const alternativas = Astro.site && traduzida ? LINGUAS.map((l) => ({ l, href: en
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Montserrat:ital,wght@0,300..700;1,300..500&display=swap" rel="stylesheet">
   {!admin && <script is:inline>document.documentElement.classList.add('js')</script>}
+  {desperta && <script is:inline>(function(){try{var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('capim-desperta'))return;sessionStorage.setItem('capim-desperta','1');d.classList.add('desperta');setTimeout(function(){d.classList.remove('desperta')},2600)}catch(e){}})()</script>}
+  {desperta && <link rel="preload" as="image" href={r + 'imagens/web/capim1.webp'} fetchpriority="high" />}
 </head>
 <body data-page={pagina}>
   <a class="absolute -top-[60px] left-3 z-200 rounded-sm bg-ink px-4 py-[10px] text-white no-underline transition-[top] duration-200 focus:top-3" href="#conteudo">{t.comum.pular}</a>

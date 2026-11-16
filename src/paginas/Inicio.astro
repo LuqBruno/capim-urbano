@@ -5,6 +5,7 @@ import Varal from '../components/Varal.astro';
 import Chamada from '../components/Chamada.astro';
 import { linguaValida } from '../i18n/interface.js';
 import { siteDe } from '../i18n/site.js';
+import { fonte, foco, menor } from '../lib/fotos.js';
 import { raizDe, linkWhatsApp, INSTAGRAM } from '../i18n/rotas.js';
 const lingua = linguaValida(Astro.props.lingua);
 const s = siteDe(lingua);
@@ -13,19 +14,19 @@ const c = s.comum;
 const r = raizDe(lingua);
 const conversa = linkWhatsApp(c.whatsapp.servico);
 const fotosVaral = [
-  ['capim5.webp', 1200, 1600], ['oficina-presente-vivo.webp', 1350, 1800], ['oficina-guirlanda.webp', 960, 1194], ['capim6.webp', 1200, 1600],
-  ['oficina-arranjo-180.webp', 1350, 1800], ['capim4.webp', 1200, 1600], ['oficina-escapularios.webp', 960, 1106], ['oficina-hero.webp', 1254, 1254]
-].map(([arquivo, largura, altura], i) => ({ src: r + 'imagens/web/' + arquivo, largura, altura, titulo: t.varal[i][0], legenda: t.varal[i][1], alt: t.varal[i][2] }));
+  ['presentes-cone-floral.webp', 1086, 1448], ['oficinas-detalhe-materiais.webp', 900, 1600], ['eternizacao-cavalete-colorido.webp', 1200, 1600], ['capim5.webp', 1200, 1600],
+  ['oficina-guirlanda.webp', 960, 1194], ['oficinas-grupo-final.webp', 1600, 1200], ['oficina-arranjo-180.webp', 1350, 1800], ['oficina-escapularios.webp', 960, 1106]
+].map(([arquivo, largura, altura], i) => ({ src: r + 'imagens/web/' + menor(arquivo), largura, altura, titulo: t.varal[i][0], legenda: t.varal[i][1], alt: t.varal[i][2] }));
 const sv = t.servicos;
 const servicos = [
-  { chave: 'assinatura', href: 'assinatura-floral.html', foto: ['capim5.webp', 1200, 1600] },
-  { chave: 'eternizacao', href: 'eternizacao-de-flores.html', foto: ['capim2.webp', 1600, 2400] },
-  { chave: 'oficinas', href: 'oficinas-florais.html', foto: ['oficina-hero.webp', 1254, 1254] },
+  { chave: 'assinatura', href: 'assinatura-floral.html', foto: ['presentes-garrafinha-alegria.webp', 1086, 1448, '50% 92%', '50% 92%'] },
+  { chave: 'eternizacao', href: 'eternizacao-de-flores.html', foto: ['eternizacao-principal.webp', 1200, 1600, '48% 68%', '48% 72%'] },
+  { chave: 'oficinas', href: 'oficinas-florais.html', foto: ['oficinas-mesa-criativa.webp', 900, 1600, '50% 42%', '50% 36%'] },
   { chave: 'arranjos', href: 'arranjos-e-presentes.html' }
 ];
-const presentes = [['capim6.webp', 1200, 1600], ['capim4.webp', 1200, 1600], ['oficina-presente-vivo.webp', 1350, 1800]];
+const presentes = [['presentes-box-afeto.webp', 1086, 1448], ['presentes-buque-petit.webp', 1086, 1448], ['presentes-arranjo-vinho.webp', 1086, 1448]];
 ---
-<Base titulo={t.titulo} descricao={t.descricao} og atual="inicio" whatsapp={c.whatsapp.servico} lingua={lingua} arquivo="index.html">
+<Base titulo={t.titulo} descricao={t.descricao} og desperta atual="inicio" whatsapp={c.whatsapp.servico} lingua={lingua} arquivo="index.html">
   <section class="hero-cena" data-hero aria-labelledby="hero-titulo">
     <div class="hero-palco">
       <div class="wrap hero-grade">
@@ -66,12 +67,12 @@ const presentes = [['capim6.webp', 1200, 1600], ['capim4.webp', 1200, 1600], ['o
         const d = sv[chave];
         const lado = i % 2 ? 'order-2 max-820:order-none' : '';
         return (
-          <article class:list={['service grid grid-cols-2 items-center gap-[clamp(32px,7vw,112px)] py-[clamp(40px,6vw,80px)] max-820:grid-cols-1', i > 0 && 'border-t border-line']}>
+          <article class:list={['service grid grid-cols-2 items-center gap-[clamp(32px,7vw,112px)] py-[clamp(32px,4.6vw,64px)] max-820:grid-cols-1', i > 0 && 'border-t border-line']}>
             {foto ? (
-              <figure class:list={['service-media reveal-img', lado]}><img src={r + 'imagens/web/' + foto[0]} alt={d.alt} width={foto[1]} height={foto[2]} loading="lazy"></figure>
+              <figure class:list={['service-media reveal-img', lado]}><img src={r + 'imagens/web/' + foto[0]} {...fonte(r, foto[0], foto[1], '(max-width: 820px) 92vw, 44vw')} alt={d.alt} width={foto[1]} height={foto[2]} loading="lazy" style={foco(foto[3], foto[4])}></figure>
             ) : (
-              <div class:list={['gift-strip service-media rounded-none bg-transparent shadow-none', lado]}>
-                {presentes.map(([arquivo, largura, altura], j) => <figure class="reveal-img" style={j === 1 ? '--d:120ms' : undefined}><img src={r + 'imagens/web/' + arquivo} alt={d.alts[j]} width={largura} height={altura} loading="lazy"></figure>)}
+              <div class:list={['gift-strip gift-strip-pecas service-media rounded-none bg-transparent shadow-none', lado]}>
+                {presentes.map(([arquivo, largura, altura], j) => <figure class="reveal-img" style={j === 1 ? '--d:120ms' : undefined}><img src={r + 'imagens/web/' + arquivo} {...fonte(r, arquivo, largura, '(max-width: 820px) 92vw, 16vw')} alt={d.alts[j]} width={largura} height={altura} loading="lazy"></figure>)}
               </div>
             )}
             <div class="reveal max-w-[31rem]">

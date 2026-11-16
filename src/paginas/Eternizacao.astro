@@ -6,12 +6,14 @@ import Passos from '../components/Passos.astro';
 import Chamada from '../components/Chamada.astro';
 import { linguaValida } from '../i18n/interface.js';
 import { siteDe } from '../i18n/site.js';
+import { fonte, foco } from '../lib/fotos.js';
 import { raizDe } from '../i18n/rotas.js';
 const lingua = linguaValida(Astro.props.lingua);
 const s = siteDe(lingua);
 const t = s.eternizacao;
 const c = s.comum;
 const r = raizDe(lingua);
+const pecas = [['eternizacao-buque-branco.webp', 1254, 1254, '50% 50%', '50% 50%'], ['eternizacao-quadro-verde.webp', 1600, 1600, '50% 52%', '50% 52%'], ['eternizacao-cavalete-colorido.webp', 1200, 1600, '50% 60%', '50% 56%']];
 ---
 <Base titulo={t.titulo} descricao={t.descricao} og atual="eternizacao" whatsapp={c.whatsapp.eternizacao} lingua={lingua} arquivo="eternizacao-de-flores.html">
   <Topo titulo={t.h1} nota={t.nota}>
@@ -19,11 +21,19 @@ const r = raizDe(lingua);
   </Topo>
   <section class="section pt-0">
     <div class="wrap grid grid-cols-2 items-center gap-[clamp(32px,7vw,112px)] max-820:grid-cols-1">
-      <figure class="split-media reveal-img order-2 max-820:order-none"><img src={r + 'imagens/web/capim2.webp'} alt={t.fotoAlt} width="1600" height="2400" loading="lazy"></figure>
+      <figure class="split-media reveal-img order-2 max-820:order-none"><img src={r + 'imagens/web/eternizacao-principal.webp'} {...fonte(r, 'eternizacao-principal.webp', 1200, '(max-width: 820px) 92vw, 44vw')} alt={t.fotoAlt} width="1200" height="1600" loading="lazy" style={foco('48% 68%', '48% 72%')}></figure>
       <div class="reveal [&_p]:max-w-[34rem] [&_p]:text-muted">
         <h2 set:html={t.h2} />
         {t.texto.map((p) => <p>{p}</p>)}
         <ul class="chips">{t.chips.map((x) => <li>{x}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+  <section class="section pt-0" aria-labelledby="pecas-titulo">
+    <div class="wrap">
+      <div class="reveal mb-[clamp(32px,4vw,56px)] max-w-[40rem]"><h2 id="pecas-titulo" set:html={t.galeriaTitulo} /></div>
+      <div class="galeria-pecas galeria-quadrada">
+        {pecas.map(([arquivo, largura, altura, largo, celular], i) => <figure class="reveal" style={i ? `--d:${i * 100}ms` : undefined}><img src={r + 'imagens/web/' + arquivo} {...fonte(r, arquivo, largura, '(max-width: 560px) 92vw, 30vw')} alt={t.galeriaAlts[i]} width={largura} height={altura} loading="lazy" style={foco(largo, celular)}></figure>)}
       </div>
     </div>
   </section>
